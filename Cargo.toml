@@ -1,0 +1,32 @@
+[profile.dev]
+opt-level = "z"
+
+[profile.release]
+opt-level = "z"
+
+[workspace]
+members = ["dnas/*/zomes/coordinator/*", "dnas/*/zomes/integrity/*"]
+resolver = "2"
+
+[workspace.dependencies]
+hdi = "0.3"
+hdk = "0.2"
+serde = "1"
+
+[workspace.dependencies.tables]
+path = "dnas/tables/zomes/coordinator/tables"
+
+[workspace.dependencies.tables_integrity]
+path = "dnas/tables/zomes/integrity/tables"
+
+[workspace.dependencies.profiles]
+path = "dnas/tables/zomes/coordinator/profiles"
+
+[workspace.dependencies.profiles_integrity]
+path = "dnas/tables/zomes/integrity/profiles"
+
+[workspace.dependencies.file_storage]
+path = "dnas/tables/zomes/coordinator/file_storage"
+
+[workspace.dependencies.file_storage_integrity]
+path = "dnas/tables/zomes/integrity/file_storage"
