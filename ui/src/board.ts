@@ -5,6 +5,7 @@ import { type AgentPubKey, type EntryHash, type EntryHashB64, encodeHashToBase64
 import { BoardType } from "./boardList";
 import type { HrlB64WithContext } from "@lightningrodlabs/we-applet";
 import { cloneDeep } from "lodash";
+import { reorder } from "svelte-dnd-list";
 
 export class LabelDef {
     type: uuidv1
@@ -19,7 +20,7 @@ export enum ColumnType {
   Date,
   Email,
   URL,
-  TableLink,
+  // TableLink,
   WeaveAsset,
 }
 
@@ -153,7 +154,12 @@ export interface BoardState {
         type: "set-label-defs";
         labelDefs: LabelDef[];
       }
-      | {
+    | {
+        type: "add-column";
+        name: string;
+        columnType: ColumnType;
+      }
+    | {
         type: "set-column-defs";
         columnDefs: ColumnDef[];
       }
@@ -209,6 +215,9 @@ export interface BoardState {
         break;
       case "add-row":
         feedText = `added a row`
+        break;
+      case "add-column":
+        feedText = `added a column`
         break;
       case "set-label-defs":
         feedText = `updated the labels`
@@ -274,8 +283,14 @@ export interface BoardState {
         case "set-column-defs":
           state.columnDefs = delta.columnDefs
           break;
-        case "add-row": 
+        case "set-column-order":
+          
+          break;
+        case "add-row":
           state.rows.push(delta.row)
+          break;
+        case "add-column":
+          state.columnDefs.push(new ColumnDef(delta.name, delta.columnType))
           break;
         case "update-row-props":
           const rowIdx = state.rows.findIndex(row => row.id === delta.id)

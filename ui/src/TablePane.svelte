@@ -3,8 +3,10 @@
   import type { TablesStore } from "./store";
   import LabelSelector from "./LabelSelector.svelte";
   import type { v1 as uuidv1 } from "uuid";
-  import {Board, type BoardProps, type Feed, type FeedItem, sortedFeedKeys, feedItems, deltaToFeedString, type Cell, Row, ColumnType, type CellId, type RowId } from "./board";
+  import {LabelDef, ColumnDef, Board, type BoardProps, type Feed, type FeedItem, sortedFeedKeys, feedItems, deltaToFeedString, type Cell, Row, ColumnType, type CellId, type RowId } from "./board";
   import EditBoardDialog from "./EditBoardDialog.svelte";
+  import AddColumnModal from "./AddColumnModal.svelte";
+  import EditHeader from "./EditHeader.svelte";
   import CellEdit from "./CellEdit.svelte";
   import Avatar from "./Avatar.svelte";
   import { decodeHashFromBase64, type Timestamp } from "@holochain/client";
@@ -19,6 +21,7 @@
   import AttachmentsList from './AttachmentsList.svelte';
   import AttachmentsDialog from "./AttachmentsDialog.svelte"
   import type { HrlWithContext } from "@lightningrodlabs/we-applet";
+  import DragDropList, { VerticalDropZone, reorder, type DropEvent, HorizontalDropZone } from 'svelte-dnd-list';
   import RowDetailsDrawer from "./RowDetailsDrawer.svelte";
 
   class MyRenderer extends Renderer {
@@ -45,6 +48,9 @@
   });
 
   $: filterOption = null;
+  $: showAddColumnModal = false;
+  $: showEditHeader = false;
+  $: editHeaderIndex = null;
 
   function setFilterOption(newOption) {
     filterOption = newOption;
@@ -60,6 +66,7 @@
   $: participants = activeBoard.participants()
   $: activeHashB64 = store.boardList.activeBoardHashB64;
   $: activeRow = store.boardList.activeRow;
+  // let columnDefs: Array<ColumnDef> = []
 
   $: state = activeBoard.readableState()
   $: orderedRows = Object.entries($state.rows).map(([key,value])=>{return{id:key, cells:value}})
@@ -82,7 +89,7 @@
 
   $: rowDetailsId = openDetails($activeRow)
 
-  let width = 300
+  let width = 100
 
   let prevHash = ""
 
@@ -124,6 +131,17 @@
     const attachment: HrlWithContext = { hrl: [store.dnaHash, activeBoard.hash], context: "" }
     store.weClient?.hrlToClipboard(attachment)
   }
+
+  const onDropColumnDefs = ({ detail: { from, to } }: CustomEvent<DropEvent>) => {
+    if (!to || from === to || from.dropZoneID !== "columnDefs") {
+      return;
+    }
+
+    let columnDefs = cloneDeep($state.columnDefs)
+    columnDefs = reorder(columnDefs, from.index, to.index)
+    activeBoard.requestChanges([{ type: "set-column-defs",  "columnDefs": columnDefs}]);
+  }
+
   let feedHidden = true
   let rowDetailsDrawer
 </script>
@@ -243,14 +261,103 @@
   {#if $state}
     <div class="data-table">
       <div class="header-row">
+        <div style="width:22px; cursor: pointer; border-right: 1px dashed;">
+          <!-- <sl-button
+            on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
+            circle size=small> -->
+            <div style="display:flex; align-items: center; justify-content: center; width:18px; height:18px; cursor: pointer; margin: 2px;"
+              on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}}
+            >
+            <!-- <SvgIcon icon="expand" size="16px"/> -->
+          </div>
+          <!-- </sl-button> -->
+          </div>
+      <DragDropList
+        id="columnDefs"
+        itemSize={width}
+        type={HorizontalDropZone}
+        itemCount={$state.columnDefs.length}
+        on:drop={onDropColumnDefs}
+        let:index
+        let:drag
+      >
+        {@const isDragging = drag?.sourceIndex === index}
+        <div class="header-cell" >
+          {$state.columnDefs[index].name}
+          <span class="header-caret"
+          on:click={()=>{
+            editHeaderIndex = index;
+            showEditHeader = true;
+          }}
+          >
+            &#9660;
+          </span>
+
+        </div>
+        {#if showEditHeader && editHeaderIndex == index}
+          <EditHeader bind:showEditHeader {activeBoard} {editHeaderIndex}></EditHeader>
+        {/if}
+        {#if isDragging}
+          {#each $state.rows as row}
+            <div class="data-cell" style="width:{width}px; background-color: #f0f0f0; border-right: 1px dashed; border-bottom: 1px dashed;">
+              {row.cells[$state.columnDefs[index].id]?.value}
+            </div>
+          {/each}
+        {/if}
+      </DragDropList>
+        <!-- <sl-dialog label="Edit Header" open={showEditHeader} onSlOverlayDismiss={() => showEditHeader = false}>
+          <sl-input label="Name" value={editHeaderIndex} on:input={(e)=>{activeBoard.requestChanges([{ type: "set-column-name", columnId: $state.columnDefs[editHeaderIndex].id, name:e.target.value}])}}></sl-input>
+          <sl-button on:click={()=>{
+            showEditHeader = false;
+          }}>Save</sl-button>
+        </sl-dialog> -->
+      <div style="width:22px; cursor: pointer;"
+        on:click={()=>{
+          showAddColumnModal = true;
+        }}
+      >
+      <div style="display:flex; align-items: center; justify-content: center; width:18px; height:18px; cursor: pointer; margin: 2px;">
+        <SvgIcon icon=faPlus size=10/>
+      </div>
+      
+      </div>
+      {#if showAddColumnModal}
+        <AddColumnModal bind:showAddColumnModal activeBoard={activeBoard} />
+      {/if}
+    </div>
+
+      <!-- <div class="header-row">
         {#each $state.columnDefs as def}
           <div class="header-cell" style="width:{width}px">
             {def.name}
           </div>
         {/each}
-      </div>
+        <div class="header-cell" style="width:40px; cursor: pointer;"
+          on:click={()=>{
+            showAddColumnModal = true;
+          }}
+        >
+        <sl-button size="small" circle style="margin-left:3px">
+          <SvgIcon icon=faPlus size=10/>
+        </sl-button>
+        </div>
+        {#if showAddColumnModal}
+          <AddColumnModal bind:showAddColumnModal activeBoard={activeBoard} />
+        {/if}
+      </div> -->
       {#each $state.rows as row, y}
         <div class="data-row">
+          <div style="width:22px; cursor: pointer; border-right: 1px dashed">
+            <!-- <sl-button
+              on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
+              circle size=small> -->
+              <div style="display:flex; align-items: center; justify-content: center; width:18px; height:18px; cursor: pointer; margin: 2px;"
+                on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}}
+              >
+              <SvgIcon icon="expand" size="16px"/>
+            </div>
+            <!-- </sl-button> -->
+            </div>
           {#each $state.columnDefs as def, x}
           {@const cell = row.cells[def.id]}
             {#if editingCell && editingCell.rowId == row.id && editingCell.columnId == def.id}
@@ -290,12 +397,10 @@
               </div>
             {/if}
           {/each}
-          <sl-button
-            on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
-            circle size=small><SvgIcon icon="expand" size="20px"/></sl-button>
+          
         </div>
       {/each}
-      <sl-button size="small" circle style="margin-left:3px" on:click={async ()=>{
+      <div size="small" circle style="margin-left:3px; cursor: pointer;" on:click={async ()=>{
           const cells = {}
           //$state.columnDefs.forEach(def=>cells[def.id]={value: null, attachments:[]})
           const row = new Row(store.myAgentPubKeyB64, cells)
@@ -303,7 +408,7 @@
 
         }} >          
           <SvgIcon icon=faPlus size=10/>
-      </sl-button>
+      </div>
     </div>
 
   {/if}
@@ -315,23 +420,43 @@
   }
   .header-row {
     display:flex;
-    border-bottom: 1px solid;
+    /* border-bottom: 1px solid; */
+    width: fit-content;
   }
   .header-cell {
     font-weight: bold;
     color: black;
+    background-color: #ededed;
   }
+
+  .header-caret {
+    position: absolute;
+    right: 5px;
+  }
+
+  .long-header {
+    /* transparent background */
+    background: rgb(213, 213, 213);
+    /* background: linear-gradient(360deg, rgba(189, 209, 230, 0) 0%, rgba(185, 185, 185, 0.81) 100%); */
+    border: 0 !important;
+  }
+ 
   .data-row {
     display:flex;
-    border-bottom: 1px dashed;
+    /* border-bottom: 1px dashed; */
+    width: fit-content;
   }
   .data-cell, .header-cell {
     padding-right: 2px;
     padding-left: 2px;
     border-right: 1px dashed;
+    border-bottom: 1px dashed;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .data-cell {
-  }
+
+  /* .data-cell {
+  } */
 
   .board {
     display: flex;

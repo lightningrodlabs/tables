@@ -96,6 +96,7 @@
     </div>
 {:else }
     Unimplemented Type!!
+    {type}
 {/if}
 
 

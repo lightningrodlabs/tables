@@ -52,6 +52,7 @@
           text = state.name
           nameInput.value = text
           labelDefs = cloneDeep(state.labelDefs)
+          console.log("columnDefs", state.columnDefs)
           columnDefs = cloneDeep(state.columnDefs)
           props = state.props ? cloneDeep(state.props) : {bgUrl:""}
       } else {
