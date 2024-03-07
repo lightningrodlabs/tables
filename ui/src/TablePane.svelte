@@ -294,13 +294,10 @@
           </span>
 
         </div>
-        {#if showEditHeader && editHeaderIndex == index}
-          <EditHeader bind:showEditHeader {activeBoard} {editHeaderIndex}></EditHeader>
-        {/if}
         {#if isDragging}
           {#each $state.rows as row}
             <div class="data-cell" style="width:{width}px; background-color: #f0f0f0; border-right: 1px dashed; border-bottom: 1px dashed;">
-              {row.cells[$state.columnDefs[index].id]?.value}
+              {row.cells[$state.columnDefs[index].id]?.value || "null"}
             </div>
           {/each}
         {/if}
@@ -326,6 +323,9 @@
       {/if}
     </div>
 
+    {#if showEditHeader}
+      <EditHeader bind:showEditHeader {activeBoard} {editHeaderIndex}></EditHeader>
+    {/if}
       <!-- <div class="header-row">
         {#each $state.columnDefs as def}
           <div class="header-cell" style="width:{width}px">
@@ -400,22 +400,58 @@
           
         </div>
       {/each}
-      <div size="small" circle style="margin-left:3px; cursor: pointer;" on:click={async ()=>{
-          const cells = {}
-          //$state.columnDefs.forEach(def=>cells[def.id]={value: null, attachments:[]})
-          const row = new Row(store.myAgentPubKeyB64, cells)
-          await activeBoard.requestChanges([{ type: "add-row",  row}]);
 
-        }} >          
+      
+      <div size="small" circle style="margin-left:3px; cursor: pointer;" on:click={async ()=>{
+        const cells = {}
+        //$state.columnDefs.forEach(def=>cells[def.id]={value: null, attachments:[]})
+        const row = new Row(store.myAgentPubKeyB64, cells)
+        await activeBoard.requestChanges([{ type: "add-row",  row}]);
+        
+      }} >          
           <SvgIcon icon=faPlus size=10/>
+        </div>
       </div>
-    </div>
+      
+      <!-- summaries row -->
+      <div class="data-row">
+        <div style="width:22px; cursor: pointer; border-right: 1px dashed">
+        </div>
+        {#each $state.columnDefs as def, x}
+          <div class="data-cell" style="width:{width}px; background-color: gray; color: white;">
+            {#if def.type == ColumnType.Number}
+            {@const sum = Object.values($state.rows).reduce((acc, row) => {
+              const cell = row.cells[def.id];
+              if (cell && cell.value) {
+                return acc + Number(cell.value);
+              }
+              return acc;
+            }, 0)}
+            {sum}
+            {/if}
+            <!-- {#if def.type == ColumnType.WeaveAsset}
+              {#if $state.summaries[def.id]}
+                <AttachmentsList attachments={$state.summaries[def.id]} allowDelete={false}/>
+              {:else}
+                null
+              {/if}
+            {:else}
+              {#if $state.summaries[def.id]}
+                {$state.summaries[def.id]}
+              {:else}
+                null
+              {/if}
+            {/if} -->
+          </div>
+        {/each}
+      </div>
 
   {/if}
   <div class="bottom-fade"></div>
 </div>
 <style>
   .data-table {
+    min-height: 200px;
     border: 1px solid;
   }
   .header-row {

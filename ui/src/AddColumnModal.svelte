@@ -2,7 +2,7 @@
   import { getContext, onMount } from "svelte";
   import type { TablesStore } from "./store";
   import LabelSelector from "./LabelSelector.svelte";
-  import type { v1 as uuidv1 } from "uuid";
+  import { v1 as uuidv1 } from "uuid";
   import {LabelDef, ColumnDef, Board, type BoardProps, type Feed, type FeedItem, sortedFeedKeys, feedItems, deltaToFeedString, type Cell, Row, ColumnType, type CellId, type RowId } from "./board";
   import EditBoardDialog from "./EditBoardDialog.svelte";
   import CellEdit from "./CellEdit.svelte";
@@ -35,14 +35,17 @@
 
   function addColumn() {
     // const newColumn = new ColumnDef(``,columnDef.type)
+    if (columnDef.name == "") {
+      columnDef.name = `Field ${activeBoard.state().columnDefs.length + 1}`;
+    }
     activeBoard.requestChanges([{ type: "add-column", name: columnDef.name, columnType: columnDef.type}]);
   }
 
-  // onMount() {
-  //   if (activeBoard) {
-  //     columnDef.id = uuidv1();
-  //   }
-  // }
+  onMount(() => {
+    if (activeBoard) {
+      columnDef.id = uuidv1();
+    }
+  });
 
 </script>
 
@@ -51,6 +54,9 @@
 
 <div class="modal">
   <div class="modal-content">
+    <div class="form-group">
+      <h2>Add a field</h2>
+    </div>
     <div class="form-group">
       <input
         type="text"
@@ -61,7 +67,7 @@
       />
     </div>
     <div class="form-group">
-      <label for="column-type">Column Type</label>
+      <label for="column-type">Type</label>
       <select
         class="form-control"
         id="column-type"
@@ -72,25 +78,27 @@
         {/each}
       </select>
     </div>
-    <button
-      type="button"
-      class="btn btn-secondary"
-      on:click={() => {showAddColumnModal = false}}
-    >
-      Cancel
-    </button>
-    <button
-      type="button"
-      class="btn btn-primary"
-      on:click={() => {
-        addColumn();
-        activeBoard = null;
-        showAddColumnModal = false;
-      }}
-    >
-      
-      Add Column
-    </button>
+    <div class="form-group">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        on:click={() => {showAddColumnModal = false}}
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        on:click={() => {
+          addColumn();
+          activeBoard = null;
+          showAddColumnModal = false;
+        }}
+      >
+        
+        Add Column
+      </button>
+    </div>
   </div>
 </div>
 
@@ -98,6 +106,11 @@
 
 
 <style>
+  .form-group {
+    text-align: center;
+    margin-bottom: 0.2em;
+  }
+
   .modal {
     /* display: none;
     position: fixed;
@@ -114,35 +127,38 @@
     padding: 0;
   }
 
+  .modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  
   .modal-content {
-    /* background-color: #fefefe;
+    background-color: #fefefe;
     position: static;
     left: 0;
     margin: 15% auto;
     padding: 20px;
     border: 1px solid #888;
     width: fit-content;
-    max-width: 80%; */
-
-    /* display: block;
-    position: fixed;
-    margin: 0px;
-    right: 0;
-    width: fit-content;
-    z-index: 999999999999999;
-    margin-top: 2em;
-    margin-right: 2em; */
+    max-width: 80%;
   }
-
-  .modal-content {
+  
+  /* .modal-content {
     background-color: #fefefe;
     position: absolute;
     top: 22px;
-    left: -22px;
+    left: -202px;
     padding: 14px;
     border: 1px solid #888;
     width: fit-content;
-  }
+  } */
 
   .close {
     color: #aaa;

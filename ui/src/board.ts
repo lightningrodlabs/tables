@@ -138,6 +138,10 @@ export interface BoardState {
         props: RowProps;
       }
     | {
+      type: "delete-row";
+      id: RowId,
+    }
+    | {
         type: "set-name";
         name: string;
       }
@@ -216,6 +220,9 @@ export interface BoardState {
       case "add-row":
         feedText = `added a row`
         break;
+      case "delete-row":
+        feedText = `deleted a row`
+        break;
       case "add-column":
         feedText = `added a column`
         break;
@@ -288,6 +295,12 @@ export interface BoardState {
           break;
         case "add-row":
           state.rows.push(delta.row)
+          break;
+        case "delete-row":
+          const idx = state.rows.findIndex(row => row.id === delta.id)
+          if (idx >= 0) {
+            state.rows.splice(idx,1)
+          }
           break;
         case "add-column":
           state.columnDefs.push(new ColumnDef(delta.name, delta.columnType))
