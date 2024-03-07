@@ -3,7 +3,7 @@
   import type { TablesStore } from "./store";
   import LabelSelector from "./LabelSelector.svelte";
   import { v1 as uuidv1 } from "uuid";
-  import {LabelDef, ColumnDef, Board, type BoardProps, type Feed, type FeedItem, sortedFeedKeys, feedItems, deltaToFeedString, type Cell, Row, ColumnType, type CellId, type RowId } from "./board";
+  import {LabelDef, ColumnDef, Board, type BoardProps, type Feed, type FeedItem, sortedFeedKeys, feedItems, deltaToFeedString, type Cell, Row, ColumnType, type CellId, type RowId, SumType } from "./board";
   import EditBoardDialog from "./EditBoardDialog.svelte";
   import CellEdit from "./CellEdit.svelte";
   import Avatar from "./Avatar.svelte";
@@ -31,6 +31,7 @@
     id: "",
     name: "",
     type: ColumnType.String,
+    sumType: SumType.None
   };
 
   function addColumn() {
@@ -38,7 +39,7 @@
     if (columnDef.name == "") {
       columnDef.name = `Field ${activeBoard.state().columnDefs.length + 1}`;
     }
-    activeBoard.requestChanges([{ type: "add-column", name: columnDef.name, columnType: columnDef.type}]);
+    activeBoard.requestChanges([{ type: "add-column", name: columnDef.name, columnType: columnDef.type, sumType: columnDef.sumType}]);
   }
 
   onMount(() => {

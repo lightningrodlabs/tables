@@ -24,9 +24,27 @@ export enum ColumnType {
   WeaveAsset,
 }
 
+export enum SumType {
+  None,
+  Sum,
+  Count,
+  Average,
+  Max,
+  Min,
+  Median,
+  Mode,
+  Range,
+  StDeviation,
+  Variance,
+  Percentile,
+  Filled,
+  Empty,
+  Unique,
+}
+
 export class ColumnDef {
   id: ColumnId
-  constructor(public name: string, public type: ColumnType){
+  constructor(public name: string, public type: ColumnType, public sumType: SumType){
       this.id = uuidv1()
   }
 }
@@ -162,6 +180,7 @@ export interface BoardState {
         type: "add-column";
         name: string;
         columnType: ColumnType;
+        sumType: SumType;
       }
     | {
         type: "set-column-defs";
@@ -303,7 +322,7 @@ export interface BoardState {
           }
           break;
         case "add-column":
-          state.columnDefs.push(new ColumnDef(delta.name, delta.columnType))
+          state.columnDefs.push(new ColumnDef(delta.name, delta.columnType, delta.sumType))
           break;
         case "update-row-props":
           const rowIdx = state.rows.findIndex(row => row.id === delta.id)

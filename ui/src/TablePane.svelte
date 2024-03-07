@@ -3,12 +3,13 @@
   import type { TablesStore } from "./store";
   import LabelSelector from "./LabelSelector.svelte";
   import type { v1 as uuidv1 } from "uuid";
-  import {LabelDef, ColumnDef, Board, type BoardProps, type Feed, type FeedItem, sortedFeedKeys, feedItems, deltaToFeedString, type Cell, Row, ColumnType, type CellId, type RowId } from "./board";
+  import {LabelDef, ColumnDef, Board, type BoardProps, type Feed, type FeedItem, sortedFeedKeys, feedItems, deltaToFeedString, type Cell, Row, ColumnType, type CellId, type RowId, SumType } from "./board";
   import EditBoardDialog from "./EditBoardDialog.svelte";
   import AddColumnModal from "./AddColumnModal.svelte";
   import EditHeader from "./EditHeader.svelte";
   import CellEdit from "./CellEdit.svelte";
   import Avatar from "./Avatar.svelte";
+  import SummaryRow from "./SummaryRow.svelte";
   import { decodeHashFromBase64, type Timestamp } from "@holochain/client";
   import { cloneDeep, isEqual } from "lodash";
   import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
@@ -89,7 +90,7 @@
 
   $: rowDetailsId = openDetails($activeRow)
 
-  let width = 100
+  let width = 200
 
   let prevHash = ""
 
@@ -362,7 +363,6 @@
           {@const cell = row.cells[def.id]}
             {#if editingCell && editingCell.rowId == row.id && editingCell.columnId == def.id}
               <div class="data-cell editing" style="width:{width}px">
-                
                   <CellEdit
                     width={width}
                     type={def.type} 
@@ -412,40 +412,7 @@
           <SvgIcon icon=faPlus size=10/>
         </div>
       </div>
-      
-      <!-- summaries row -->
-      <div class="data-row">
-        <div style="width:22px; cursor: pointer; border-right: 1px dashed">
-        </div>
-        {#each $state.columnDefs as def, x}
-          <div class="data-cell" style="width:{width}px; background-color: gray; color: white;">
-            {#if def.type == ColumnType.Number}
-            {@const sum = Object.values($state.rows).reduce((acc, row) => {
-              const cell = row.cells[def.id];
-              if (cell && cell.value) {
-                return acc + Number(cell.value);
-              }
-              return acc;
-            }, 0)}
-            {sum}
-            {/if}
-            <!-- {#if def.type == ColumnType.WeaveAsset}
-              {#if $state.summaries[def.id]}
-                <AttachmentsList attachments={$state.summaries[def.id]} allowDelete={false}/>
-              {:else}
-                null
-              {/if}
-            {:else}
-              {#if $state.summaries[def.id]}
-                {$state.summaries[def.id]}
-              {:else}
-                null
-              {/if}
-            {/if} -->
-          </div>
-        {/each}
-      </div>
-
+      <SummaryRow activeBoard={activeBoard} width={width} />
   {/if}
   <div class="bottom-fade"></div>
 </div>

@@ -150,7 +150,7 @@
 
     {#if store.weClient}
       <div style="display:flex; flex-wrap:wrap; align-items: center; margin-bottom:10px;">
-        <div style="margin-left:10px; margin-right:10px;">
+        <div style="margin-left:20px; margin-right:10px;">
           <button title="Manage Record Attachments" class="attachment-button" 
             on:click={()=>attachmentsDialog.open(row.props.attachments,"row")} >          
             <SvgIcon icon="link" size="16px"/>
@@ -167,6 +167,10 @@
   </div>
 </div>
 <style>
+  .row-fields {
+    margin: 20px;
+  }
+
   .card-editor {
     display: flex;
     flex-basis: 100%;
