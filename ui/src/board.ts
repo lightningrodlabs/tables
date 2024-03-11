@@ -20,6 +20,7 @@ export enum ColumnType {
   Date,
   Email,
   URL,
+  User,
   // TableLink,
   WeaveAsset,
 }

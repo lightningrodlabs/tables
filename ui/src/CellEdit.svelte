@@ -8,6 +8,10 @@
     import { createEventDispatcher } from "svelte";
     import AttachmentsList from './AttachmentsList.svelte';
     import type { TablesStore } from './store';
+
+    import "@holochain-open-dev/profiles/dist/elements/search-agent.js";
+    import "@holochain-open-dev/profiles/dist/elements/profiles-context.js";
+
   import SvgIcon from './SvgIcon.svelte';
 
     const dispatch = createEventDispatcher()
@@ -18,6 +22,7 @@
     export let cell:Cell
     export let width
 
+    let searchAgentOpen = false;
     let origValue = ""
     let closing = ""
 
@@ -74,6 +79,34 @@
         }
     }}
 />
+{:else if type==ColumnType.User}
+    <div style="display:flex"
+                      >
+        {#if value}
+            <div style="display:flex;align-items:center">
+                <img src={value.avatar} style="border-radius:50%;width:20px;height:20px;margin-right:5px"/>
+                {value.name}
+            </div>
+        {/if}
+        <button title="Search For User" class="attachment-button" style="margin-right:10px" on:click={
+            ()=>{
+                searchAgentOpen = !searchAgentOpen
+            }
+        } >          
+            <SvgIcon icon="faUser" size="16px"/>
+        </button>
+        {#if searchAgentOpen}
+        <!-- <profiles-context store={store.profilesStore}> -->
+        <search-agent
+            on:agent-selected={(e)=>{
+                console.log("Agent selected", e.detail)
+                dispatch("save", e.detail)
+                searchAgentOpen = false
+            }}
+        ></search-agent>
+        <!-- </profiles-context> -->
+        {/if}
+    </div>
 {:else if type==ColumnType.WeaveAsset}
     <div style="display:flex"
                       >
