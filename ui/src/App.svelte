@@ -14,7 +14,7 @@
   import "@holochain-open-dev/profiles/dist/elements/create-profile.js";
   import LogoIcon from "./icons/LogoIcon.svelte";
   import { appletServices } from './we';
-
+  
   const appId = import.meta.env.VITE_APP_ID ? import.meta.env.VITE_APP_ID : 'tables'
   const roleName = 'tables'
   const appPort = import.meta.env.VITE_APP_PORT ? import.meta.env.VITE_APP_PORT : 8888

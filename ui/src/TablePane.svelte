@@ -161,7 +161,8 @@
           <SvgIcon icon=faClose size="16px"/>
         </sl-button>
         <sl-dropdown class="board-options board-menu" skidding=15 hoist>
-          <sl-button slot="trigger"   class="board-button settings" caret>{$state.name}</sl-button>
+          <sl-button slot="trigger"   class="board-button settings">{$state.name}</sl-button>
+          <!-- <sl-button slot="trigger"   class="board-button settings" caret>{$state.name}</sl-button>
           <sl-menu className="settings-menu">
             <sl-menu-item on:click={()=> editBoardDialog.open(cloneDeep(activeBoard.hash))} class="board-settings" >
                 <SvgIcon icon="faCog"  style="background: transparent; opacity: .5; position: relative; top: -2px;" size="14px"/> <span>Settings</span>
@@ -177,7 +178,7 @@
             <sl-menu-item  on:click={leaveBoard} class="leave-board" >
                 <SvgIcon icon="faArrowTurnDown" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" /> <span>Leave Table</span>
             </sl-menu-item>
-          </sl-menu>
+          </sl-menu> -->
         </sl-dropdown>
 
         {#if store.weClient}
