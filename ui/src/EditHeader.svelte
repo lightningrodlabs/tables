@@ -127,7 +127,9 @@
           bind:value={columnType}
         >
           {#each columnTypes as type}
-            <option value={columnTypes.indexOf(type)}>{type}</option>
+            {#if type !== "TableLink"}
+              <option value={columnTypes.indexOf(type)}>{type}</option>
+            {/if}
           {/each}
         </select>
       </div>
