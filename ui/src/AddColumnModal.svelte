@@ -20,9 +20,24 @@
   import AttachmentsDialog from "./AttachmentsDialog.svelte"
   import type { HrlWithContext } from "@lightningrodlabs/we-applet";
   import RowDetailsDrawer from "./RowDetailsDrawer.svelte";
+    import BoardMenuItem from "./BoardMenuItem.svelte";
+    import { BoardType } from "./boardList";
+    import SelectColumn from "./SelectColumn.svelte";
+    import { encodeHashToBase64 } from "@holochain/client";
 
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
+  $: activeBoards = store.boardList.activeBoardHashes
+  let selectedBoard = null;
+  $: selectedBoard;
+
+  let keyColumn = null;
+  $: keyColumn;
+  let displayColumn = null;
+  $: displayColumn;
+
+  $: encodedBoard = selectedBoard ? encodeHashToBase64(selectedBoard) : null
+
 
   export let showAddColumnModal = false;
   export let activeBoard: Board
@@ -30,8 +45,9 @@
   let columnDef: ColumnDef = {
     id: "",
     name: "",
+    unique: false,
     type: ColumnType.String,
-    sumType: SumType.None
+    sumType: SumType.None,
   };
 
   function addColumn() {
@@ -39,11 +55,12 @@
     if (columnDef.name == "") {
       columnDef.name = `Field ${activeBoard.state().columnDefs.length + 1}`;
     }
-    activeBoard.requestChanges([{ type: "add-column", name: columnDef.name, columnType: columnDef.type, sumType: columnDef.sumType}]);
+    activeBoard.requestChanges([{ type: "add-column", name: columnDef.name, columnType: columnDef.type, sumType: columnDef.sumType, unique: columnDef.unique, linkedTable: encodedBoard, keyColumn: keyColumn, displayColumn: displayColumn}]);
   }
 
   onMount(() => {
     if (activeBoard) {
+      console.log(store.boardList.activeBoardHashes)
       columnDef.id = uuidv1();
     }
   });
@@ -67,7 +84,7 @@
         bind:value={columnDef.name}
       />
     </div>
-    <div class="form-group">
+    <div>
       <label for="column-type">Type</label>
       <select
         class="form-control"
@@ -77,7 +94,44 @@
         {#each columnTypes as type}
           <option value={columnTypes.indexOf(type)}>{type}</option>
         {/each}
+
       </select>
+    </div>
+    <div>
+      {#if columnDef.type == ColumnType.TableLink}
+        <label for="column-type">Table</label>
+        <!-- {JSON.stringify(boardData.value.latestState.name)} -->
+        {#if $activeBoards.status == "complete" && $activeBoards.value.length > 0}
+          <select
+            class="form-control"
+            id="column-type"
+            bind:value={selectedBoard}
+          >
+            <!-- select board -->
+            {#each $activeBoards.value as board}
+              <option value={board}>
+                <BoardMenuItem boardType={BoardType.archived} boardHash={board}></BoardMenuItem>
+              </option>
+            {/each}
+          </select>
+          {#if selectedBoard}
+          <div>
+            <label for="column">Key field</label>
+            <SelectColumn boardHash={selectedBoard} uniqueOnly={true} bind:selectedColumn={keyColumn}></SelectColumn>
+          </div>
+          <div>
+            <label for="column">Display field</label>
+            <SelectColumn boardHash={selectedBoard} bind:selectedColumn={displayColumn}></SelectColumn>
+          </div>
+          {/if}
+        {/if}
+      {:else}
+        <!-- unique? checkbox -->
+        <div>
+          <input type="checkbox" id="unique" name="unique" value="unique" bind:checked={columnDef.unique}>
+          <label for="column-type">Values must be unique</label>
+        </div>
+      {/if}
     </div>
     <div class="form-group">
       <button

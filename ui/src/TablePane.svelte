@@ -24,6 +24,7 @@
   import type { HrlWithContext } from "@lightningrodlabs/we-applet";
   import DragDropList, { VerticalDropZone, reorder, type DropEvent, HorizontalDropZone } from 'svelte-dnd-list';
   import RowDetailsDrawer from "./RowDetailsDrawer.svelte";
+  import CellDisplay from "./CellDisplay.svelte";
 
   class MyRenderer extends Renderer {
     override link(href: string, title : string, text: string) {
@@ -161,12 +162,12 @@
           <SvgIcon icon=faClose size="16px"/>
         </sl-button>
         <sl-dropdown class="board-options board-menu" skidding=15 hoist>
-          <sl-button slot="trigger"   class="board-button settings">{$state.name}</sl-button>
-          <!-- <sl-button slot="trigger"   class="board-button settings" caret>{$state.name}</sl-button>
+          <!-- <sl-button slot="trigger"   class="board-button settings">{$state.name}</sl-button> -->
+          <sl-button slot="trigger"   class="board-button settings" caret>{$state.name}</sl-button>
           <sl-menu className="settings-menu">
-            <sl-menu-item on:click={()=> editBoardDialog.open(cloneDeep(activeBoard.hash))} class="board-settings" >
+            <!-- <sl-menu-item on:click={()=> editBoardDialog.open(cloneDeep(activeBoard.hash))} class="board-settings" >
                 <SvgIcon icon="faCog"  style="background: transparent; opacity: .5; position: relative; top: -2px;" size="14px"/> <span>Settings</span>
-            </sl-menu-item>
+            </sl-menu-item> -->
             <sl-menu-item on:click={() => exportBoard($state)} title="Export" class="board-export" >
               <SvgIcon icon="faFileExport"  style="background: transparent; opacity: .5; position: relative; top: -2px;" size="14px" /> <span>Export</span>
             </sl-menu-item>
@@ -178,7 +179,7 @@
             <sl-menu-item  on:click={leaveBoard} class="leave-board" >
                 <SvgIcon icon="faArrowTurnDown" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" /> <span>Leave Table</span>
             </sl-menu-item>
-          </sl-menu> -->
+          </sl-menu>
         </sl-dropdown>
 
         {#if store.weClient}
@@ -286,6 +287,9 @@
         {@const isDragging = drag?.sourceIndex === index}
         <div class="header-cell" >
           {$state.columnDefs[index].name}
+          {#if $state.columnDefs[index].unique}
+            *
+          {/if}
           <span class="header-caret"
           on:click={()=>{
             editHeaderIndex = index;
@@ -362,12 +366,17 @@
             </div>
           {#each $state.columnDefs as def, x}
           {@const cell = row.cells[def.id]}
-            {#if editingCell && editingCell.rowId == row.id && editingCell.columnId == def.id}
+          <!-- column values -->
+          {@const cells = $state.rows.map(row=>row.cells[def.id])}
+          {#if editingCell && editingCell.rowId == row.id && editingCell.columnId == def.id}
               <div class="data-cell editing" style="width:{width}px">
                   <CellEdit
+                    unique={def.unique}
+                    columnDef={def}
                     width={width}
-                    type={def.type} 
+                    type={def.type}
                     cell={cell}
+                    allColumnCells={cells}
                     on:cancel={()=>editingCell=undefined}
                     on:save={(e)=>{
                       activeBoard.requestChanges([{ type: "set-cell", cellId: {rowId: row.id, columnId: def.id}, value:e.detail }]);
@@ -382,15 +391,7 @@
                 }}
               >
                 {#if cell}
-                  {#if def.type == ColumnType.WeaveAsset}
-                    {#if cell.value}
-                      <AttachmentsList attachments={[cell.value]} allowDelete={false}/>
-                    {:else}
-                      null
-                    {/if}
-                  {:else}
-                    {cell.value}
-                  {/if}
+                  <CellDisplay {cell} {def} />                  
                 {:else}
                 null
                 {/if}

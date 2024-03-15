@@ -21,7 +21,7 @@ export enum ColumnType {
   Email,
   URL,
   User,
-  // TableLink,
+  TableLink,
   WeaveAsset,
 }
 
@@ -45,7 +45,7 @@ export enum SumType {
 
 export class ColumnDef {
   id: ColumnId
-  constructor(public name: string, public type: ColumnType, public sumType: SumType){
+  constructor(public name: string, public type: ColumnType, public sumType: SumType, public unique: boolean, public linkedTable?: EntryHashB64, public keyColumn?: ColumnId, public displayColumn?: ColumnId){
       this.id = uuidv1()
   }
 }
@@ -182,6 +182,10 @@ export interface BoardState {
         name: string;
         columnType: ColumnType;
         sumType: SumType;
+        unique?: boolean;
+        linkedTable?: EntryHashB64;
+        keyColumn?: ColumnId;
+        displayColumn?: ColumnId;
       }
     | {
         type: "set-column-defs";
@@ -323,7 +327,8 @@ export interface BoardState {
           }
           break;
         case "add-column":
-          state.columnDefs.push(new ColumnDef(delta.name, delta.columnType, delta.sumType))
+          console.log("ADDING COLUMN", delta)
+          state.columnDefs.push(new ColumnDef(delta.name, delta.columnType, delta.sumType, delta.unique, delta.linkedTable, delta.keyColumn, delta.displayColumn))
           break;
         case "update-row-props":
           const rowIdx = state.rows.findIndex(row => row.id === delta.id)

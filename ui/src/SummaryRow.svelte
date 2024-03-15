@@ -157,7 +157,7 @@
             <option value={SumType.Empty}>Percent Empty</option>
             <option value={SumType.Unique}>Percent Unique</option>
           </select>
-        {:else if def.type == ColumnType.String || def.type == ColumnType.Date || def.type == ColumnType.Email || def.type == ColumnType.WeaveAsset || def.type == ColumnType.Url}
+        {:else if def.type == ColumnType.String || def.type == ColumnType.Date || def.type == ColumnType.Email || def.type == ColumnType.WeaveAsset || def.type == ColumnType.TableLink}
           <select
             style="width: 17px;"
             bind:value={def.sumType}
@@ -177,6 +177,8 @@
               <option value={SumType.Max}>Max</option>
             {/if}
           </select>
+        {:else}
+          
         {/if}
       </div>
     </div>

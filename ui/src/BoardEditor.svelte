@@ -142,7 +142,7 @@
               <sl-option value={ColumnType.Email}>Email</sl-option>
               <sl-option value={ColumnType.URL}>URL</sl-option>
               <sl-option value={ColumnType.User}>User</sl-option>
-              <!-- <sl-option value={ColumnType.TableLink}>Table Link</sl-option> -->
+              <sl-option value={ColumnType.TableLink}>Table Link</sl-option>
               <sl-option value={ColumnType.WeaveAsset}>Weave Asset</sl-option>
             </sl-select>
           </div>
