@@ -25,6 +25,7 @@
   import DragDropList, { VerticalDropZone, reorder, type DropEvent, HorizontalDropZone } from 'svelte-dnd-list';
   import RowDetailsDrawer from "./RowDetailsDrawer.svelte";
   import CellDisplay from "./CellDisplay.svelte";
+  import DataView from "./DataView.svelte";
 
   class MyRenderer extends Renderer {
     override link(href: string, title : string, text: string) {
@@ -53,6 +54,7 @@
   $: showAddColumnModal = false;
   $: showEditHeader = false;
   $: editHeaderIndex = null;
+  $: dataView = false;
 
   function setFilterOption(newOption) {
     filterOption = newOption;
@@ -165,9 +167,9 @@
           <!-- <sl-button slot="trigger"   class="board-button settings">{$state.name}</sl-button> -->
           <sl-button slot="trigger"   class="board-button settings" caret>{$state.name}</sl-button>
           <sl-menu className="settings-menu">
-            <!-- <sl-menu-item on:click={()=> editBoardDialog.open(cloneDeep(activeBoard.hash))} class="board-settings" >
+            <sl-menu-item on:click={()=> editBoardDialog.open(cloneDeep(activeBoard.hash))} class="board-settings" >
                 <SvgIcon icon="faCog"  style="background: transparent; opacity: .5; position: relative; top: -2px;" size="14px"/> <span>Settings</span>
-            </sl-menu-item> -->
+            </sl-menu-item>
             <sl-menu-item on:click={() => exportBoard($state)} title="Export" class="board-export" >
               <SvgIcon icon="faFileExport"  style="background: transparent; opacity: .5; position: relative; top: -2px;" size="14px" /> <span>Export</span>
             </sl-menu-item>
@@ -211,7 +213,15 @@
             {/if}
           </div>
         {/if}
-  
+        <sl-menu-item  on:click={() => {dataView = !dataView}} class="leave-board" >
+          {#if dataView}
+            <SvgIcon icon="faEdit" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" />
+            <span>Table View</span>
+          {:else}
+            <SvgIcon icon="faClone" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" />
+            <span>Data View</span>
+          {/if}
+        </sl-menu-item>
       {/if}
     </div>
     <div class="filter-by">
@@ -262,6 +272,9 @@
     </div>
   </div>
   {#if $state}
+  {#if dataView}
+    <DataView state={$state} />
+  {:else}
     <div class="data-table">
       <div class="header-row">
         <div style="width:22px; cursor: pointer; border-right: 1px dashed;">
@@ -351,6 +364,7 @@
           <AddColumnModal bind:showAddColumnModal activeBoard={activeBoard} />
         {/if}
       </div> -->
+
       {#each $state.rows as row, y}
         <div class="data-row">
           <div style="width:22px; cursor: pointer; border-right: 1px dashed">
@@ -402,7 +416,6 @@
           
         </div>
       {/each}
-
       
       <div size="small" circle style="margin-left:3px; cursor: pointer;" on:click={async ()=>{
         const cells = {}
@@ -415,6 +428,7 @@
         </div>
       </div>
       <SummaryRow activeBoard={activeBoard} width={width} />
+  {/if}
   {/if}
   <div class="bottom-fade"></div>
 </div>

@@ -43,15 +43,17 @@
                 if (dateNumber) {
                   return Math.max(acc, dateNumber);
                 }
+              } else {
+                console.log(Math.max(acc, Number(cell.value)))
+                return Math.max(acc, Number(cell.value));
               }
-              return Math.max(acc, Number(cell.value));
             }
             return acc;
           }, 
             Number.NEGATIVE_INFINITY
           )}
           {def.type == ColumnType.Date && value > Number.NEGATIVE_INFINITY ? new Date(value)
-            .toISOString().split('T')[0] : null}
+            .toISOString().split('T')[0] : value}
         {:else if def.sumType == SumType.Min}
           {@const value = Object.values($state.rows).reduce((acc, row) => {
             const cell = row.cells[def.id];
@@ -70,7 +72,7 @@
             Number.POSITIVE_INFINITY
           )}
           {def.type == ColumnType.Date && value < Number.POSITIVE_INFINITY ? new Date(value)
-            .toISOString().split('T')[0] : null}
+            .toISOString().split('T')[0] : value}
         {:else if def.sumType == SumType.Median}
           {@const values = Object.values($state.rows).map(row => {
             const cell = row.cells[def.id];

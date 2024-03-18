@@ -48,11 +48,11 @@
         {#each $boardData.value.latestState.rows as row}
           {#if Object.keys(row.cells).length > 0}
             {@const keyColumnIndex = $boardData.value.latestState.columnDefs.findIndex(columnDef => columnDef.id == keyColumn)}
-            {@const keyColumnValue = Object.values(row.cells).reverse()[keyColumnIndex].value}
+            {@const keyColumnValue = Object.values(row.cells)[keyColumnIndex]?.value}
             {@const displayColumnIndex = $boardData.value.latestState.columnDefs.findIndex(columnDef => columnDef.id == displayColumn)}
-            {@const displayColumnValues = Object.values(row.cells).reverse()}
+            {@const displayColumnValues = Object.values(row.cells)}
             {#if displayColumnValues.length > displayColumnIndex}
-              {@const displayColumnValue = Object.values(row.cells).reverse()[displayColumnIndex].value}
+              {@const displayColumnValue = Object.values(row.cells)[displayColumnIndex].value}
               <option value={row.id}>{
                 keyColumnValue + " - " +
                 displayColumnValue

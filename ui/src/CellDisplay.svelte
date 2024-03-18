@@ -11,7 +11,6 @@
   import { decodeHashFromBase64 } from "@holochain/client";
   import type { TablesStore } from './store';
   import Avatar from './Avatar.svelte';
-  import SelectRowAndValue from './SelectRowAndValue.svelte';
 
   import "@holochain-open-dev/profiles/dist/elements/search-agent.js";
   import "@holochain-open-dev/profiles/dist/elements/profiles-context.js";
@@ -46,9 +45,9 @@
 {:else if def.type === ColumnType.TableLink}
   {@const row = $boardData.value.latestState.rows.find(r => r.id == cell.value)}
   {@const displayColumnIndex = $boardData.value.latestState.columnDefs.findIndex(c => c.id == def.displayColumn)}
-  {Object.values(row.cells).reverse()[displayColumnIndex].value}
-{:else if def.type === ColumnType.AgentLink}
-  <Avatar agentPubKey={cell.value} />
+  {Object.values(row.cells)[displayColumnIndex].value}
+{:else if def.type === ColumnType.User}
+  <Avatar agentPubKey={decodeHashFromBase64(cell.value)} />
 {:else}
   {cell.value}
 {/if}

@@ -8,7 +8,7 @@
     import { createEventDispatcher } from "svelte";
     import AttachmentsList from './AttachmentsList.svelte';
     import type { EntryHash } from "@holochain/client";
-    import { decodeHashFromBase64 } from "@holochain/client";
+    import { encodeHashToBase64, decodeHashFromBase64 } from "@holochain/client";
     import type { TablesStore } from './store';
     import Avatar from './Avatar.svelte';
     import SelectRowAndValue from './SelectRowAndValue.svelte';
@@ -115,7 +115,7 @@
         <search-agent
             on:agent-selected={(e)=>{
                 console.log("Agent selected", e.detail)
-                dispatch("save", e.detail.agentPubKey)
+                dispatch("save", encodeHashToBase64(e.detail.agentPubKey))
                 searchAgentOpen = false
             }}
         ></search-agent>

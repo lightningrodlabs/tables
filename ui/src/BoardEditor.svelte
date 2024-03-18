@@ -107,7 +107,7 @@
     <div class="edit-title setting">
       <div class="title-text">Title</div> <sl-input class='textarea' maxlength="60" bind:this={nameInput}  on:input={e=>text= e.target.value}></sl-input>
     </div>
-    {#if boardHash}
+    {#if boardHash && false}
 
    
     <div class="edit-column-defs unselectable setting">
