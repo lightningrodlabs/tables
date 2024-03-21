@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { type HrlB64WithContext, isWeContext, type HrlWithContext } from "@lightningrodlabs/we-applet";
+  import { isWeContext, type WAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
   import type { Board } from "./board";
   import { getContext } from "svelte";
   import type { TablesStore } from "./store";
-  import { hrlWithContextToB64} from "./util";
+  import { getMyDna, type WALUrl} from "./util";
   import '@shoelace-style/shoelace/dist/components/button/button.js';
   import '@shoelace-style/shoelace/dist/components/dialog/dialog.js';
   import AttachmentsList from "./AttachmentsList.svelte";
@@ -13,13 +13,13 @@
 
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
-  let attachments: Array<HrlB64WithContext> = []
+  let attachments: Array<WAL> = []
   let context: any = undefined
   $:attachments = attachments
 
   export let activeBoard: Board
   export const close=()=>{dialog.hide()}
-  export const open= async (a: Array<HrlB64WithContext>, c:any )=>{
+  export const open= async (a: Array<WALUrl>, c:any )=>{
     attachments = a
     context = c
     dialog.show()
@@ -34,14 +34,14 @@
   }
 
   const addAttachment = async () => {
-    const hrl = await store.weClient.userSelectHrl()
-    if (hrl) {
-      _addAttachment(hrl)
+    const wal = await store.weClient.userSelectHrl()
+    if (wal) {
+      _addAttachment(wal)
     }
   }
 
-  const _addAttachment = (hrl: HrlWithContext) => {
-    attachments.push(hrlWithContextToB64(hrl))
+  const _addAttachment = (wal: WAL) => {
+    attachments.push(weaveUrlFromWal(wal))
     attachments = attachments
     handleSave()
   }

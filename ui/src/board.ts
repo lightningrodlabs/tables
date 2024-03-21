@@ -3,7 +3,7 @@ import { get, type Readable } from "svelte/store";
 import { v1 as uuidv1 } from "uuid";
 import { type AgentPubKey, type EntryHash, type EntryHashB64, encodeHashToBase64, type AgentPubKeyB64, type Timestamp } from "@holochain/client";
 import { BoardType } from "./boardList";
-import type { HrlB64WithContext } from "@lightningrodlabs/we-applet";
+import type { WALUrl } from "./util";
 import { cloneDeep } from "lodash";
 import { reorder } from "svelte-dnd-list";
 
@@ -51,7 +51,7 @@ export class ColumnDef {
 }
 
 export type RowProps = {
-  attachments: Array<HrlB64WithContext>
+  attachments: Array<WALUrl>
 }
 
 export type RowId = uuidv1
@@ -65,7 +65,7 @@ export class Row {
   }
 }
 
-export type CellValue = string|number|Date|AgentPubKeyB64|null|HrlB64WithContext
+export type CellValue = string|number|Date|AgentPubKeyB64|null|WALUrl
 
 export type CellId = {
   rowId: RowId,
@@ -74,12 +74,12 @@ export type CellId = {
 
 export type Cell = {
   value: CellValue ,
-  attachments: Array<HrlB64WithContext>
+  attachments: Array<WALUrl>
 }
 
 export type BoardProps = {
   bgUrl: string,
-  attachments: Array<HrlB64WithContext>
+  attachments: Array<WALUrl>
 }
 
 const MAX_FEED_ITEMS = 50
@@ -130,7 +130,7 @@ export interface BoardState {
   labelDefs: LabelDef[];
   columnDefs: ColumnDef[];
   props: BoardProps;
-  boundTo: Array<HrlB64WithContext>
+  boundTo: Array<WALUrl>
   feed: Feed
 }
   

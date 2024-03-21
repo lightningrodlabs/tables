@@ -3,7 +3,8 @@
     import '@shoelace-style/shoelace/dist/components/input/input.js';
     import type SlInput from '@shoelace-style/shoelace/dist/components/input/input.js';
     import { getContext, onMount } from "svelte";
-    import { hrlWithContextToB64, onVisible } from './util';
+    import { onVisible } from './util';
+    import { isWeContext, type WAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
     import { ColumnType, type Cell, Board, ColumnDef } from './board';
     import { createEventDispatcher } from "svelte";
     import AttachmentsList from './AttachmentsList.svelte';
@@ -135,7 +136,7 @@
         <button title="Search For Attachment" class="attachment-button" style="margin-right:10px" on:click={async ()=>{
         const hrl = await store.weClient.userSelectHrl()
         if (hrl) {
-            value = hrlWithContextToB64(hrl)
+            value = weaveUrlFromWal(hrl)
             dispatch("save", value)
         }
         }} >          

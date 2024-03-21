@@ -11,7 +11,8 @@
   import { cloneDeep, isEqual } from "lodash";
   import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
   import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
-  import { hrlWithContextToB64, onVisible } from "./util";
+  import { onVisible } from "./util";
+  import { isWeContext, type WAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
   import SvgIcon from "./SvgIcon.svelte";
   import { exportBoard } from "./export";
   import { Marked, Renderer } from "@ts-stack/markdown";

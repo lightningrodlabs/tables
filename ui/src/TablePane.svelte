@@ -14,14 +14,15 @@
   import { cloneDeep, isEqual } from "lodash";
   import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
   import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
-  import { hrlWithContextToB64, onVisible } from "./util";
+  import { onVisible } from "./util";
+  import { isWeContext, type WAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
   import SvgIcon from "./SvgIcon.svelte";
   import { exportBoard } from "./export";
   import { Marked, Renderer } from "@ts-stack/markdown";
   import hljs from 'highlight.js';
   import AttachmentsList from './AttachmentsList.svelte';
   import AttachmentsDialog from "./AttachmentsDialog.svelte"
-  import type { HrlWithContext } from "@lightningrodlabs/we-applet";
+  import type { WAL } from "@lightningrodlabs/we-applet";
   import DragDropList, { VerticalDropZone, reorder, type DropEvent, HorizontalDropZone } from 'svelte-dnd-list';
   import RowDetailsDrawer from "./RowDetailsDrawer.svelte";
   import CellDisplay from "./CellDisplay.svelte";
@@ -131,9 +132,9 @@
     activeBoard.requestChanges([{type: 'set-props', props : newProps }])
   }
 
-  const copyHrlToClipboard = () => {
-    const attachment: HrlWithContext = { hrl: [store.dnaHash, activeBoard.hash], context: "" }
-    store.weClient?.hrlToClipboard(attachment)
+  const walToPocket = () => {
+    const attachment: WAL = { hrl: [store.dnaHash, activeBoard.hash], context: "" }
+    store.weClient?.walToPocket(attachment)
   }
 
   const onDropColumnDefs = ({ detail: { from, to } }: CustomEvent<DropEvent>) => {
@@ -201,7 +202,7 @@
             </div>
           {/if}
           <div style="margin-left:10px; margin-top:2px;display:flex">
-            <button title="Add Board to Pocket" class="attachment-button" style="margin-right:10px" on:click={()=>copyHrlToClipboard()} >          
+            <button title="Add Board to Pocket" class="attachment-button" style="margin-right:10px" on:click={()=>walToPocket()} >          
               <SvgIcon icon="addToPocket" size="20px"/>
             </button>
             <button title="Manage Board Attachments" class="attachment-button" style="margin-right:10px" on:click={()=>attachmentsDialog.open(activeBoard.state().props.attachments,"board")} >          

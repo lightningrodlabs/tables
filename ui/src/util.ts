@@ -1,5 +1,5 @@
 import { decodeHashFromBase64, encodeHashToBase64, type AppAgentClient, type EntryHash, type DnaHash, CellType } from "@holochain/client";
-import type { HrlB64WithContext, HrlWithContext } from "@lightningrodlabs/we-applet";
+// import type { HrlB64WithContext, HrlWithContext } from "@lightningrodlabs/we-applet";
 
 export function onVisible(element, callback) {
     new IntersectionObserver((entries, observer) => {
@@ -11,25 +11,27 @@ export function onVisible(element, callback) {
     }).observe(element);
 }
 
-export function hrlWithContextToB64(hrl: HrlWithContext): HrlB64WithContext {
-  return {
-    hrl: [encodeHashToBase64(hrl.hrl[0]), encodeHashToBase64(hrl.hrl[1])],
-    context: hrl.context === undefined ? 'null' : JSON.stringify(hrl.context),
-  };
-}
-  
-export function hrlB64WithContextToRaw(hrlB64: HrlB64WithContext): HrlWithContext {
-  let context: any
-  try {
-    context = JSON.parse(hrlB64.context)
-  } catch (e) {
+export type WALUrl = string
 
-  }
-  return {
-    hrl: [decodeHashFromBase64(hrlB64.hrl[0]), decodeHashFromBase64(hrlB64.hrl[1])],
-    context,
-  };
-}
+// export function hrlWithContextToB64(hrl: HrlWithContext): HrlB64WithContext {
+//   return {
+//     hrl: [encodeHashToBase64(hrl.hrl[0]), encodeHashToBase64(hrl.hrl[1])],
+//     context: hrl.context === undefined ? 'null' : JSON.stringify(hrl.context),
+//   };
+// }
+  
+// export function hrlB64WithContextToRaw(hrlB64: HrlB64WithContext): HrlWithContext {
+//   let context: any
+//   try {
+//     context = JSON.parse(hrlB64.context)
+//   } catch (e) {
+
+//   }
+//   return {
+//     hrl: [decodeHashFromBase64(hrlB64.hrl[0]), decodeHashFromBase64(hrlB64.hrl[1])],
+//     context,
+//   };
+// }
 
 export const hashEqual = (a:EntryHash, b:EntryHash) : boolean => {
   if (!a || !b) {

@@ -16,8 +16,7 @@
   import ClickEdit from './ClickEdit.svelte';
   import AttachmentsList from './AttachmentsList.svelte';
   import AttachmentsDialog from "./AttachmentsDialog.svelte"
-  import type { HrlWithContext } from '@lightningrodlabs/we-applet';
-
+  import type { WAL } from '@lightningrodlabs/we-applet';
   
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
@@ -86,9 +85,9 @@
     handleSave(props)
   }
 
-  const copyHrlToClipboard = () => {
-    const attachment: HrlWithContext = { hrl: [store.dnaHash, $activeBoard.hash], context: rowId }
-    store.weClient?.hrlToClipboard(attachment)
+  const walToPocket = () => {
+    const attachment: WAL = { hrl: [store.dnaHash, $activeBoard.hash], context: rowId }
+    store.weClient?.walToPocket(attachment)
   }
 
   const columnName = (defId: ColumnId) => {
@@ -118,7 +117,7 @@
           <div class="card-controls">
             
             {#if store.weClient}
-              <div class="details-button pocket-button" title="Add this record to pocket" on:click={()=>copyHrlToClipboard()}>
+              <div class="details-button pocket-button" title="Add this record to pocket" on:click={()=>walToPocket()}>
                 <SvgIcon icon=addToPocket size="25px"/>
               </div>
             {/if}

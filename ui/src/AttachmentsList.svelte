@@ -2,14 +2,14 @@
   import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
   import { createEventDispatcher, getContext } from "svelte";
   import type { TablesStore } from "./store";
-  import { hrlB64WithContextToRaw } from "./util";
-  import type { HrlB64WithContext } from "@lightningrodlabs/we-applet";
+  import { type WALUrl } from "./util";
+  import { weaveUrlFromWal, weaveUrlToWAL, WeClient } from "@lightningrodlabs/we-applet";
   import SvgIcon from "./SvgIcon.svelte";
   import { hrlToString } from "@holochain-open-dev/utils";
 
   const dispatch = createEventDispatcher()
 
-  export let attachments: Array<HrlB64WithContext>
+  export let attachments: Array<WALUrl>
   export let allowDelete = true
 
   const { getStore } :any = getContext("store");
@@ -18,25 +18,25 @@
 </script>
 <div class="attachments-list">
   {#each attachments as attachment, index}
-    {@const hrlWithContext = hrlB64WithContextToRaw(attachment)}
-    <div 
+  {@const wal = weaveUrlToWAL(attachment)}
+  <div 
       class:attachment-item-with-delete={allowDelete}
       class:attachment-item={!allowDelete}
     >
-      {#await store.weClient.attachableInfo(hrlWithContext)}
-        <div style="cursor:pointer; padding: 0 5px 0 5px; border: dashed 1px;margin-right:5px" title={`${hrlToString(hrlWithContext.hrl)}?${JSON.stringify(hrlWithContext.context)}`}> ?...</div>
-      {:then { attachableInfo }}
+      {#await store.weClient.assetInfo(wal)}
+        <div style="cursor:pointer; padding: 0 5px 0 5px; border: dashed 1px;margin-right:5px" title={`${hrlToString(wal.hrl)}?${JSON.stringify(wal.context)}`}> ?...</div>
+      {:then { assetInfo }}
         <sl-button  size="small"
           on:click={async (e)=>{
               e.stopPropagation()
               try {
-                await store.weClient.openHrl(hrlWithContext)
+                await store.weClient.openWal(wal)
               } catch(e) {
                 alert(`Error opening link: ${e}`)
               }
             }}
-          style="display:flex;flex-direction:row;margin-right:5px"><sl-icon src={attachableInfo.icon_src} slot="prefix"></sl-icon>
-          {attachableInfo.name}
+          style="display:flex;flex-direction:row;margin-right:5px"><sl-icon src={assetInfo.icon_src} slot="prefix"></sl-icon>
+          {assetInfo.name}
         </sl-button> 
       {:catch error}
         Oops. something's wrong.
