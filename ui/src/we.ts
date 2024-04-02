@@ -32,6 +32,10 @@ export const appletServices: AppletServices = {
         view: "applet-view",
       },
     },
+    bindAsset: async (appletClient: AppAgentClient,
+      srcWal: WAL, dstWal: WAL): Promise<void> => {
+      console.log("Bind requested.  Src:", srcWal, "  Dst:", dstWal)
+    },
     getAssetInfo: async (
       appletClient: AppAgentClient,
       roleName: RoleName,
