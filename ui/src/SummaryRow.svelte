@@ -1,19 +1,42 @@
 <script lang="ts">
-    import { get } from "svelte/store";
-  import {Board, ColumnType, SumType } from "./board";
+  import { get } from "svelte/store";
+  import {Board, ColumnType, ColumnDef, SumType } from "./board";
+  import { getContext, onMount } from "svelte";
   import { cloneDeep, isEqual } from "lodash";
+  import type { TablesStore } from './store';
+  import SvgIcon from './SvgIcon.svelte';
+  import type { HrlWithContext } from '@lightningrodlabs/we-applet';
   export let activeBoard: Board;
   export let width = 0;
+  export let def: ColumnDef;
+  export let embedded = false;
+
+  const { getStore } :any = getContext("store");
+  let store: TablesStore = getStore();
+
+  const copyWalToPocket = (columnId) => {
+    console.log("copyWalToPocket", activeBoard.hashB64)
+    const attachment: HrlWithContext = { hrl: [store.dnaHash, activeBoard.hash], context: {columnId: columnId, assetType: "Column Summary"} }
+    console.log("attachment", attachment)
+    store.weClient?.walToPocket(attachment)
+  }
 
   $: state = activeBoard.readableState()
+  $: x = Number($state.columnDefs.findIndex(c => c.id == def.id))
 
   </script>
 
-<div class="data-row">
+<!-- <div class="data-row">
   <div style="width:22px; cursor: pointer; border-right: 1px dashed">
   </div>
-  {#each $state.columnDefs as def, x}
-    <div class="data-cell" style="width:{width}px; background-color: #a9a9a9; color: white;">
+  {#each $state.columnDefs as def, x} -->
+    <div class:column-summary={!embedded} style="width:{width}px;">
+      {#if store.weClient && !embedded}
+        <span style="" title="Add this card to pocket" on:click={()=>copyWalToPocket(def.id)}>
+          <SvgIcon color="#fff" icon=addToPocket size="25px"/>
+        </span>
+      {/if}
+        
         {#if def.sumType == SumType.Sum}
           {@const sum = Object.values($state.rows).reduce((acc, row) => {
             const cell = row.cells[def.id];
@@ -131,61 +154,64 @@
         {:else}
           &nbsp;--
         {/if}
-        <div style="float: right; color: white;">
-          {SumType[def.sumType]}
-        {#if def.type == ColumnType.Number}
-          <select
-            style="width: 17px;"
-            bind:value={def.sumType}
-            on:change={(e)=>{
-              const columnDefs = cloneDeep($state.columnDefs);
-              columnDefs[x].sumType = e.target.value;
-              activeBoard.requestChanges([{ type: "set-column-defs",  "columnDefs": columnDefs}]);
-            }}
-            >Sum
-            <option value={SumType.None}>None</option>
-            <option value={SumType.Sum}>Sum</option>
-            <option value={SumType.Average}>Average</option>
-            <option value={SumType.Count}>Count</option>
-            <option value={SumType.Max}>Max</option>
-            <option value={SumType.Min}>Min</option>
-            <option value={SumType.Median}>Median</option>
-            <option value={SumType.Mode}>Mode</option>
-            <option value={SumType.Range}>Range</option>
-            <option value={SumType.StDeviation}>Standard Deviation</option>
-            <!-- <option value={SumType.Variance}>Variance</option> -->
-            <!-- <option value={SumType.Percentile}>Percentile</option> -->
-            <option value={SumType.Filled}>Percent Filled</option>
-            <option value={SumType.Empty}>Percent Empty</option>
-            <option value={SumType.Unique}>Percent Unique</option>
-          </select>
-        {:else if def.type == ColumnType.String || def.type == ColumnType.Date || def.type == ColumnType.Email || def.type == ColumnType.WeaveAsset || def.type == ColumnType.TableLink}
-          <select
-            style="width: 17px;"
-            bind:value={def.sumType}
-            on:change={(e)=>{
-              const columnDefs = cloneDeep($state.columnDefs);
-              columnDefs[x].sumType = e.target.value;
-              activeBoard.requestChanges([{ type: "set-column-defs",  "columnDefs": columnDefs}]);
-            }}
-            >
-            <option value={SumType.None}>None</option>
-            <option value={SumType.Count}>Count</option>
-            <option value={SumType.Filled}>Percent Filled</option>
-            <option value={SumType.Empty}>Percent Empty</option>
-            <option value={SumType.Unique}>Percent Unique</option>
-            {#if def.type == ColumnType.Date}
-              <option value={SumType.Min}>Min</option>
+
+        {#if !embedded}
+          <div style="float: right; color: white;">
+            {SumType[def.sumType]}
+          {#if def.type == ColumnType.Number}
+            <select
+              style="width: 17px;"
+              bind:value={def.sumType}
+              on:change={(e)=>{
+                const columnDefs = cloneDeep($state.columnDefs);
+                columnDefs[x].sumType = e.target.value;
+                console.log(columnDefs[x].sumType)
+                activeBoard.requestChanges([{ type: "set-column-defs",  "columnDefs": columnDefs}]);
+              }}
+              >Sum
+              <option value={SumType.None}>None</option>
+              <option value={SumType.Sum}>Sum</option>
+              <option value={SumType.Average}>Average</option>
+              <option value={SumType.Count}>Count</option>
               <option value={SumType.Max}>Max</option>
-            {/if}
-          </select>
-        {:else}
-          
+              <option value={SumType.Min}>Min</option>
+              <option value={SumType.Median}>Median</option>
+              <option value={SumType.Mode}>Mode</option>
+              <option value={SumType.Range}>Range</option>
+              <option value={SumType.StDeviation}>Standard Deviation</option>
+              <!-- <option value={SumType.Variance}>Variance</option> -->
+              <!-- <option value={SumType.Percentile}>Percentile</option> -->
+              <option value={SumType.Filled}>Percent Filled</option>
+              <option value={SumType.Empty}>Percent Empty</option>
+              <option value={SumType.Unique}>Percent Unique</option>
+            </select>
+          {:else if def.type == ColumnType.String || def.type == ColumnType.Date || def.type == ColumnType.Email || def.type == ColumnType.WeaveAsset || def.type == ColumnType.TableLink}
+            <select
+              style="width: 17px;"
+              bind:value={def.sumType}
+              on:change={(e)=>{
+                const columnDefs = cloneDeep($state.columnDefs);
+                columnDefs[x].sumType = e.target.value;
+                activeBoard.requestChanges([{ type: "set-column-defs",  "columnDefs": columnDefs}]);
+              }}
+              >
+              <option value={SumType.None}>None</option>
+              <option value={SumType.Count}>Count</option>
+              <option value={SumType.Filled}>Percent Filled</option>
+              <option value={SumType.Empty}>Percent Empty</option>
+              <option value={SumType.Unique}>Percent Unique</option>
+              {#if def.type == ColumnType.Date}
+                <option value={SumType.Min}>Min</option>
+                <option value={SumType.Max}>Max</option>
+              {/if}
+            </select>
+          {:else}
+          {/if}
+        </div>
         {/if}
-      </div>
     </div>
-  {/each}
-</div>
+  <!-- {/each}
+</div> -->
 
 
 <style>
@@ -195,13 +221,15 @@
     /* border-bottom: 1px dashed; */
     width: fit-content;
   }
-  .data-cell, .header-cell {
+  .column-summary, .header-cell {
     padding-right: 2px;
     padding-left: 2px;
     border-right: 1px dashed;
     border-bottom: 1px dashed;
     overflow: hidden;
     text-overflow: ellipsis;
+    background-color: #a9a9a9; 
+    color: white;
   }
 
 </style>

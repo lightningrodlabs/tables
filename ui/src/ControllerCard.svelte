@@ -5,6 +5,8 @@
     import type { SynStore } from '@holochain-syn/store';
     import type { ProfilesStore } from "@holochain-open-dev/profiles";
     import type { WeClient } from '@lightningrodlabs/we-applet';
+    import CellDisplay from './CellDisplay.svelte';
+    import SummaryRow from './SummaryRow.svelte';
     import type { v1 as uuidv1 } from "uuid";
 
     export let roleName = ""
@@ -12,7 +14,8 @@
     export let weClient : WeClient
     export let profilesStore : ProfilesStore
     export let board : EntryHash
-    export let cardId : uuidv1
+    // export let cardId : uuidv1
+    export let context: any;
 
     let store: TablesStore = new TablesStore (
       weClient,
@@ -23,6 +26,8 @@
     let synStore: SynStore = store.synStore
     store.boardList.setActiveBoard(board)
     $: activeBoardHash = store.boardList.activeBoardHash
+    $: activeBoard = store.boardList.activeBoard;
+    $: state = $activeBoard ? $activeBoard.readableState() : undefined
 
     setContext('synStore', {
       getStore: () => synStore,
@@ -40,9 +45,25 @@
       <div class="wrapper">
 
       <div class="workspace" style="display:flex">
-
-
-        {#if $activeBoardHash !== undefined}
+        {#if context}
+        {#if state && context.assetType == "Column Summary"}
+          {@const def = $state.columnDefs.find(c=>c.id == context.columnId)}
+          <SummaryRow
+            activeBoard={$activeBoard}
+            def={def}
+            width={100}
+            embedded={true}
+          />
+        {:else if state && context.cellId}
+          {@const cell = $state.rows.find(c=>c.id == context.cellId.rowId).cells[context.cellId.columnId]}
+            <CellDisplay
+              cell={cell}
+              def={context.def}
+            />
+          {:else}
+            Malformed context
+          {/if}
+        {:else if $activeBoardHash !== undefined}
           CELL DATA GOES HERE
         {:else}
           Unable to find board.

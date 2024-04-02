@@ -5,7 +5,7 @@
     import { getContext, onMount } from "svelte";
     import { onVisible } from './util';
     import { isWeContext, type WAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
-    import { ColumnType, type Cell, Board, ColumnDef } from './board';
+    import { ColumnType, type Cell, Board, ColumnDef, type CellId } from './board';
     import { createEventDispatcher } from "svelte";
     import AttachmentsList from './AttachmentsList.svelte';
     import type { EntryHash } from "@holochain/client";
@@ -13,6 +13,7 @@
     import type { TablesStore } from './store';
     import Avatar from './Avatar.svelte';
     import SelectRowAndValue from './SelectRowAndValue.svelte';
+    import type { HrlWithContext } from '@lightningrodlabs/we-applet';
 
     import "@holochain-open-dev/profiles/dist/elements/search-agent.js";
     import "@holochain-open-dev/profiles/dist/elements/profiles-context.js";
@@ -27,21 +28,39 @@
     export let type;
     export let columnDef:ColumnDef;
     export let cell:Cell;
+    export let cellId: CellId;
     export let width;
     export let allColumnCells = [];
+    export let boardHash: EntryHash
 
     let allColumnValues = []
     let searchAgentOpen = false;
     let origValue = ""
     let closing = ""
-    let boardHash: EntryHash
+
+    function checkKey(e: any) {
+        if (e.key === "Escape" && !e.shiftKey) {
+        e.preventDefault();
+            dispatch("cancel")
+        }
+    }
+
+    onMount(() => {
+        window.addEventListener("keydown", checkKey);
+    });
 
     $: allColumnValues = allColumnCells.map((cell:Cell)=>cell?.value)
     $: cellValuePresent = cell?.value !== undefined
-    $: boardHash = columnDef.linkedTable ? decodeHashFromBase64(columnDef.linkedTable) : null
+    // $: boardHash = columnDef.linkedTable ? decodeHashFromBase64(columnDef.linkedTable) : null
     $: boardData = columnDef.linkedTable ? store.boardList.boardData2.get(boardHash) : null
 
     // assign boardhash as columndef.linkedtable and change type to EntryHash
+    const copyWalToPocket = () => {
+        console.log("copyWalToPocket", boardHash)
+        const attachment: HrlWithContext = { hrl: [store.dnaHash, boardHash], context: {cellId: cellId, def: columnDef, assetType: "Cell"} }
+        console.log("attachment", attachment)
+        store.weClient?.walToPocket(attachment)
+    }
 
     onMount(async () => {
         let closing = ""
@@ -66,6 +85,12 @@
 
     let value
 </script>
+
+{#if store.weClient}
+    <span style="position: absolute; z-index: 1; margin-left: 170px;" title="Add this card to pocket" on:click={()=>copyWalToPocket()}>
+      <SvgIcon icon=addToPocket size="25px"/>
+    </span>
+{/if}
 
 {#if slTypes[type] !== undefined}
     {@const allColumnValuesExceptThisCell = cellValuePresent ? allColumnValues.filter((v)=>v!=cell.value) : allColumnValues}

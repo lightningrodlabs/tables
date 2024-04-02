@@ -216,10 +216,10 @@
         {/if}
         <sl-menu-item  on:click={() => {dataView = !dataView}} class="leave-board" >
           {#if dataView}
-            <SvgIcon icon="faEdit" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" />
+            <!-- <SvgIcon icon="faEdit" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" /> -->
             <span>Table View</span>
           {:else}
-            <SvgIcon icon="faClone" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" />
+            <!-- <SvgIcon icon="faClone" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" /> -->
             <span>Data View</span>
           {/if}
         </sl-menu-item>
@@ -388,6 +388,8 @@
                   <CellEdit
                     unique={def.unique}
                     columnDef={def}
+                    boardHash={activeBoard.hash}
+                    cellId={{rowId: row.id, columnId: def.id}}
                     width={width}
                     type={def.type}
                     cell={cell}
@@ -428,7 +430,13 @@
           <SvgIcon icon=faPlus size=10/>
         </div>
       </div>
-      <SummaryRow activeBoard={activeBoard} width={width} />
+      <div class="data-row">
+        <div style="width:22px; cursor: pointer; border-right: 1px dashed">
+        </div>
+        {#each $state.columnDefs as def, x}
+          <SummaryRow activeBoard={activeBoard} def={def} width={width} />
+        {/each}
+      </div>
   {/if}
   {/if}
   <div class="bottom-fade"></div>

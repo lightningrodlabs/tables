@@ -31,7 +31,8 @@
     App,
     Hrl,
     CreateBoard,
-    BlockActiveBoards
+    BlockActiveBoards,
+    Cells
   }
 
   let renderType = RenderType.App
@@ -91,6 +92,8 @@
                           renderType = RenderType.Hrl
                           wal = weClient.renderInfo.view.wal
                           break;
+                        case "asset":
+                          renderType = RenderType.Cells
                         default:
                           throw new Error("Unknown entry type:"+weClient.renderInfo.view.entryType);
                       }
@@ -168,7 +171,7 @@
     {:else if  renderType== RenderType.Hrl && !wal.context}
       <ControllerBoard  board={wal.hrl[1]} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerBoard>
     {:else if  renderType== RenderType.Hrl && wal.context}
-      <ControllerCard  board={wal.hrl[1]} cardId={wal.context} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerCard>
+      <ControllerCard  board={wal.hrl[1]} context={wal.context} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerCard>
     {:else if  renderType== RenderType.BlockActiveBoards}
       <ControllerBlockActiveBoards client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerBlockActiveBoards>
     {/if}

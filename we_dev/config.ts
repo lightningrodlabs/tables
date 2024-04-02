@@ -45,8 +45,8 @@ export default defineConfig({
           joiningAgents: [2],
         },
         {
-          name: 'notebooks',
-          instanceName: 'notebooks',
+          name: 'kando',
+          instanceName: 'kando',
           registeringAgent: 1,
           joiningAgents: [2],
         },
@@ -69,6 +69,19 @@ export default defineConfig({
       },
     },
     {
+      name: 'kando',
+      subtitle: 'KanDo',
+      description: 'task it it!',
+      icon: {
+        type: 'https',
+        url: 'https://raw.githubusercontent.com/holochain-apps/gamez/main/we_dev/gamez_icon.svg',
+      },
+      source: {
+        type: 'https',
+        url: 'https://github.com/holochain-apps/kando/releases/download/v0.9.3/kando.webhapp',
+      },
+    },
+    {
         name: 'gamez',
         subtitle: 'play!',
         description: 'Real-time games based on syn',
@@ -78,7 +91,7 @@ export default defineConfig({
         },
         source: {
           type: "https",
-          url: "https://github.com/holochain-apps/gamez/releases/download/v0.3.100/gamez.webhapp"
+          url: "https://github.com/holochain-apps/gamez/releases/download/v0.4.2/gamez.webhapp"
         },
       },
       {
@@ -91,7 +104,7 @@ export default defineConfig({
       },
       source: {
         type: 'https',
-        url: 'https://github.com/lightningrodlabs/notebooks/releases/download/v0.2.0/notebooks.webhapp',
+        url: 'https://github.com/lightningrodlabs/notebooks/releases/download/v0.2.4/notebooks.webhapp',
       },
     },
   ],

@@ -44,9 +44,8 @@
     null
   {/if}
 {:else if def.type === ColumnType.TableLink}
-  {@const row = $boardData.value.latestState.rows.find(r => r.id == cell.value)}
-  {@const displayColumnIndex = $boardData.value.latestState.columnDefs.findIndex(c => c.id == def.displayColumn)}
-  {Object.values(row.cells)[displayColumnIndex].value}
+  {@const row = $boardData?.value?.latestState?.rows?.find(r => r.id == cell.value)}
+  {row?.cells[def.displayColumn]?.value}
 {:else if def.type === ColumnType.User}
   <Avatar agentPubKey={decodeHashFromBase64(cell.value)} />
 {:else}
