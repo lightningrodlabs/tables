@@ -62,8 +62,8 @@
     align-items: center;
   }
   .board-name {
-        font-size: 16px;
-        font-weight: bold;
-        margin-right: 10px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-right: 10px;
     }
 </style>

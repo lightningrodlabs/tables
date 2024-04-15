@@ -27,6 +27,7 @@
   import RowDetailsDrawer from "./RowDetailsDrawer.svelte";
   import CellDisplay from "./CellDisplay.svelte";
   import DataView from "./DataView.svelte";
+  import Queries from './Queries.svelte'
 
   class MyRenderer extends Renderer {
     override link(href: string, title : string, text: string) {
@@ -76,6 +77,7 @@
   $: state = activeBoard.readableState()
   $: orderedRows = Object.entries($state.rows).map(([key,value])=>{return{id:key, cells:value}})
   let editCardDialog
+  let showQueryBuilder = false;
   let editingCell: undefined|CellId
   function init(el){
     //if (el)
@@ -223,6 +225,15 @@
             <span>Data View</span>
           {/if}
         </sl-menu-item>
+        <sl-menu-item  on:click={() => {showQueryBuilder = !showQueryBuilder}} class="leave-board" >
+          {#if showQueryBuilder}
+            <!-- <SvgIcon icon="faEdit" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" /> -->
+            <span>Hide Query Builder</span>
+          {:else}
+            <!-- <SvgIcon icon="faClone" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" /> -->
+            <span>Query Builder</span>
+          {/if}
+        </sl-menu-item>
       {/if}
     </div>
     <div class="filter-by">
@@ -273,6 +284,11 @@
     </div>
   </div>
   {#if $state}
+
+  {#if showQueryBuilder}
+    <Queries {activeBoard} />
+  {/if}
+
   {#if dataView}
     <DataView state={$state} />
   {:else}
@@ -289,6 +305,7 @@
           </div>
           <!-- </sl-button> -->
           </div>
+          
       <DragDropList
         id="columnDefs"
         itemSize={width}
@@ -321,6 +338,7 @@
             </div>
           {/each}
         {/if}
+        
       </DragDropList>
         <!-- <sl-dialog label="Edit Header" open={showEditHeader} onSlOverlayDismiss={() => showEditHeader = false}>
           <sl-input label="Name" value={editHeaderIndex} on:input={(e)=>{activeBoard.requestChanges([{ type: "set-column-name", columnId: $state.columnDefs[editHeaderIndex].id, name:e.target.value}])}}></sl-input>
