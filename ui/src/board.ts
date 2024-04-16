@@ -14,6 +14,13 @@ export class LabelDef {
     }
 }
 
+export class Query {
+  id: uuidv1
+  constructor(public label: string, public query: any, summaryDefs: Array<any>){
+      this.id = uuidv1()
+  }
+}
+
 export enum ColumnType {
   String,
   Number,
@@ -127,6 +134,7 @@ export interface BoardState {
   status: string;
   name: string;
   rows: Array<Row>;
+  queries: Query[];
   labelDefs: LabelDef[];
   columnDefs: ColumnDef[];
   props: BoardProps;
@@ -152,6 +160,10 @@ export interface BoardState {
         row: Row;
       }
     | {
+        type: "add-query";
+        query: any;
+      }
+    | {
         type: "update-row-props";
         id: RowId,
         props: RowProps;
@@ -160,6 +172,10 @@ export interface BoardState {
       type: "delete-row";
       id: RowId,
     }
+    | {
+        type: "remove-query";
+        query: any;
+      }
     | {
         type: "set-name";
         name: string;
@@ -244,6 +260,12 @@ export interface BoardState {
       case "add-row":
         feedText = `added a row`
         break;
+      case "add-query":
+        feedText = `added a query`
+        break;
+      case "remove-query":
+        feedText = `removed a query`
+        break;
       case "delete-row":
         feedText = `deleted a row`
         break;
@@ -270,6 +292,7 @@ export interface BoardState {
         status: "",
         name: "untitled",
         rows: [],
+        queries: [],
         labelDefs: [],
         columnDefs: [],
         props: {bgUrl:"", attachments:[]},
@@ -299,6 +322,7 @@ export interface BoardState {
           if (delta.state.labelDefs !== undefined) state.labelDefs = delta.state.labelDefs
           if (delta.state.columnDefs !== undefined) state.columnDefs = delta.state.columnDefs
           if (delta.state.rows !== undefined) state.rows = delta.state.rows
+          if (delta.state.queries !== undefined) state.queries = delta.state.queries
           if (delta.state.props !== undefined) state.props = delta.state.props
           if (delta.state.boundTo !== undefined) state.boundTo = delta.state.boundTo
           break;
@@ -320,6 +344,14 @@ export interface BoardState {
         case "add-row":
           state.rows.push(delta.row)
           break;
+        case "add-query":
+          state.queries.push(delta.query)
+          break;
+        case "remove-query":
+          const idy = state.queries.findIndex(q => q.id === delta.query.id)
+          if (idy >= 0) {
+            state.queries.splice(idy,1)
+          }
         case "delete-row":
           const idx = state.rows.findIndex(row => row.id === delta.id)
           if (idx >= 0) {

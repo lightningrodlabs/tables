@@ -30,6 +30,6 @@
   :global(.ruleGroup) {
     background-color: white;
     border-radius: 0;
-    border-bottom: 0;
+    border: 0;
   }
 </style>

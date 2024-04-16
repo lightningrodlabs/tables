@@ -78,7 +78,7 @@
   $: state = activeBoard.readableState()
   $: orderedRows = Object.entries($state.rows).map(([key,value])=>{return{id:key, cells:value}})
   let editCardDialog
-  let showQueryBuilder = false;
+  let showQueryBuilder = true;
   let editingCell: undefined|CellId
   let queriedData;
   $: queriedData;
@@ -228,15 +228,13 @@
             <span>Data View</span>
           {/if}
         </sl-menu-item>
-        <sl-menu-item  on:click={() => {showQueryBuilder = !showQueryBuilder}} class="leave-board" >
+        <!-- <sl-menu-item  on:click={() => {showQueryBuilder = !showQueryBuilder}} class="leave-board" >
           {#if showQueryBuilder}
-            <!-- <SvgIcon icon="faEdit" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" /> -->
             <span>Hide Query Builder</span>
           {:else}
-            <!-- <SvgIcon icon="faClone" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" /> -->
             <span>Query Builder</span>
           {/if}
-        </sl-menu-item>
+        </sl-menu-item> -->
       {/if}
     </div>
     <div class="filter-by">
@@ -288,7 +286,7 @@
   </div>
   {#if $state}
 
-  {#if showQueryBuilder}
+  {#if showQueryBuilder && $state.queries}
     <Queries {activeBoard} bind:queriedData />
   {/if}
 
@@ -468,7 +466,7 @@
 <style>
   .data-table {
     min-height: 200px;
-    border: 1px solid;
+    border-bottom: 1px solid;
   }
   .header-row {
     display:flex;
@@ -479,6 +477,7 @@
     font-weight: bold;
     color: black;
     background-color: #ededed;
+    border-top: 1px dashed;
   }
 
   .header-caret {
