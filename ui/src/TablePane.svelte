@@ -72,6 +72,7 @@
   $: participants = activeBoard.participants()
   $: activeHashB64 = store.boardList.activeBoardHashB64;
   $: activeRow = store.boardList.activeRow;
+
   // let columnDefs: Array<ColumnDef> = []
 
   $: state = activeBoard.readableState()
@@ -79,6 +80,8 @@
   let editCardDialog
   let showQueryBuilder = false;
   let editingCell: undefined|CellId
+  let queriedData;
+  $: queriedData;
   function init(el){
     //if (el)
      // el.focus()
@@ -286,7 +289,7 @@
   {#if $state}
 
   {#if showQueryBuilder}
-    <Queries {activeBoard} />
+    <Queries {activeBoard} bind:queriedData />
   {/if}
 
   {#if dataView}
@@ -385,57 +388,60 @@
       </div> -->
 
       {#each $state.rows as row, y}
-        <div class="data-row">
-          <div style="width:22px; cursor: pointer; border-right: 1px dashed">
-            <!-- <sl-button
-              on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
-              circle size=small> -->
-              <div style="display:flex; align-items: center; justify-content: center; width:18px; height:18px; cursor: pointer; margin: 2px;"
-                on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}}
-              >
-              <SvgIcon icon="expand" size="16px"/>
-            </div>
-            <!-- </sl-button> -->
-            </div>
-          {#each $state.columnDefs as def, x}
-          {@const cell = row.cells[def.id]}
-          <!-- column values -->
-          {@const cells = $state.rows.map(row=>row.cells[def.id])}
-          {#if editingCell && editingCell.rowId == row.id && editingCell.columnId == def.id}
-              <div class="data-cell editing" style="width:{width}px">
-                  <CellEdit
-                    unique={def.unique}
-                    columnDef={def}
-                    boardHash={activeBoard.hash}
-                    cellId={{rowId: row.id, columnId: def.id}}
-                    width={width}
-                    type={def.type}
-                    cell={cell}
-                    allColumnCells={cells}
-                    on:cancel={()=>editingCell=undefined}
-                    on:save={(e)=>{
-                      activeBoard.requestChanges([{ type: "set-cell", cellId: {rowId: row.id, columnId: def.id}, value:e.detail }]);
-                      editingCell=undefined
-                      }}
-                  ></CellEdit>
+        <!-- {queriedData} -->
+        {#if queriedData && queriedData.indexOf(row.id) == -1 ? null : true}
+          <div class="data-row">
+            <div style="width:22px; cursor: pointer; border-right: 1px dashed">
+              <!-- <sl-button
+                on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
+                circle size=small> -->
+                <div style="display:flex; align-items: center; justify-content: center; width:18px; height:18px; cursor: pointer; margin: 2px;"
+                  on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}}
+                >
+                <SvgIcon icon="expand" size="16px"/>
               </div>
-            {:else}
-              <div class="data-cell" style="width:{width}px"
-                on:click={()=>{
-                  editingCell= {rowId:row.id, columnId:def.id}
-                }}
-              >
-                {#if cell}
-                  <CellDisplay {cell} {def} />                  
-                {:else}
-                null
-                {/if}
-               
+              <!-- </sl-button> -->
               </div>
-            {/if}
-          {/each}
-          
-        </div>
+            {#each $state.columnDefs as def, x}
+            {@const cell = row.cells[def.id]}
+            <!-- column values -->
+            {@const cells = $state.rows.map(row=>row.cells[def.id])}
+            {#if editingCell && editingCell.rowId == row.id && editingCell.columnId == def.id}
+                <div class="data-cell editing" style="width:{width}px">
+                    <CellEdit
+                      unique={def.unique}
+                      columnDef={def}
+                      boardHash={activeBoard.hash}
+                      cellId={{rowId: row.id, columnId: def.id}}
+                      width={width}
+                      type={def.type}
+                      cell={cell}
+                      allColumnCells={cells}
+                      on:cancel={()=>editingCell=undefined}
+                      on:save={(e)=>{
+                        activeBoard.requestChanges([{ type: "set-cell", cellId: {rowId: row.id, columnId: def.id}, value:e.detail }]);
+                        editingCell=undefined
+                        }}
+                    ></CellEdit>
+                </div>
+              {:else}
+                <div class="data-cell" style="width:{width}px"
+                  on:click={()=>{
+                    editingCell= {rowId:row.id, columnId:def.id}
+                  }}
+                >
+                  {#if cell}
+                    <CellDisplay {cell} {def} />                  
+                  {:else}
+                  null
+                  {/if}
+                
+                </div>
+              {/if}
+            {/each}
+            
+          </div>
+        {/if}
       {/each}
       
       <div size="small" circle style="margin-left:3px; cursor: pointer;" on:click={async ()=>{

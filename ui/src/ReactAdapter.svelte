@@ -25,3 +25,11 @@
 </script>
 
 <div bind:this={container} class={$$props.class} />
+
+<style>
+  :global(.ruleGroup) {
+    background-color: white;
+    border-radius: 0;
+    border-bottom: 0;
+  }
+</style>

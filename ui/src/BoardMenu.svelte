@@ -85,7 +85,7 @@
     }
 
     .board-menu {
-        overflow-y: auto;
+        /* overflow-y: auto; */
         display: flex;
         flex-direction: row;
         flex: 0 0 auto;
@@ -122,13 +122,13 @@
         position: relative;
         width: 50px;
         height: 30px;
-        background: rgba(24, 55, 122, 1.0);
-        border: 1px solid #4A559D;
+        /* background: rgba(24, 55, 122, 1.0); */
+        /* border: 1px solid #4A559D; */
         color: #fff;
         display: flex;
         align-items: center;
         border-radius: 5px;
-        font-size: 16px;
+        font-size: 46px;
         font-weight: bold;
         transition: all .25s ease;
         top: 3px;
@@ -140,10 +140,10 @@
         cursor: pointer;
         padding: 15px 5px;
         width: 60px;
-        border: 1px solid #252d5d;
-        background: rgb(10, 25, 57);
+        /* border: 1px solid #252d5d; */
+        /* background: rgb(10, 25, 57); */
         margin: 0 -5px 0 -5px;
-        box-shadow: 0px 4px 15px rgba(35, 32, 74, 0.8);
+        /* box-shadow: 0px 4px 15px rgba(35, 32, 74, 0.8); */
     }
 
     .board {
@@ -178,7 +178,7 @@
         display: block;
         align-items: center;
         left: 0;
-        background-color: rgba(23, 55, 123, .9);
+        /* background-color: rgba(23, 55, 123, .9); */
         animation-duration: .3s;
         animation-name: slideIn;
         animation-iteration-count: 1;
