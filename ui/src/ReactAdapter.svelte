@@ -30,6 +30,8 @@
   :global(.ruleGroup) {
     background-color: white;
     border-radius: 0;
-    border: 0;
+    /* border: 0; */
+    margin: 12px;
+    margin-top: 6px;
   }
 </style>

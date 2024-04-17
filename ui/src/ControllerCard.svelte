@@ -50,6 +50,8 @@
           {@const def = $state.columnDefs.find(c=>c.id == context.columnId)}
           <SummaryRow
             activeBoard={$activeBoard}
+            query={context.query ? context.query : "true"}
+            sumType={context.sumType}
             def={def}
             width={100}
             embedded={true}

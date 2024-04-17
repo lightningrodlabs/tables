@@ -1,7 +1,7 @@
 <script lang="ts">
   import { get } from "svelte/store";
   import {Board, ColumnType, ColumnDef, SumType } from "./board";
-  import { getContext, onMount } from "svelte";
+  import { getContext, onMount, createEventDispatcher } from "svelte";
   import { cloneDeep, isEqual } from "lodash";
   import type { TablesStore } from './store';
   import SvgIcon from './SvgIcon.svelte';
@@ -10,19 +10,47 @@
   export let width = 0;
   export let def: ColumnDef;
   export let embedded = false;
+  export let query = "true";
+  export let sumType = 0;
 
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
+  const dispatch = createEventDispatcher()
 
   const copyWalToPocket = (columnId) => {
     console.log("copyWalToPocket", activeBoard.hashB64)
-    const attachment: HrlWithContext = { hrl: [store.dnaHash, activeBoard.hash], context: {columnId: columnId, assetType: "Column Summary"} }
+    const attachment: HrlWithContext = { hrl: [store.dnaHash, activeBoard.hash], context: {columnId: columnId, query: query, sumType: sumType, assetType: "Column Summary"} }
     console.log("attachment", attachment)
     store.weClient?.walToPocket(attachment)
   }
 
   $: state = activeBoard.readableState()
   $: x = Number($state.columnDefs.findIndex(c => c.id == def.id))
+  let querriedData = []
+  $: if ($state && $state.rows) {
+    console.log("query", query)
+    querriedData = $state.rows.filter(row => {
+      let subbedQuery = query
+      Object.keys(row.cells).forEach((cellId) => {
+        let value: any = '"' + row.cells[cellId]?.value + '"'
+        console.log($state.columnDefs.find((col) => col.id === cellId)?.type)
+        if ($state.columnDefs.find((col) => col.id === cellId)?.type === 1) {
+          const tempValue = parseInt(row.cells[cellId]?.value)
+          if (!isNaN(tempValue)) {
+            value = tempValue
+          }
+        }
+        subbedQuery = subbedQuery.replace(new RegExp(cellId, 'g'), value);
+        subbedQuery = subbedQuery.replace(new RegExp('contains', 'g'), 'includes');
+      })
+      console.log("subbedQuery", subbedQuery)
+      try {
+        return eval(subbedQuery) ? true : false
+      } catch {
+        return false
+      }
+    })
+  }
 
   </script>
 
@@ -37,8 +65,8 @@
         </span>
       {/if}
         
-        {#if def.sumType == SumType.Sum}
-          {@const sum = Object.values($state.rows).reduce((acc, row) => {
+        {#if sumType == SumType.Sum}
+          {@const sum = Object.values(querriedData).reduce((acc, row) => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
               return acc + Number(cell.value);
@@ -46,19 +74,19 @@
             return acc;
           }, 0)}
           {sum}
-        {:else if def.sumType == SumType.Average}
-          {@const sum = Object.values($state.rows).reduce((acc, row) => {
+        {:else if sumType == SumType.Average}
+          {@const sum = Object.values(querriedData).reduce((acc, row) => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
               return acc + Number(cell.value);
             }
             return acc;
           }, 0)}
-          {parseFloat((sum / Object.values($state.rows).length).toFixed(10))}
-        {:else if def.sumType == SumType.Count}
-          {Object.values($state.rows).filter(row => row.cells[def.id] && row.cells[def.id].value).length}
-        {:else if def.sumType == SumType.Max}
-          {@const value = Object.values($state.rows).reduce((acc, row) => {
+          {parseFloat((sum / Object.values(querriedData).length).toFixed(10))}
+        {:else if sumType == SumType.Count}
+          {Object.values(querriedData).filter(row => row.cells[def.id] && row.cells[def.id].value).length}
+        {:else if sumType == SumType.Max}
+          {@const value = Object.values(querriedData).reduce((acc, row) => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
               if (def.type == ColumnType.Date) {
@@ -77,8 +105,8 @@
           )}
           {def.type == ColumnType.Date && value > Number.NEGATIVE_INFINITY ? new Date(value)
             .toISOString().split('T')[0] : value}
-        {:else if def.sumType == SumType.Min}
-          {@const value = Object.values($state.rows).reduce((acc, row) => {
+        {:else if sumType == SumType.Min}
+          {@const value = Object.values(querriedData).reduce((acc, row) => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
               console.log(cell.value)
@@ -96,8 +124,8 @@
           )}
           {def.type == ColumnType.Date && value < Number.POSITIVE_INFINITY ? new Date(value)
             .toISOString().split('T')[0] : value}
-        {:else if def.sumType == SumType.Median}
-          {@const values = Object.values($state.rows).map(row => {
+        {:else if sumType == SumType.Median}
+          {@const values = Object.values(querriedData).map(row => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
               return Number(cell.value);
@@ -105,8 +133,8 @@
           }).sort((a, b) => a - b).filter(value => value !== undefined)}
 
           {values[Math.floor(values.length / 2)]}
-        {:else if def.sumType == SumType.Mode}
-          {@const values = Object.values($state.rows).map(row => {
+        {:else if sumType == SumType.Mode}
+          {@const values = Object.values(querriedData).map(row => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
               return Number(cell.value);
@@ -122,16 +150,16 @@
           }, {})}
           {@const max = Math.max(...Object.values(counts))}
           {Object.keys(counts).filter(key => counts[key] === max).join(", ")}
-        {:else if def.sumType == SumType.Range}
-          {@const values = Object.values($state.rows).map(row => {
+        {:else if sumType == SumType.Range}
+          {@const values = Object.values(querriedData).map(row => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
               return Number(cell.value);
             }
           }).sort((a, b) => a - b).filter(value => value !== undefined)}
           {values[values.length - 1] - values[0]}
-        {:else if def.sumType == SumType.StDeviation}
-          {@const values = Object.values($state.rows).map(row => {
+        {:else if sumType == SumType.StDeviation}
+          {@const values = Object.values(querriedData).map(row => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
               return Number(cell.value);
@@ -139,12 +167,12 @@
           }).filter(value => value !== undefined)}
           {@const mean = values.reduce((acc, value) => acc + value, 0) / values.length}
           {parseFloat(Math.sqrt(values.reduce((acc, value) => acc + Math.pow(value - mean, 2), 0) / values.length).toFixed(10))}
-        {:else if def.sumType == SumType.Filled}
-          {parseFloat((Object.values($state.rows).filter(row => row.cells[def.id] && row.cells[def.id].value).length / Object.values($state.rows).length * 100).toFixed(8))}%
-        {:else if def.sumType == SumType.Empty}
-          {parseFloat((Object.values($state.rows).filter(row => !row.cells[def.id] || !row.cells[def.id].value).length / Object.values($state.rows).length * 100).toFixed(8))}%
-        {:else if def.sumType == SumType.Unique}
-          {@const values = Object.values($state.rows).map(row => {
+        {:else if sumType == SumType.Filled}
+          {parseFloat((Object.values(querriedData).filter(row => row.cells[def.id] && row.cells[def.id].value).length / Object.values(querriedData).length * 100).toFixed(8))}%
+        {:else if sumType == SumType.Empty}
+          {parseFloat((Object.values(querriedData).filter(row => !row.cells[def.id] || !row.cells[def.id].value).length / Object.values(querriedData).length * 100).toFixed(8))}%
+        {:else if sumType == SumType.Unique}
+          {@const values = Object.values(querriedData).map(row => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
               return cell.value;
@@ -157,16 +185,22 @@
 
         {#if !embedded}
           <div style="float: right; color: white;">
-            {SumType[def.sumType]}
+            {SumType[sumType]}
           {#if def.type == ColumnType.Number}
             <select
               style="width: 17px;"
-              bind:value={def.sumType}
+              bind:value={sumType}
               on:change={(e)=>{
                 const columnDefs = cloneDeep($state.columnDefs);
                 columnDefs[x].sumType = e.target.value;
                 console.log(columnDefs[x].sumType)
-                activeBoard.requestChanges([{ type: "set-column-defs",  "columnDefs": columnDefs}]);
+                if (query == "true") {
+                  console.log("query is true")
+                  activeBoard.requestChanges([{ type: "set-column-defs",  "columnDefs": columnDefs}]);
+                } else {
+                  console.log("query is not true", e.target.value)
+                  dispatch("set-sumtype", e.target.value)
+                }
               }}
               >Sum
               <option value={SumType.None}>None</option>
@@ -188,11 +222,17 @@
           {:else if def.type == ColumnType.String || def.type == ColumnType.Date || def.type == ColumnType.Email || def.type == ColumnType.WeaveAsset || def.type == ColumnType.TableLink}
             <select
               style="width: 17px;"
-              bind:value={def.sumType}
+              bind:value={sumType}
               on:change={(e)=>{
                 const columnDefs = cloneDeep($state.columnDefs);
                 columnDefs[x].sumType = e.target.value;
-                activeBoard.requestChanges([{ type: "set-column-defs",  "columnDefs": columnDefs}]);
+                if (query == "true") {
+                  console.log("query is true")
+                  activeBoard.requestChanges([{ type: "set-column-defs",  "columnDefs": columnDefs}]);
+                } else {
+                  console.log("query is not true", e.target.value)
+                  dispatch("set-sumtype", e.target.value)
+                }
               }}
               >
               <option value={SumType.None}>None</option>
@@ -212,7 +252,6 @@
     </div>
   <!-- {/each}
 </div> -->
-
 
 <style>
 

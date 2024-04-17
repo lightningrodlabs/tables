@@ -2,7 +2,7 @@
   import { getContext, onMount } from "svelte";
   import type { TablesStore } from "./store";
   import LabelSelector from "./LabelSelector.svelte";
-  import type { v1 as uuidv1 } from "uuid";
+  import { v1 as uuidv1 } from "uuid";
   import {LabelDef, ColumnDef, Board, type BoardProps, type Feed, type FeedItem, sortedFeedKeys, feedItems, deltaToFeedString, type Cell, Row, ColumnType, type CellId, type RowId, SumType } from "./board";
   import EditBoardDialog from "./EditBoardDialog.svelte";
   import AddColumnModal from "./AddColumnModal.svelte";
@@ -82,6 +82,8 @@
   let editingCell: undefined|CellId
   let queriedData;
   $: queriedData;
+  let newSummaryRowModal = false;
+  $: newSummaryRowModal;
   function init(el){
     //if (el)
      // el.focus()
@@ -154,6 +156,12 @@
 
   let feedHidden = true
   let rowDetailsDrawer
+
+  onMount(() => {
+    if (activeBoard) {
+      queriedData = activeBoard.state().rows.map(row=>row.id)
+    }
+  });
 </script>
 <RowDetailsDrawer
   bind:this={rowDetailsDrawer}
@@ -287,7 +295,7 @@
   {#if $state}
 
   {#if showQueryBuilder && $state.queries}
-    <Queries {activeBoard} bind:queriedData />
+    <Queries {activeBoard} {state} bind:queriedData />
   {/if}
 
   {#if dataView}
@@ -447,7 +455,7 @@
         //$state.columnDefs.forEach(def=>cells[def.id]={value: null, attachments:[]})
         const row = new Row(store.myAgentPubKeyB64, cells)
         await activeBoard.requestChanges([{ type: "add-row",  row}]);
-        
+        queriedData = activeBoard.state().rows.map(row=>row.id)
       }} >          
           <SvgIcon icon=faPlus size=10/>
         </div>
@@ -459,11 +467,135 @@
           <SummaryRow activeBoard={activeBoard} def={def} width={width} />
         {/each}
       </div>
+      {#if $state.summaryRows && $state.summaryRows.length}
+      {#each $state.summaryRows as summaryRow}
+        <div class="data-row" style="margin-left: 20px; margin-top: 2px;">
+          {summaryRow.queryLabel}
+          <button
+            style="margin-left: 10px;"
+            on:click={()=>{activeBoard.requestChanges([{ type: "remove-summary-row", id: summaryRow.id}]);}}
+          >delete</button>
+        </div>
+        <div class="data-row">
+          <div style="width:22px; cursor: pointer; border-right: 1px dashed">
+          </div>
+          {#each $state.columnDefs as def, x}
+            <SummaryRow activeBoard={activeBoard} def={def} width={width} query={summaryRow.query} sumType={summaryRow.summaryDefs[def.id] ? summaryRow.summaryDefs[def.id] : 0}
+              on:set-sumtype={(e)=>{
+                activeBoard.requestChanges([{ type: "set-summary-row", summaryRow: {id: summaryRow.id, query: summaryRow.query, queryLabel: summaryRow.queryLabel, summaryDefs: {...summaryRow.summaryDefs, [def.id]: e.detail}} }]);
+              }} 
+            />
+          {/each}
+        </div>
+      {/each}
+      {/if}
+      {#if newSummaryRowModal}
+        <div class="modal">
+          <div class="modal-content">
+            <div class="modal-header">
+              <span class="close" on:click={()=>{newSummaryRowModal = false}}>&times;</span>
+              <h2>Add summary rows</h2>
+            </div>
+            {#each $state.queries as query}
+              <div class="modal-body" style="display:flex; margin: 10px 0">
+                <button
+                  style="width: 20px;"
+                  on:click={()=>{
+                    // add summary row to board
+                    let summaryDefs = {}
+                    $state.columnDefs.forEach(def=> {
+                      // if (def.type) {
+                      //   summaryDefs[def.id] = def.type
+                      // }
+                      summaryDefs[def.id] = 0
+                    })
+                    activeBoard.requestChanges([{ type: "add-summary-row", summaryRow: {id: uuidv1(), query: query.query, queryLabel: query.label, summaryDefs: summaryDefs}}]);
+                  }}>+</button>&nbsp;
+                <h3>{query.label}</h3>
+              </div>
+            {/each}
+            <button on:click={()=>{newSummaryRowModal = false}}>Done</button>
+          </div>
+        </div>
+      {/if}
+      <div class="data-row">
+        <button style="width: 20px" on:click={()=>{newSummaryRowModal = true}}>+</button>
+      </div>
   {/if}
   {/if}
   <div class="bottom-fade"></div>
 </div>
 <style>
+
+  .form-group {
+    text-align: center;
+    margin-bottom: 0.2em;
+  }
+
+  .modal {
+    /* display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4); */
+    position: relative;
+    height: 0;
+    padding: 0;
+  }
+
+  .modal {
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+  }
+  
+  .modal-content {
+    background-color: #fefefe;
+    position: static;
+    left: 0;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: fit-content;
+    max-width: 80%;
+    min-width: 300px;
+  }
+  
+  /* .modal-content {
+    background-color: #fefefe;
+    position: absolute;
+    top: 22px;
+    left: -202px;
+    padding: 14px;
+    border: 1px solid #888;
+    width: fit-content;
+  } */
+
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
   .data-table {
     min-height: 200px;
     border-bottom: 1px solid;

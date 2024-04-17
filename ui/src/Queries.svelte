@@ -10,24 +10,32 @@ import ReactAdapter from './ReactAdapter.svelte';
 import { formatQuery } from 'react-querybuilder'; // Import the formatQuery function
 
 export let activeBoard;
+export let state;
 export let queriedData = [];
 
 let queryBuilder;
-let fields2;
+// let fields2;
+$: fields = $state.columnDefs.map((col) => {
+    return {
+      name: col.id,
+      label: col.name
+    }
+  })
 let newQueryBool = false;
 let queryName = "";
+let currentQuery = "true";
 
-$: state = activeBoard.readableState()
-$: fields2, queriedData;
+// $: state = activeBoard.readableState()
+$: queriedData;
 
 const initialQuery: RuleGroupType = { combinator: 'and', rules: [] };
 const queryStore = writable(initialQuery);
 
 function changeQuery(newQuery) {
+  currentQuery = newQuery
   console.log("new query", newQuery)
   queriedData = []
   $state.rows.forEach((row) => {
-    console.log("hh")
     if (newQuery.length === 0) {
       queriedData.push(row.id)
     } else {
@@ -71,15 +79,15 @@ function onQueryChange(newQuery) {
   changeQuery(formatQuery(newQuery, 'cel'));
 }
 
-onMount(() => {
-  fields2 = $state.columnDefs.map((col) => {
-    return {
-      name: col.id,
-      label: col.name
-    }
-  })
-  console.log(fields2)
-});
+// onMount(() => {
+//   fields2 = $state.columnDefs.map((col) => {
+//     return {
+//       name: col.id,
+//       label: col.name
+//     }
+//   })
+//   console.log(fields2)
+// });
 
 </script>
 
@@ -99,11 +107,17 @@ onMount(() => {
    style="width: 100px"> -->
     {#each $state.queries as q}
       <div
-        on:click={() => {
+      class:selected-query={q.query === currentQuery}
+      on:click={() => {
+        if (q.query === currentQuery) {
+          changeQuery("true")
+        } else {
+
           console.log(q.query)
           newQueryBool = false
           changeQuery(q.query);
-        }}
+        }
+      }}
         style="margin-left: 6px; cursor: pointer; border: 1px solid; padding: 5px;"
       >{q.label}
     </div>
@@ -116,32 +130,39 @@ onMount(() => {
     {/each}
     <!-- <option value="new">New</option> -->
   <!-- </select> -->
-  <button style="width: 100px; margin-left: 10px;"
-  on:click={() => 
-  {
-    // console.log(formatQuery($queryStore, 'cel'))
-    newQueryBool = true
-  }
-}
+  <button style="width: 100px; margin-left: 5px;"
+    on:click={() => 
+      {
+        // console.log(formatQuery($queryStore, 'cel'))
+        newQueryBool = true
+      }
+    }
   >+ new query</button>
 </div>
 
-{#if fields2 && newQueryBool}
-<div style="display:flex;">
+{#if fields && newQueryBool}
+<div style="display:flex; margin-left: 12px;">
   <input
     bind:value={queryName}
-   type="text" placeholder="Query Name" style="width: 100px;"/>
-  <button on:click={()=>{newQueryBool = false; changeQuery(true)}}>Cancel</button>
-  <button on:click={()=>{
+   type="text" placeholder="Query Name" style="width: 100px; margin-right: 4px;"/>
+  <button style="margin-right: 4px;" on:click={()=>{newQueryBool = false; changeQuery("true")}}>Cancel</button>
+  <button style="margin-right: 4px;" on:click={()=>{
+    if (queryName === "") {
+      queryName = "Query " + $state.queries.length
+    }
     activeBoard.requestChanges([{ type: "add-query", query: {label: queryName, query: formatQuery($queryStore, 'cel')}}]);
+    newQueryBool = false;
+    queryName = "";
   }}>Save</button>
 </div>
 
-<ReactAdapter 
-el={QueryBuilder}
-fields={fields2}
-onQueryChange={onQueryChange} 
-/>
+{#if fields && $state && $state.rows}
+  <ReactAdapter 
+  el={QueryBuilder}
+  fields={fields}
+  onQueryChange={onQueryChange} 
+  />
+{/if}
 
 {/if}
 <br>
@@ -151,3 +172,11 @@ onQueryChange={onQueryChange}
   fields={fields2}
   onQueryChange={onQueryChange} 
 /> -->
+
+<style>
+  .selected-query {
+    background-color: #cecece;
+    border: 3px solid !important;
+    padding: 3px !important;
+  }
+</style>

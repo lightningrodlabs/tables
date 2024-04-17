@@ -16,8 +16,15 @@ export class LabelDef {
 
 export class Query {
   id: uuidv1
-  constructor(public label: string, public query: any, summaryDefs: Array<any>){
+  constructor(public label: string, public query: any){
       this.id = uuidv1()
+  }
+}
+
+export class SummaryRow {
+  id: uuidv1
+  constructor(public query: any, public queryLabel, public summaryDefs: any){
+    this.id = uuidv1()
   }
 }
 
@@ -135,6 +142,7 @@ export interface BoardState {
   name: string;
   rows: Array<Row>;
   queries: Query[];
+  summaryRows: SummaryRow[];
   labelDefs: LabelDef[];
   columnDefs: ColumnDef[];
   props: BoardProps;
@@ -164,6 +172,14 @@ export interface BoardState {
         query: any;
       }
     | {
+      type: "add-summary-row";
+      summaryRow: any;
+    }
+    | {
+      type: "set-summary-row";
+      summaryRow: any;
+    }
+    | {
         type: "update-row-props";
         id: RowId,
         props: RowProps;
@@ -176,6 +192,10 @@ export interface BoardState {
         type: "remove-query";
         query: any;
       }
+    | {
+      type: "remove-summary-row";
+      id: uuidv1;
+    }
     | {
         type: "set-name";
         name: string;
@@ -293,6 +313,7 @@ export interface BoardState {
         name: "untitled",
         rows: [],
         queries: [],
+        summaryRows: [],
         labelDefs: [],
         columnDefs: [],
         props: {bgUrl:"", attachments:[]},
@@ -347,10 +368,24 @@ export interface BoardState {
         case "add-query":
           state.queries.push(delta.query)
           break;
+        case "add-summary-row":
+          state.summaryRows.push(delta.summaryRow)
+          break;
+        case "set-summary-row":
+          const usidx = state.summaryRows.findIndex(q => q.id === delta.summaryRow.id)
+          if (usidx >= 0) {
+            state.summaryRows[usidx] = delta.summaryRow
+          }
+          break;
         case "remove-query":
-          const idy = state.queries.findIndex(q => q.id === delta.query.id)
-          if (idy >= 0) {
-            state.queries.splice(idy,1)
+          const qidx = state.queries.findIndex(q => q.id === delta.query.id)
+          if (qidx >= 0) {
+            state.queries.splice(qidx,1)
+          }
+        case "remove-summary-row":
+          const sidx = state.summaryRows.findIndex(q => q.id === delta.id)
+          if (sidx >= 0) {
+            state.summaryRows.splice(sidx,1)
           }
         case "delete-row":
           const idx = state.rows.findIndex(row => row.id === delta.id)
