@@ -78,7 +78,7 @@
 </script>
 
 
-<sl-dialog label="Tables: UI v0.1.0 for DNA v0.1.0" bind:this={dialog} width={600} >
+<sl-dialog label="Tables: UI v0.0.5 for DNA v0.3.0" bind:this={dialog} width={600} >
     <div class="about">
         <p>Tables is a demonstration Holochain app built by Lightning Rod Labs.</p>
         <p> <b>Developers:</b>
