@@ -70,7 +70,8 @@
 
   $: uiProps = store.uiProps
   $: participants = activeBoard.participants()
-  $: activeHashB64 = store.boardList.activeBoardHashB64;
+  // $: activeHashB64 = store.boardList.activeBoardHashB64;
+  $: activeHashB64 = activeBoard.hashB64
   $: activeRow = store.boardList.activeRow;
 
   // let columnDefs: Array<ColumnDef> = []
@@ -80,7 +81,7 @@
   let editCardDialog
   let showQueryBuilder = true;
   let editingCell: undefined|CellId
-  let queriedData;
+  let queriedData = {};
   $: queriedData;
   let newSummaryRowModal = false;
   $: newSummaryRowModal;
@@ -97,7 +98,6 @@
     }
     return rowId
   }
-
 
   $: rowDetailsId = openDetails($activeRow)
 
@@ -159,7 +159,7 @@
 
   onMount(() => {
     if (activeBoard) {
-      queriedData = activeBoard.state().rows.map(row=>row.id)
+      queriedData[activeHashB64] = activeBoard.state().rows.map(row=>row.id)
     }
   });
 </script>
@@ -395,7 +395,7 @@
 
       {#each $state.rows as row, y}
         <!-- {queriedData} -->
-        {#if queriedData && queriedData.indexOf(row.id) == -1 ? null : true}
+        {#if queriedData[activeHashB64] && queriedData[activeHashB64].indexOf(row.id) == -1 ? null : true}
           <div class="data-row">
             <div style="width:22px; cursor: pointer; border-right: 1px dashed">
               <!-- <sl-button
@@ -455,7 +455,7 @@
         //$state.columnDefs.forEach(def=>cells[def.id]={value: null, attachments:[]})
         const row = new Row(store.myAgentPubKeyB64, cells)
         await activeBoard.requestChanges([{ type: "add-row",  row}]);
-        queriedData = activeBoard.state().rows.map(row=>row.id)
+        queriedData[activeHashB64] = activeBoard.state().rows.map(row=>row.id)
       }} >          
           <SvgIcon icon=faPlus size=10/>
         </div>
@@ -464,7 +464,7 @@
         <div style="width:22px; cursor: pointer; border-right: 1px dashed">
         </div>
         {#each $state.columnDefs as def, x}
-          <SummaryRow activeBoard={activeBoard} def={def} width={width} />
+          <SummaryRow activeBoard={activeBoard} def={def} width={width} sumType={def.sumType} />
         {/each}
       </div>
       {#if $state.summaryRows && $state.summaryRows.length}

@@ -11,7 +11,7 @@ import { formatQuery } from 'react-querybuilder'; // Import the formatQuery func
 
 export let activeBoard;
 export let state;
-export let queriedData = [];
+export let queriedData = {};
 
 let queryBuilder;
 // let fields2;
@@ -23,21 +23,24 @@ $: fields = $state.columnDefs.map((col) => {
   })
 let newQueryBool = false;
 let queryName = "";
-let currentQuery = "true";
 
 // $: state = activeBoard.readableState()
 $: queriedData;
+$: activeHashB64 = activeBoard.hashB64
+
+let currentQuery = {};
+currentQuery[activeHashB64] = "true";
 
 const initialQuery: RuleGroupType = { combinator: 'and', rules: [] };
 const queryStore = writable(initialQuery);
 
 function changeQuery(newQuery) {
-  currentQuery = newQuery
+  currentQuery[activeHashB64] = newQuery
   console.log("new query", newQuery)
-  queriedData = []
+  queriedData[activeHashB64] = []
   $state.rows.forEach((row) => {
     if (newQuery.length === 0) {
-      queriedData.push(row.id)
+      queriedData[activeHashB64].push(row.id)
     } else {
       console.log("jjk")
       // for key and value in row.cells
@@ -64,12 +67,12 @@ function changeQuery(newQuery) {
 
       console.log("subbedQuery", subbedQuery)
       if (eval(subbedQuery)) {
-        queriedData.push(row.id)
+        queriedData[activeHashB64].push(row.id)
       }
     }
   })
 
-  console.log("queried data", queriedData)
+  console.log("queried data", queriedData[activeHashB64])
 }
 
 // Function to handle query changes
@@ -107,9 +110,9 @@ function onQueryChange(newQuery) {
    style="width: 100px"> -->
     {#each $state.queries as q}
       <div
-      class:selected-query={q.query === currentQuery}
+      class:selected-query={q.query === currentQuery[activeHashB64]}
       on:click={() => {
-        if (q.query === currentQuery) {
+        if (q.query === currentQuery[activeHashB64]) {
           changeQuery("true")
         } else {
 

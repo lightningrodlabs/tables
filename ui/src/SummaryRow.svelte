@@ -11,7 +11,7 @@
   export let def: ColumnDef;
   export let embedded = false;
   export let query = "true";
-  export let sumType = 0;
+  export let sumType;
 
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
