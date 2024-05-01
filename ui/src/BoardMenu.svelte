@@ -9,6 +9,7 @@
     import LogoIcon from "./icons/LogoIcon.svelte";
     import BoardMenuItem from "./BoardMenuItem.svelte";
     import { BoardType } from "./boardList";
+    export let mainpage = false
 
     let newBoardDialog
 
@@ -47,13 +48,15 @@
                 <div
                     on:click={()=>selectBoard(hash)}
                     class="board" >
-                    <BoardMenuItem boardType={BoardType.active} boardHash={hash}></BoardMenuItem>
-                    <div class="board-bg" style="background-image: url({bgUrl});"></div>
+                    <BoardMenuItem largeDisplay={true} boardType={BoardType.active} boardHash={hash}></BoardMenuItem>
+                    <!-- <div class="board-bg" style="background-image: url({bgUrl});"></div> -->
                 </div>
             {/each}
         {/if}
-        <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Table"><SvgIcon color="white" size=25px icon=faSquarePlus style="margin-left: 15px;"/></div>
 
+        {#if !mainpage}
+            <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Tub"><SvgIcon color="white" size=25px icon=faSquarePlus style="margin-left: 15px;"/></div>
+        {/if}
     </div>
     
     {#if $archivedBoards.status == "complete" && $archivedBoards.value.length > 0}
@@ -64,24 +67,27 @@
                     on:click={()=>unarchiveBoard(hash)}
                     class="board" >
                     <BoardMenuItem boardType={BoardType.archived} boardHash={hash}></BoardMenuItem>
-                    <div class="board-bg" style="background-image: url({bgUrl});"></div>
+                    <!-- <div class="board-bg" style="background-image: url({bgUrl});"></div> -->
                 </div>
             {/each}
         </div>
     {/if}
 
-    <NewBoardDialog bind:this={newBoardDialog}></NewBoardDialog>
-    <div class="footer" 
-        on:click={()=>aboutDialog.open()}>   
-        <div class="logo" title="About Tables"><LogoIcon /></div>
-        <div class="cog"><SvgIcon icon=faCog size="20px" color="#fff"/></div>
-    </div>
+    <!-- {#if !mainpage} -->
+        <NewBoardDialog bind:this={newBoardDialog}></NewBoardDialog>
+        <div class="footer" 
+            on:click={()=>aboutDialog.open()}>   
+            <div class="logo" title="About Tables"><LogoIcon /></div>
+            <div class="cog"><SvgIcon icon=faCog size="20px" color="#fff"/></div>
+        </div>
+    <!-- {/if} -->
 </div>
 
 <style>
     .boards-section {
         display: flex;
         flex-wrap: wrap;
+        padding-left: 10px;
     }
 
     .board-menu {
@@ -148,15 +154,19 @@
 
     .board {
         width: 200px;
+        height: 100px;
         border-radius: 5px;
         padding: 5px;
-        margin: 5px;
+        margin-top: 20px;
+        margin-right: 20px;
+        /* margin: 5px; */
         transition: all .25s ease;
-        border: 1px solid;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgb(200 221 237) 100%);
+        border: 1px solid rgb(84 54 19 / 50%);
+        /* background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgb(200 221 237) 100%); */
+        background: linear-gradient(180deg, rgb(101 71 14) 0%, rgb(178 125 28) 100%);
         position: relative;
         display: block;
-        box-shadow: 0px 4px 8px rgba(35, 32, 74, 0.8);
+        box-shadow: 0px 4px 8px rgb(74 58 32 / 80%);
     }
 
     .board:hover {
@@ -164,8 +174,12 @@
         z-index: 100;
         padding: 9px;
         width: 220px;
-        background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%);
-        margin: 0 -10px 0 -5px;
+        /* background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%); */
+        background: linear-gradient(180deg, rgb(141, 98, 19) 0%, rgb(214, 151, 33) 100%);
+        margin: 0 -1px 0 -10px;
+        margin-right: 10px;
+        margin-top: 14px;
+        height: 120px;
         box-shadow: 0px 4px 14px rgba(35, 32, 74, 0.8);
         z-index: 100;
     }

@@ -6,12 +6,16 @@
   import type { TablesStore } from "./store";
   import SvgIcon from "./SvgIcon.svelte";
   import BoardMenu from "./BoardMenu.svelte";
+  import BoardMenuItem from "./BoardMenuItem.svelte";
+    import { BoardType } from "./boardList";
 
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
 
   $: uiProps = store.uiProps
   $: activeHash = store.boardList.activeBoardHash;
+  $: activeBoard = store.boardList.activeBoard;
+
 
   export let profilesStore: ProfilesStore|undefined
 
@@ -19,7 +23,10 @@
 
 <div class='toolbar'>
   <div class="items">
-    <BoardMenu></BoardMenu>
+    <!-- <BoardMenu></BoardMenu> -->
+    {#if $activeHash}
+    <BoardMenuItem boardType={BoardType.archived} boardHash={$activeHash} />
+    {/if}
   </div>
   <div class="items"><Search></Search></div>
   <div class="items">
@@ -44,7 +51,7 @@
     background-color: #ddd;
   }
   .toolbar {
-    background: linear-gradient(90.1deg, #143C77 4.43%, #261492 99.36%);
+    background: linear-gradient(90.1deg, #774914 4.43%, #ac7f18 99.36%);
     align-items: center;
     justify-content: space-between;
     color: #fff;

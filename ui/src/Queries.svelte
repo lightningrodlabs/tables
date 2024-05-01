@@ -8,6 +8,7 @@ import { onDestroy, onMount } from "svelte";
 import { writable } from 'svelte/store';
 import ReactAdapter from './ReactAdapter.svelte';
 import { formatQuery } from 'react-querybuilder'; // Import the formatQuery function
+import { v1 as uuidv1 } from 'uuid';
 
 export let activeBoard;
 export let state;
@@ -101,6 +102,15 @@ function onQueryChange(newQuery) {
 
 
 <div style="display: flex; margin: 7px;">
+
+  <button class="new-query"
+    on:click={() => 
+      {
+        // console.log(formatQuery($queryStore, 'cel'))
+        newQueryBool = true
+      }
+    }
+  >+ query</button>
   <!-- <div>Queries</div> -->
   <!-- <select
     on:change={(e) => {
@@ -121,26 +131,20 @@ function onQueryChange(newQuery) {
           changeQuery(q.query);
         }
       }}
-        style="margin-left: 6px; cursor: pointer; border: 1px solid; padding: 5px;"
-      >{q.label}
+        style="display:flex; margin-left: 6px; cursor: pointer; border: 1px solid; padding: 5px; font-weight: bold; background-color: #00000078;"
+      >
+      <div
+        class="remove-query"
+        on:click={() => {
+          activeBoard.requestChanges([{ type: "remove-query", query: q}]);
+        }}
+      >&times;</div>
+      {q.label}
     </div>
-    <div
-      style="margin-right: 10px; cursor: pointer; padding: 5px;"
-      on:click={() => {
-        activeBoard.requestChanges([{ type: "remove-query", query: q}]);
-      }}
-    >&times;</div>
+
     {/each}
     <!-- <option value="new">New</option> -->
   <!-- </select> -->
-  <button style="width: 100px; margin-left: 5px;"
-    on:click={() => 
-      {
-        // console.log(formatQuery($queryStore, 'cel'))
-        newQueryBool = true
-      }
-    }
-  >+ new query</button>
 </div>
 
 {#if fields && newQueryBool}
@@ -153,7 +157,7 @@ function onQueryChange(newQuery) {
     if (queryName === "") {
       queryName = "Query " + $state.queries.length
     }
-    activeBoard.requestChanges([{ type: "add-query", query: {label: queryName, query: formatQuery($queryStore, 'cel')}}]);
+    activeBoard.requestChanges([{ type: "add-query", query: {label: queryName, query: formatQuery($queryStore, 'cel'), id: uuidv1()}}]);
     newQueryBool = false;
     queryName = "";
   }}>Save</button>
@@ -181,5 +185,42 @@ function onQueryChange(newQuery) {
     background-color: #cecece;
     border: 3px solid !important;
     padding: 3px !important;
+  }
+
+  .new-query {
+    width: 68px;
+    padding: 0px;
+    font-size: 12px;
+    height: 33px;
+    background-color: #986526;
+    color: white;
+    font-weight: bold;
+    border: 0;
+    border-radius: 2px;
+    text-transform: capitalize;
+    transition: background-color 0.2s;
+  }
+
+  .new-query:hover {
+    background-color: #ee9127;
+    /* transition */
+    transition: background-color 0.2s;
+  }
+
+  .remove-query {
+    margin-right: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0px 5px;
+    background-color: transparent;
+    border: 1px solid;
+    border-radius: 20px;
+    height: 20px;
+    transition: background-color 0.2s;
+  }
+
+  .remove-query:hover {
+    background-color: rgba(210, 147, 0, 0.608);
+    transition: background-color 0.2s;
   }
 </style>

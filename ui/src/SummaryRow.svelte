@@ -184,11 +184,11 @@
         {/if}
 
         {#if !embedded}
-          <div style="float: right; color: white;">
+          <div style="float: right; color: #baa480;">
             {SumType[sumType]}
           {#if def.type == ColumnType.Number}
             <select
-              style="width: 17px;"
+              style="width: 15px;"
               bind:value={sumType}
               on:change={(e)=>{
                 const columnDefs = cloneDeep($state.columnDefs);
@@ -221,7 +221,7 @@
             </select>
           {:else if def.type == ColumnType.String || def.type == ColumnType.Date || def.type == ColumnType.Email || def.type == ColumnType.WeaveAsset || def.type == ColumnType.TableLink}
             <select
-              style="width: 17px;"
+              style="width: 15px;"
               bind:value={sumType}
               on:change={(e)=>{
                 const columnDefs = cloneDeep($state.columnDefs);
@@ -255,7 +255,7 @@
 
 <style>
 
-.data-row {
+  .data-row {
     display:flex;
     /* border-bottom: 1px dashed; */
     width: fit-content;
@@ -269,6 +269,18 @@
     text-overflow: ellipsis;
     background-color: #a9a9a9; 
     color: white;
+  }
+
+  .column-summary {
+    background-color: #964d08;
+    border: 1px solid rgb(108, 53, 1);
+    color: #baa480;
+  }
+
+  select {
+    background-color: #baa480;
+    color: #ece0cc;
+    border: none;
   }
 
 </style>

@@ -32,7 +32,7 @@
     let boardEditor
 
 </script>
-<sl-dialog bind:this={dialog} label="New Table"
+<sl-dialog bind:this={dialog} label="New Tub"
     on:sl-initial-focus={(e)=>{
         boardEditor.initialFocus()
         e.preventDefault()
@@ -41,5 +41,6 @@
         if (event.detail.source === 'overlay') {
         event.preventDefault();    
   }}}>
+
     <BoardEditor bind:this={boardEditor}  handleSave={addBoard} cancelEdit={()=>dialog.hide()} />
 </sl-dialog>

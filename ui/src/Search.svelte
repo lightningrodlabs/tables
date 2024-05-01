@@ -147,8 +147,10 @@
 }
 sl-input::part(base) {
     color: #fff;
-    background-color: rgb(10 17 76);
-    border: 1px solid rgba(71, 76, 154, 1.0);
+    /* background-color: rgb(10 17 76); */
+    /* border: 1px solid rgba(71, 76, 154, 1.0); */
+    background-color: rgb(188, 128, 25);
+    border: 1px solid rgb(188, 128, 25);
 }
 
 sl-input::part(input) {

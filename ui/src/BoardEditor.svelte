@@ -104,9 +104,10 @@
 </script>
 
   <div class='board-editor'>
-    <div class="edit-title setting">
-      <div class="title-text">Title</div> <sl-input class='textarea' maxlength="60" bind:this={nameInput}  on:input={e=>text= e.target.value}></sl-input>
-    </div>
+    <!-- <div class="edit-title setting"> -->
+      <!-- <div class="title-text">Title</div>  -->
+      <sl-input class='textarea' maxlength="60" bind:this={nameInput}  on:input={e=>text= e.target.value}></sl-input>
+    <!-- </div> -->
     {#if boardHash && false}
 
    
@@ -249,6 +250,7 @@
     padding: 5px;
     margin-right: 5px;
     font-weight: normal;
+    border:none;
   }
 
   .setting {
@@ -338,5 +340,8 @@
   border-radius: 4px;
   padding: 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: rgba(0, 0, 0, 0.6);
+  border:none;
 }
+
 </style>

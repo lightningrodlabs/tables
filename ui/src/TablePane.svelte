@@ -303,7 +303,7 @@
   {:else}
     <div class="data-table">
       <div class="header-row">
-        <div style="width:22px; cursor: pointer; border-right: 1px dashed;">
+        <div style="width:22px; cursor: pointer; border-right: 1px solid #462700;">
           <!-- <sl-button
             on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
             circle size=small> -->
@@ -342,7 +342,7 @@
         </div>
         {#if isDragging}
           {#each $state.rows as row}
-            <div class="data-cell" style="width:{width}px; background-color: #f0f0f0; border-right: 1px dashed; border-bottom: 1px dashed;">
+            <div class="data-cell" style="width:{width}px; background-color: #f0f0f0; border-right: 1px solid #462700; border-bottom: 1px dashed #462700;">
               {row.cells[$state.columnDefs[index].id]?.value || "null"}
             </div>
           {/each}
@@ -360,8 +360,8 @@
           showAddColumnModal = true;
         }}
       >
-      <div style="display:flex; align-items: center; justify-content: center; width:18px; height:18px; cursor: pointer; margin: 2px;">
-        <SvgIcon icon=faPlus size=10/>
+      <div class="add-column-button">
+        <SvgIcon icon=faPlus size=10 style="height:23px;"/>
       </div>
       
       </div>
@@ -397,14 +397,16 @@
         <!-- {queriedData} -->
         {#if queriedData[activeHashB64] && queriedData[activeHashB64].indexOf(row.id) == -1 ? null : true}
           <div class="data-row">
-            <div style="width:22px; cursor: pointer; border-right: 1px dashed">
+            <div style="width:72px; cursor: pointer; border-right: 1px dashed #462700">
               <!-- <sl-button
                 on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
                 circle size=small> -->
-                <div style="display:flex; align-items: center; justify-content: center; width:18px; height:18px; cursor: pointer; margin: 2px;"
+                <div 
+                  class="expand-button"
                   on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}}
                 >
-                <SvgIcon icon="expand" size="16px"/>
+                <!-- Expand -->
+                <SvgIcon icon="expand" size="14px"/>
               </div>
               <!-- </sl-button> -->
               </div>
@@ -450,18 +452,21 @@
         {/if}
       {/each}
       
-      <div size="small" circle style="margin-left:3px; cursor: pointer;" on:click={async ()=>{
+      <div size="small" circle style="margin-left:50px; cursor: pointer;" 
+      class="add-column-button"
+      on:click={async ()=>{
         const cells = {}
         //$state.columnDefs.forEach(def=>cells[def.id]={value: null, attachments:[]})
         const row = new Row(store.myAgentPubKeyB64, cells)
         await activeBoard.requestChanges([{ type: "add-row",  row}]);
         queriedData[activeHashB64] = activeBoard.state().rows.map(row=>row.id)
       }} >          
-          <SvgIcon icon=faPlus size=10/>
+          <SvgIcon icon=faPlus size=10 style="height: 23px;"/>
         </div>
       </div>
-      <div class="data-row">
-        <div style="width:22px; cursor: pointer; border-right: 1px dashed">
+      <div class="summary-row">
+        <div class="summary-row-label" style="margin-left: 20px;">
+          All data
         </div>
         {#each $state.columnDefs as def, x}
           <SummaryRow activeBoard={activeBoard} def={def} width={width} sumType={def.sumType} />
@@ -469,16 +474,18 @@
       </div>
       {#if $state.summaryRows && $state.summaryRows.length}
       {#each $state.summaryRows as summaryRow}
-        <div class="data-row" style="margin-left: 20px; margin-top: 2px;">
-          {summaryRow.queryLabel}
-          <button
-            style="margin-left: 10px;"
-            on:click={()=>{activeBoard.requestChanges([{ type: "remove-summary-row", id: summaryRow.id}]);}}
-          >delete</button>
-        </div>
-        <div class="data-row">
-          <div style="width:22px; cursor: pointer; border-right: 1px dashed">
+      <div class="summary-row">
+        <button
+          class="remove-summary-row"
+          on:click={()=>{activeBoard.requestChanges([{ type: "remove-summary-row", id: summaryRow.id}]);}}
+        >x</button>
+          <div class="summary-row-label">
+              {summaryRow.queryLabel}
           </div>
+          <!-- {summaryRow.queryLabel} -->
+
+          <!-- <div style="width:22px; cursor: pointer;">
+          </div> -->
           {#each $state.columnDefs as def, x}
             <SummaryRow activeBoard={activeBoard} def={def} width={width} query={summaryRow.query} sumType={summaryRow.summaryDefs[def.id] ? summaryRow.summaryDefs[def.id] : 0}
               on:set-sumtype={(e)=>{
@@ -557,7 +564,8 @@
     height: 100%;
     overflow: auto;
     background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.6);
+    border: none;
   }
   
   .modal-content {
@@ -597,8 +605,8 @@
   }
 
   .data-table {
-    min-height: 200px;
-    border-bottom: 1px solid;
+    /* min-height: 200px; */
+    /* border-bottom: 1px solid; */
   }
   .header-row {
     display:flex;
@@ -609,7 +617,7 @@
     font-weight: bold;
     color: black;
     background-color: #ededed;
-    border-top: 1px dashed;
+    border-top: 1px solid #462700;
   }
 
   .header-caret {
@@ -623,23 +631,41 @@
     /* background: linear-gradient(360deg, rgba(189, 209, 230, 0) 0%, rgba(185, 185, 185, 0.81) 100%); */
     border: 0 !important;
   }
+
+  .header-row {
+    margin-left: 60px;
+  }
  
   .data-row {
     display:flex;
     /* border-bottom: 1px dashed; */
     width: fit-content;
+    margin-left: 10px;
   }
+
+  .summary-row {
+    display:flex;
+    /* border-bottom: 1px dashed; */
+    width: fit-content;
+  }
+
   .data-cell, .header-cell {
     padding-right: 2px;
     padding-left: 2px;
-    border-right: 1px dashed;
-    border-bottom: 1px dashed;
+    border-right: 1px solid #462700;
+    border-bottom: 1px solid #462700;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  /* .data-cell {
-  } */
+  .header-cell {
+    background-color: #baa480;
+  }
+
+  .data-cell {
+    background-color: #f2e3cb;
+    color: rgb(20, 20, 20);
+  }
 
   .board {
     display: flex;
@@ -658,7 +684,8 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    background-color: #fff;
+    /* background-color: #fff; */
+    background-color: #b789327b;
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 0;
@@ -757,6 +784,8 @@
     align-items: center;
     justify-content: center;
     transition: all .25s ease;
+    color: white;
+    margin-left: 6px !important;
   }
   
   .board-button:hover {
@@ -850,7 +879,7 @@
   }
 
   .new-column-button {
-    width: 40px;
+    width: 60px;
     transform: scale(1);
     transition: all .25s ease;
     display: flex;
@@ -1151,4 +1180,61 @@
     opacity: 0.5;
   }
 
+  .remove-summary-row {
+    width: 14px;
+    height: 14px;
+    background: rgb(190, 114, 0);
+    border: 0px;
+    border-radius: 14px;
+    color: white;
+    font-weight: bold;
+    font-size: 10px;
+    margin-top: 8px;
+    margin-left: 6px;
+  }
+
+  .remove-summary-row:hover {
+    background: rgb(243, 153, 19);
+  }
+
+  .summary-row-label {
+    width: 62px; padding: 6px; font-size: 12px; overflow:hidden; text-overflow:ellipsis; height: 28px; font-style: italic;
+  }
+
+  .expand-button {
+    background-color:#baa480; 
+    color:#462700; 
+    font-weight: bold; 
+    display:flex; 
+    align-items: center; 
+    justify-content: center; 
+    width:20px; 
+    height:20px; 
+    cursor: pointer; 
+    margin: 2px;
+    margin-left: 40px;
+    border-radius: 2px;
+  }
+
+  .expand-button:hover {
+    background-color:rgb(94, 86, 70);
+  }
+
+  .add-column-button {
+    background-color:#baa480; 
+    color:#462700; 
+    font-weight: bold; 
+    display:flex; 
+    align-items: center; 
+    justify-content: center; 
+    width:20px; 
+    height:20px; 
+    cursor: pointer; 
+    margin: 2px;
+    border-radius: 2px;
+  }
+
+  .add-column-button:hover {
+    background-color:rgb(246, 214, 161);
+  }
 </style>

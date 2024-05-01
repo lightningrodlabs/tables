@@ -19,7 +19,7 @@
     }
 	.primary{
 		color:white;
-        background-color: lightskyblue;
+		background-color: rgb(221, 143, 40);
 	}
 	.secondary{
 		color:black;

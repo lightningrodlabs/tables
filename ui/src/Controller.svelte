@@ -9,6 +9,7 @@
     import type { WeClient } from '@lightningrodlabs/we-applet';
     import NewBoardDialog from './NewBoardDialog.svelte';
     import SvgIcon from "./SvgIcon.svelte";
+    import BoardMenu from "./BoardMenu.svelte";
 
     export let roleName = ""
     export let client : AppAgentClient
@@ -62,8 +63,10 @@
           <TablePane activeBoard={$activeBoard}/>
         {:else}
           <div style="margin:20px;">
-            <h2>Tables</h2>
-            <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Table"><SvgIcon color="white" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:white">New Table</span></div>
+            <!-- <h2>Data Tubs</h2> -->
+            <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Tub"><SvgIcon color="white" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Tub</span></div>
+            <BoardMenu mainpage={true} />
+            
           </div>
         {/if}
         </div>
@@ -80,7 +83,10 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
-    background-color: #fff;
+    /* background-color: #fff; */
+    background-image: url('/datatub.png');
+    /* make background image vertically centered */
+    background-position: center;
     height: 100vh;
     position: relative;
   }
@@ -90,10 +96,12 @@
     padding:5px;
         box-sizing: border-box;
         position: relative;
-        width: 200px;
+        width: 160px;
         height: 35px;
-        background: rgba(24, 55, 122, 1.0);
-        border: 1px solid #4A559D;
+        /* background: rgba(24, 55, 122, 1.0);
+        border: 1px solid #4A559D; */
+        background: #774914;
+        border: 1px solid #583409;
         color: #fff;
         display: flex;
         align-items: center;
@@ -102,16 +110,18 @@
         font-weight: bold;
         transition: all .25s ease;
         top: 3px;
-        padding: 15px 0px;
+        padding: 15px 4px;
         box-shadow: 0px 4px 8px rgba(35, 32, 74, 0);
     }
 
     .new-board:hover {
         cursor: pointer;
         padding: 20px 5px;
-        width: 210px;
-        border: 1px solid #252d5d;
-        background: rgb(10, 25, 57);
+        width: 170px;
+        /* border: 1px solid #252d5d; */
+        /* background: rgb(10, 25, 57); */
+        border: 1px solid #885415;
+        background: #c3751d;
         margin: 0 -5px 0 -5px;
         box-shadow: 0px 4px 15px rgba(35, 32, 74, 0.8);
     }

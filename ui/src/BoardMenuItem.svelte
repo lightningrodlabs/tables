@@ -13,6 +13,7 @@
 
   export let boardHash: EntryHash
   export let boardType: BoardType
+  export let largeDisplay: boolean = false
 
   let width = 10
 
@@ -28,7 +29,8 @@
         <div class="unread"></div>
       {/if}
 
-      <div class="board-name">{$boardData.value.latestState.name}</div>
+      <div class="board-name">{$boardData?.value?.latestState?.name}</div>
+
       {#if boardType == BoardType.active}
       <div style="width:100%; display:flex; justify-content:flex-end" bind:clientWidth={width}>
         <Participants board={$boardData.value.board} max={Math.floor(width/30)}></Participants>
@@ -43,6 +45,18 @@
       {$boardData.error}
     {/if}
 </div>
+
+{#if largeDisplay}
+  <div style="display:flex; flex-direction:column; width: 100%">
+    <div class="board-name">
+      {$boardData?.value?.latestState?.columnDefs.length} fields
+    </div>
+    <div class="board-name">
+      {$boardData?.value?.latestState?.rows.length} entries
+    </div>
+  </div>
+{/if}
+
 <style>
   .unread {
     margin-right: 4px;
