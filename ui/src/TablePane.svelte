@@ -28,6 +28,7 @@
   import CellDisplay from "./CellDisplay.svelte";
   import DataView from "./DataView.svelte";
   import Queries from './Queries.svelte'
+  import { scale } from 'svelte/transition';
 
   class MyRenderer extends Renderer {
     override link(href: string, title : string, text: string) {
@@ -222,20 +223,20 @@
               <SvgIcon icon="link" size="20px"/>
             </button>
             {#if $state.props.attachments}
-              <AttachmentsList attachments={$state.props.attachments}
+              <div style="margin-top: 2.5px">
+                <AttachmentsList attachments={$state.props.attachments}
                 allowDelete={false}/>
+              </div>
             {/if}
           </div>
         {/if}
-        <sl-menu-item  on:click={() => {dataView = !dataView}} class="leave-board" >
+        <!-- <sl-menu-item  on:click={() => {dataView = !dataView}} class="leave-board" >
           {#if dataView}
-            <!-- <SvgIcon icon="faEdit" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" /> -->
             <span>Table View</span>
           {:else}
-            <!-- <SvgIcon icon="faClone" style="background: transparent; opacity: .5; position: relative; top: -2px;" size="12px" /> -->
             <span>Data View</span>
           {/if}
-        </sl-menu-item>
+        </sl-menu-item> -->
         <!-- <sl-menu-item  on:click={() => {showQueryBuilder = !showQueryBuilder}} class="leave-board" >
           {#if showQueryBuilder}
             <span>Hide Query Builder</span>
@@ -342,7 +343,7 @@
         </div>
         {#if isDragging}
           {#each $state.rows as row}
-            <div class="data-cell" style="width:{width}px; background-color: #f0f0f0; border-right: 1px solid #462700; border-bottom: 1px dashed #462700;">
+            <div class="data-cell" style="width:{width}px; background-color: #f0f0f0; border-right: 1px solid #462700; border-bottom: 1px solid #462700;">
               {row.cells[$state.columnDefs[index].id]?.value || "null"}
             </div>
           {/each}
@@ -397,14 +398,25 @@
         <!-- {queriedData} -->
         {#if queriedData[activeHashB64] && queriedData[activeHashB64].indexOf(row.id) == -1 ? null : true}
           <div class="data-row">
-            <div style="width:72px; cursor: pointer; border-right: 1px dashed #462700">
+            <div style="width:72px; cursor: pointer; border-right: 1px solid #462700; display:flex;">
               <!-- <sl-button
                 on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
                 circle size=small> -->
-                <div 
-                  class="expand-button"
-                  on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}}
-                >
+              <div
+                class="trash-button"
+                on:click={(e)=>{
+                  e.stopPropagation(); 
+                  let id = row.id
+                  activeBoard.requestChanges([{ type: "delete-row", id }]);
+                }}
+              >
+                <!-- Expand -->
+                <SvgIcon icon="faTrash" size="10px"/>
+              </div>
+              <div 
+                class="expand-button"
+                on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}}
+              >
                 <!-- Expand -->
                 <SvgIcon icon="expand" size="14px"/>
               </div>
@@ -421,7 +433,7 @@
                       columnDef={def}
                       boardHash={activeBoard.hash}
                       cellId={{rowId: row.id, columnId: def.id}}
-                      width={width}
+                      width={width-34}
                       type={def.type}
                       cell={cell}
                       allColumnCells={cells}
@@ -452,7 +464,7 @@
         {/if}
       {/each}
       
-      <div size="small" circle style="margin-left:50px; cursor: pointer;" 
+      <div size="small" circle style="margin-left:61px; cursor: pointer;" 
       class="add-column-button"
       on:click={async ()=>{
         const cells = {}
@@ -497,16 +509,23 @@
       {/each}
       {/if}
       {#if newSummaryRowModal}
-        <div class="modal">
-          <div class="modal-content">
+        <div class="modal" on:click={
+          (e)=>{
+            if (e.target == e.currentTarget) {
+              newSummaryRowModal = false
+            }
+          }
+        }>
+          <div class="modal-content" transition:scale="{{ duration: 200 }}">
             <div class="modal-header">
-              <span class="close" on:click={()=>{newSummaryRowModal = false}}>&times;</span>
-              <h2>Add summary rows</h2>
+              <h2>
+                <span class="close" on:click={()=>{newSummaryRowModal = false}}>&times;&nbsp;</span>
+                Add summary rows</h2>
             </div>
             {#each $state.queries as query}
               <div class="modal-body" style="display:flex; margin: 10px 0">
                 <button
-                  style="width: 20px;"
+                  class="add-summary-row-button"
                   on:click={()=>{
                     // add summary row to board
                     let summaryDefs = {}
@@ -517,16 +536,22 @@
                       summaryDefs[def.id] = 0
                     })
                     activeBoard.requestChanges([{ type: "add-summary-row", summaryRow: {id: uuidv1(), query: query.query, queryLabel: query.label, summaryDefs: summaryDefs}}]);
-                  }}>+</button>&nbsp;
+                  }}>
+                  <SvgIcon icon=faPlus size=10 style="height:20px;"/>
+                  </button>&nbsp;
                 <h3>{query.label}</h3>
               </div>
             {/each}
-            <button on:click={()=>{newSummaryRowModal = false}}>Done</button>
+            <!-- <button on:click={()=>{newSummaryRowModal = false}}>Done</button> -->
           </div>
         </div>
       {/if}
       <div class="data-row">
-        <button style="width: 20px" on:click={()=>{newSummaryRowModal = true}}>+</button>
+        <!-- <button style="width: 20px" on:click={()=>{newSummaryRowModal = true}}> -->
+      <div class="add-column-button" style="margin-left: 51px" on:click={()=>{newSummaryRowModal = true}}>
+
+          <SvgIcon icon=faPlus size=10 style="height:23px;"/>
+      </div>
       </div>
   {/if}
   {/if}
@@ -569,7 +594,7 @@
   }
   
   .modal-content {
-    background-color: #fefefe;
+    background-color: #ffecd4;
     position: static;
     left: 0;
     margin: 15% auto;
@@ -592,7 +617,7 @@
 
   .close {
     color: #aaa;
-    float: right;
+    /* float: right; */
     font-size: 28px;
     font-weight: bold;
   }
@@ -703,6 +728,7 @@
   .board-name {
     font-size: 24px;
     padding-left: 5px;
+
   }
   .right-items {
     display: flex;
@@ -774,7 +800,7 @@
   .board-button {
     width: 30px;
     height: 30px;
-    background: #FFFFFF;
+    background: #e6a85d;
     border: 1px solid rgba(35, 32, 74, 0.1);
     box-shadow: 0px 4px 4px rgba(66, 66, 66, 0.1);
     border-radius: 5px;
@@ -1124,7 +1150,8 @@
     justify-content: center;
     border-radius: 5px;
     margin-right: 10px;
-    border: 1px solid rgba(235, 235, 238, 1.0);
+    /* border: 1px solid rgba(235, 235, 238, 1.0); */
+    border: none;
     background-color: rgba(255,255,255,.8);
   }
 
@@ -1133,9 +1160,11 @@
     height: 30px;
     padding: 4px;
     border-radius: 50%;
-    border: 1px solid rgba(235, 235, 238, 1.0);
-    background-color: rgba(255,255,255,.8);    
+    border: 1px solid #f2bb78;
+    background-color: #e6a85d;    
+    transition: all .25s ease;
   }
+
   :global(.attachment-button:hover) {
     transform: scale(1.25);
   }
@@ -1181,16 +1210,17 @@
   }
 
   .remove-summary-row {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
+    padding: 2px;
     background: rgb(190, 114, 0);
     border: 0px;
     border-radius: 14px;
     color: white;
     font-weight: bold;
     font-size: 10px;
-    margin-top: 8px;
-    margin-left: 6px;
+    margin-top: 5px;
+    margin-left: 2px;
   }
 
   .remove-summary-row:hover {
@@ -1198,22 +1228,33 @@
   }
 
   .summary-row-label {
-    width: 62px; padding: 6px; font-size: 12px; overflow:hidden; text-overflow:ellipsis; height: 28px; font-style: italic;
+    width: 62px; padding: 6px; 
+    font-size: 12px; 
+    overflow:hidden; text-overflow:ellipsis; 
+    height: 24px; 
+    font-style: italic;
   }
 
-  .expand-button {
+  .expand-button, .trash-button {
     background-color:#baa480; 
     color:#462700; 
     font-weight: bold; 
     display:flex; 
     align-items: center; 
     justify-content: center; 
-    width:20px; 
-    height:20px; 
+    width:19px; 
+    height:19px; 
     cursor: pointer; 
     margin: 2px;
-    margin-left: 40px;
     border-radius: 2px;
+  }
+
+  .trash-button {
+    margin-left: 30px;
+  }
+  
+  .trash-button:hover {
+    background-color:#f9ddb1; 
   }
 
   .expand-button:hover {
@@ -1227,14 +1268,32 @@
     display:flex; 
     align-items: center; 
     justify-content: center; 
-    width:20px; 
-    height:20px; 
+    width:19px; 
+    height:18px; 
     cursor: pointer; 
     margin: 2px;
     border-radius: 2px;
   }
 
   .add-column-button:hover {
+    background-color:rgb(246, 214, 161);
+  }
+
+  .add-summary-row-button {
+    background-color:#baa480; 
+    color:#462700; 
+    font-weight: bold; 
+    display:flex; 
+    align-items: center; 
+    justify-content: center; 
+    width:19px; 
+    height:18px; 
+    cursor: pointer; 
+    margin: 2px;
+    border-radius: 2px;
+  }
+
+  .add-summary-row-button:hover {
     background-color:rgb(246, 214, 161);
   }
 </style>

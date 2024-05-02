@@ -226,7 +226,7 @@
 }
 
 .modal-content {
-  background-color: #fefefe;
+  background-color: #ffecd4;
   position: static;
   left: 0;
   margin: 15% auto;

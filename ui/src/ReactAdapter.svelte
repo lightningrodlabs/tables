@@ -28,10 +28,24 @@
 
 <style>
   :global(.ruleGroup) {
-    background-color: white;
+    background-color: #b789327b;
+    border-color: #b78932db;
+    width: fit-content;
     border-radius: 0;
     /* border: 0; */
     margin: 12px;
     margin-top: 6px;
+  }
+
+  :global(.ruleGroup select, .ruleGroup button, .ruleGroup input) {
+    background-color: #986526;
+    border: 1px solid #b78932db;
+    color: #ffffffca;
+    padding: 2px 4px;
+    font-weight: bold;
+  }
+
+  :global(.ruleGroup select:hover, .ruleGroup button:hover, .ruleGroup input:focus) {
+    background-color: #c27b24;
   }
 </style>

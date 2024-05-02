@@ -60,6 +60,7 @@
         const attachment: HrlWithContext = { hrl: [store.dnaHash, boardHash], context: {cellId: cellId, def: columnDef, assetType: "Cell"} }
         console.log("attachment", attachment)
         store.weClient?.walToPocket(attachment)
+        dispatch("cancel")
     }
 
     onMount(async () => {
@@ -87,14 +88,15 @@
 </script>
 
 {#if store.weClient}
-    <span style="position: absolute; z-index: 1; margin-left: 170px;" title="Add this card to pocket" on:click={()=>copyWalToPocket()}>
-      <SvgIcon icon=addToPocket size="25px"/>
+    <span class="copyWal" title="Add this card to pocket" on:click={()=>copyWalToPocket()}>
+      <SvgIcon icon=addToPocket size="20px"/>
     </span>
 {/if}
 
 {#if slTypes[type] !== undefined}
     {@const allColumnValuesExceptThisCell = cellValuePresent ? allColumnValues.filter((v)=>v!=cell.value) : allColumnValues}
-    <sl-input
+    <!-- <sl-input
+    class="edit-cell-input"
     class:duplicate = {allColumnValuesExceptThisCell.includes(value) && unique}
     size="small"
     bind:this={inputElement}
@@ -110,6 +112,37 @@
     style="width:{width}px" 
     value={value} 
     on:sl-input={(e)=>{
+        value = e.target.value
+    }}
+    on:keydown={(e)=> {
+        if (e.keyCode == 27) {
+            closing="cancel"
+            dispatch("cancel")
+        }
+        if (e.keyCode == 13 && (!allColumnValuesExceptThisCell.includes(value) || !unique)) {
+            closing="save"
+            inputElement.blur()
+        }
+    }}
+/> -->
+
+<input 
+    class="edit-cell-input"
+    class:duplicate = {allColumnValuesExceptThisCell.includes(value) && unique}
+    size="small"
+    bind:this={inputElement}
+    on:blur={()=>{
+        if (closing!="cancel") {
+            const value = inputElement.value
+            if (value != origValue) {
+                dispatch("save", value)
+            }
+        }
+    }}
+    type={slTypes[type]} 
+    style="width:{width}px" 
+    value={value} 
+    on:input={(e)=>{
         value = e.target.value
     }}
     on:keydown={(e)=> {
@@ -159,7 +192,7 @@
         />
         {/if}
         <button title="Search For Attachment" class="attachment-button" style="margin-right:10px" on:click={async ()=>{
-        const hrl = await store.weClient.userSelectHrl()
+        const hrl = await store.weClient.userSelectWal()
         if (hrl) {
             value = weaveUrlFromWal(hrl)
             dispatch("save", value)
@@ -190,4 +223,33 @@
     .duplicate {
         border: 2px solid red;
     }
+
+    .copyWal {
+        position: absolute; z-index: 1; margin-left: 170px;
+        cursor: pointer;
+        border-radius: 100%;
+        padding: 0px;
+        width: 22px;
+        height: 22px;
+        margin-top: 0px;
+        padding: 1px;
+    }
+
+    .copyWal:hover {
+        background-color: #e6a85d;
+    }
+
+    .edit-cell-input {
+        background-color: rgb(251, 216, 174);
+        border: 0;
+        outline: 1px solid #e6a85d;
+        margin: 2px;
+        display: inline-block;
+        width: 100%;
+    }
+
+    /* :global(.edit-cell-input) {
+        --sl-input-background-color: #e6a85d !important;
+        --sl-input-focus-ring-color: transparent;
+    } */
 </style>

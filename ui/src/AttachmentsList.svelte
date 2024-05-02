@@ -1,11 +1,11 @@
 <script lang="ts">
   import "@shoelace-style/shoelace/dist/components/skeleton/skeleton.js";
   import { createEventDispatcher, getContext } from "svelte";
-  import type { TablesStore } from "./store";
-  import { type WALUrl } from "./util";
-  import { weaveUrlFromWal, weaveUrlToWAL, WeClient } from "@lightningrodlabs/we-applet";
+  import type { CalcyStore } from "./store";
+  import { weaveUrlToWAL, type WAL } from "@lightningrodlabs/we-applet";
   import SvgIcon from "./SvgIcon.svelte";
   import { hrlToString } from "@holochain-open-dev/utils";
+  import type { WALUrl } from "./util";
 
   const dispatch = createEventDispatcher()
 
@@ -13,21 +13,38 @@
   export let allowDelete = true
 
   const { getStore } :any = getContext("store");
-  let store: TablesStore = getStore();
+  let store: CalcyStore = getStore();
   
 </script>
 <div class="attachments-list">
   {#each attachments as attachment, index}
-  {@const wal = weaveUrlToWAL(attachment)}
-  <div 
+    {@const wal = weaveUrlToWAL(attachment)}
+    <div 
       class:attachment-item-with-delete={allowDelete}
       class:attachment-item={!allowDelete}
     >
       {#await store.weClient.assetInfo(wal)}
-        <div style="cursor:pointer; padding: 0 5px 0 5px; border: dashed 1px;margin-right:5px" title={`${hrlToString(wal.hrl)}?${JSON.stringify(wal.context)}`}> ?...</div>
-      {:then { assetInfo }}
-        <sl-button  size="small"
-          on:click={async (e)=>{
+        <div style="cursor:pointer; padding: 0 5px 0 5px; border: dashed 1px;margin-right:5px;" title={`Resolving WAL: ${hrlToString(wal.hrl)}?${JSON.stringify(wal.context)}`}> ...</div>
+      {:then data}
+        {#if data}
+          {@const assetInfo = data.assetInfo}
+          <!-- <sl-button  size="small"
+            on:click={async (e)=>{
+                e.stopPropagation()
+                try {
+  //                embedLink = index
+                  await store.weClient.openWal(wal)
+                } catch(e) {
+                  alert(`Error opening link: ${e}`)
+                }
+              }}
+            style="display:flex;flex-direction:row;margin-right:5px"><sl-icon src={assetInfo.icon_src} slot="prefix"></sl-icon>
+            {assetInfo.name}
+          </sl-button> -->
+          <button 
+            class="attachment-button-single"
+            title="Open Attachment"
+            on:click={async (e)=>{
               e.stopPropagation()
               try {
                 await store.weClient.openWal(wal)
@@ -35,11 +52,16 @@
                 alert(`Error opening link: ${e}`)
               }
             }}
-          style="display:flex;flex-direction:row;margin-right:5px"><sl-icon src={assetInfo.icon_src} slot="prefix"></sl-icon>
-          {assetInfo.name}
-        </sl-button> 
+          >
+          <sl-icon src={assetInfo.icon_src}></sl-icon>
+          &nbsp;{assetInfo.name}
+          </button>
+        {:else} 
+        <div style="color:red; cursor:pointer; padding: 0 5px 0 5px; border: dashed 1px;margin-right:5px" title={`Failed to resolve WAL: ${hrlToString(wal.hrl)}?${JSON.stringify(wal.context)}`}>Bad WAL</div>
+
+        {/if}
       {:catch error}
-        Oops. something's wrong.
+        <div style="color:red">Error getting asset info: {error}</div>
       {/await}
       {#if allowDelete}
         <sl-button size="small"
@@ -54,11 +76,26 @@
   {/each}
 </div>
 <style>
+  .attachment-button-single {
+    display:flex;
+    flex-direction:row;
+    align-items:center;
+    padding: 4px;
+    border-radius: 4px;
+    background-color: #fbd8ae;
+    border: 0;
+    cursor: pointer;
+    width: fit-content;
+    height: 18px !important;
+    display:flex;flex-direction:row;
+    margin-right:5px;
+    margin-top:3px; 
+  }
+
   .attachments-list {
     display:flex;
     flex-direction:row;
     flex-wrap: wrap;
-    align-items: center;
   }
   .attachment-item {
   }

@@ -24,9 +24,13 @@
 <div class='toolbar'>
   <div class="items">
     <!-- <BoardMenu></BoardMenu> -->
-    {#if $activeHash}
-    <BoardMenuItem boardType={BoardType.archived} boardHash={$activeHash} />
-    {/if}
+    <h1 style="margin-left: 20px; font-size: 24px; font-family:math; font-style: oblique;
+    letter-spacing: 4px;">data⊈tub</h1>
+    <!-- {#if $activeHash}
+    <div style="margin-left: 20px;">
+      <BoardMenuItem boardType={BoardType.archived} boardHash={$activeHash} />
+    </div>
+    {/if} -->
   </div>
   <div class="items"><Search></Search></div>
   <div class="items">
@@ -51,7 +55,7 @@
     background-color: #ddd;
   }
   .toolbar {
-    background: linear-gradient(90.1deg, #774914 4.43%, #ac7f18 99.36%);
+    background: linear-gradient(90.1deg, rgb(101 62 14) 0%, rgb(118, 75, 26) 100%);
     align-items: center;
     justify-content: space-between;
     color: #fff;

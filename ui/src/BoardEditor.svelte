@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { LabelDef, type BoardProps, ColumnDef, Board, ColumnType } from './board';
+    import { LabelDef, type BoardProps, ColumnDef, Board, ColumnType, SumType } from './board';
     import { getContext, onMount } from 'svelte';
   	import DragDropList, { VerticalDropZone, reorder, type DropEvent } from 'svelte-dnd-list';
     import 'emoji-picker-element';
@@ -27,7 +27,7 @@
     let text = ''
     let props:BoardProps = {bgUrl: "", attachments: []}
     let labelDefs: Array<LabelDef> = []
-    let columnDefs: Array<ColumnDef> = []
+    let columnDefs: Array<ColumnDef> = [new ColumnDef("ID", ColumnType.Number, SumType.Count, true, null, null, null)]
     let nameInput
     let columnType
 
@@ -35,7 +35,7 @@
       text = ''
       props = {bgUrl: "", attachments: []}
       labelDefs = []
-      columnDefs = []
+      columnDefs = [new ColumnDef("ID", ColumnType.Number, SumType.Count, true, null, null, null)]
       nameInput.value = ""
       nameInput.focus()
     }
@@ -108,8 +108,8 @@
       <!-- <div class="title-text">Title</div>  -->
       <sl-input class='textarea' maxlength="60" bind:this={nameInput}  on:input={e=>text= e.target.value}></sl-input>
     <!-- </div> -->
-    {#if boardHash && false}
 
+    {#if boardHash && false}
    
     <div class="edit-column-defs unselectable setting">
       <div class="title-text">Columns</div>

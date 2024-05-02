@@ -32,9 +32,9 @@
       <div class="board-name">{$boardData?.value?.latestState?.name}</div>
 
       {#if boardType == BoardType.active}
-      <div style="width:100%; display:flex; justify-content:flex-end" bind:clientWidth={width}>
-        <Participants board={$boardData.value.board} max={Math.floor(width/30)}></Participants>
-      </div>
+        <div style="width:100%; display:flex; justify-content:flex-end" bind:clientWidth={width}>
+          <Participants board={$boardData.value.board} max={Math.floor(width/30)}></Participants>
+        </div>
       {/if}
     {:else if $boardData.status == "pending"}
       <sl-skeleton
@@ -48,11 +48,11 @@
 
 {#if largeDisplay}
   <div style="display:flex; flex-direction:column; width: 100%">
-    <div class="board-name">
-      {$boardData?.value?.latestState?.columnDefs.length} fields
+    <div class="board-detail">
+      {$boardData?.value?.latestState?.columnDefs.length} Fields
     </div>
-    <div class="board-name">
-      {$boardData?.value?.latestState?.rows.length} entries
+    <div class="board-detail">
+      {$boardData?.value?.latestState?.rows.length} Entries
     </div>
   </div>
 {/if}
@@ -76,8 +76,13 @@
     align-items: center;
   }
   .board-name {
-    font-size: 10px;
+    font-size: 18px;
     font-weight: bold;
     margin-right: 10px;
-    }
+  }
+  .board-detail {
+    font-size: 12px;
+    font-weight: bold;
+    font-style: italic;
+  }
 </style>

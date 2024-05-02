@@ -70,3 +70,11 @@
       {$boardData.error}
     {/if}
 </div>
+
+<style>
+  select {
+    margin: 0;
+    padding: 0;
+    height: 22px;
+  }
+</style>

@@ -45,7 +45,7 @@
   }
   .board-button {
     margin-left: 10px;
-    background: #FFFFFF;
+    background: #986526;
     border: 1px solid rgba(35, 32, 74, 0.1);
     box-shadow: 0px 4px 4px rgba(66, 66, 66, 0.1);
     border-radius: 5px;

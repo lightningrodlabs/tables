@@ -64,7 +64,7 @@
         {:else}
           <div style="margin:20px;">
             <!-- <h2>Data Tubs</h2> -->
-            <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Tub"><SvgIcon color="white" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Tub</span></div>
+            <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Tub"><SvgIcon color="#ad7d2b" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Tub</span></div>
             <BoardMenu mainpage={true} />
             
           </div>
@@ -117,12 +117,13 @@
     .new-board:hover {
         cursor: pointer;
         padding: 20px 5px;
-        width: 170px;
+        width: 180px;
         /* border: 1px solid #252d5d; */
         /* background: rgb(10, 25, 57); */
         border: 1px solid #885415;
-        background: #c3751d;
-        margin: 0 -5px 0 -5px;
+        background: #a66721;
+        /* margin: 0 -5px 0 -5px; */
+        margin: 0px -5px -7px 0px;
         box-shadow: 0px 4px 15px rgba(35, 32, 74, 0.8);
     }
     @keyframes slideIn {

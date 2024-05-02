@@ -6,6 +6,7 @@ import { LazyHoloHashMap } from '@holochain-open-dev/utils';
 import type { AppletHash, AppletServices, AssetInfo, WAL, WeServices } from '@lightningrodlabs/we-applet';
 import { getMyDna } from './util';
 import type { AppAgentClient, RoleName, ZomeName } from '@holochain/client';
+import { svgIcons } from "./svgIcons"
 
 const ROLE_NAME = "tables"
 const ZOME_NAME = "syn"
@@ -19,7 +20,7 @@ export const appletServices: AppletServices = {
     creatables: {
       'table': {
         label: "Table",
-        icon_src: TABLE_ICON_SRC,
+        icon_src: svgIcons["datatubMini"],
       }
     },
 
@@ -27,8 +28,8 @@ export const appletServices: AppletServices = {
     blockTypes: {
       'active_boards': {
         label: 'Active Boards',
-        icon_src: 
-        `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 96C0 60.7 28.7 32 64 32H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zm64 0v64h64V96H64zm384 0H192v64H448V96zM64 224v64h64V224H64zm384 0H192v64H448V224zM64 352v64h64V352H64zm384 0H192v64H448V352z"/></svg>`,
+        icon_src: svgIcons["datatubMini"],
+        // `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 96C0 60.7 28.7 32 64 32H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zm64 0v64h64V96H64zm384 0H192v64H448V96zM64 224v64h64V224H64zm384 0H192v64H448V224zM64 352v64h64V352H64zm384 0H192v64H448V352z"/></svg>`,
         view: "applet-view",
       },
     },
@@ -79,8 +80,9 @@ export const appletServices: AppletServices = {
         } catch {
           // do nothing
         }
+        let icon = 'data:image/svg+xml;charset=utf-8,' + svgIcons["datatubMini"].replace("#","%23")
         return {
-          icon_src: TABLE_ICON_SRC,
+          icon_src: icon,
           name: name,
         };
       } else {

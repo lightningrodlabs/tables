@@ -166,6 +166,10 @@
   </div>
 </div>
 <style>
+  * {
+    color: rgb(67, 65, 65);
+  }
+
   .row-fields {
     margin: 20px;
   }
@@ -388,7 +392,7 @@
   }
 
   .card-section {
-    border-top: 1px dashed rgba(35, 32, 75, .1);
+    border-top: 1px solid rgba(35, 32, 75, .1);
     padding: 20px;
     width: 100%;
   }

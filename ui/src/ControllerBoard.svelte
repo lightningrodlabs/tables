@@ -69,6 +69,10 @@
     position: relative;
   }
 
+  .wrapper {
+    background-color: #90827a;
+  }
+
   :global(:root) {
     --resizeable-height: 200px;
     --tab-width: 60px;

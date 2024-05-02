@@ -60,7 +60,7 @@ export default defineConfig({
       description: 'store it!',
       icon: {
         type: 'filesystem',
-        path: './we_dev/tables_icon.svg',
+        path: './we_dev/datatubmini.svg',
       },
       source: {
         type: 'localhost',

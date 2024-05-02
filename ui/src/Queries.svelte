@@ -120,6 +120,7 @@ function onQueryChange(newQuery) {
    style="width: 100px"> -->
     {#each $state.queries as q}
       <div
+      class="query-button-select"
       class:selected-query={q.query === currentQuery[activeHashB64]}
       on:click={() => {
         if (q.query === currentQuery[activeHashB64]) {
@@ -131,7 +132,6 @@ function onQueryChange(newQuery) {
           changeQuery(q.query);
         }
       }}
-        style="display:flex; margin-left: 6px; cursor: pointer; border: 1px solid; padding: 5px; font-weight: bold; background-color: #00000078;"
       >
       <div
         class="remove-query"
@@ -151,9 +151,9 @@ function onQueryChange(newQuery) {
 <div style="display:flex; margin-left: 12px;">
   <input
     bind:value={queryName}
-   type="text" placeholder="Query Name" style="width: 100px; margin-right: 4px;"/>
-  <button style="margin-right: 4px;" on:click={()=>{newQueryBool = false; changeQuery("true")}}>Cancel</button>
-  <button style="margin-right: 4px;" on:click={()=>{
+   type="text" placeholder="Query Name" style="width: 100px; margin-right: 4px; background-color: #fbd8ae; border: 0; padding: 4px"/>
+  <button class="query-button" on:click={()=>{newQueryBool = false; changeQuery("true")}}>Cancel</button>
+  <button class="query-button" on:click={()=>{
     if (queryName === "") {
       queryName = "Query " + $state.queries.length
     }
@@ -181,10 +181,40 @@ function onQueryChange(newQuery) {
 /> -->
 
 <style>
+  .query-button {
+    margin-right: 4px;
+    background-color: #fbd8ae;
+    border: 0;
+    padding: 4px;
+    color: #986526;
+  }
+
+  .query-button:hover {
+    background-color: #fff2e2 !important;
+  }
+
+  .query-button-select {
+    display: flex;
+    margin-left: 6px;
+    cursor: pointer;
+    border: 1px solid;
+    padding: 5px;
+    font-weight: bold;
+    background-color: #00000078;
+  }
+
+  .query-button-select:hover {
+    background-color: #fbd8ae46 !important;
+  }
+
   .selected-query {
-    background-color: #cecece;
-    border: 3px solid !important;
-    padding: 3px !important;
+    background-color: #986526 !important;
+    border: 2px solid !important;
+    padding: 4px !important;
+  }
+
+  .query-button:hover {
+    background-color: black;
   }
 
   .new-query {

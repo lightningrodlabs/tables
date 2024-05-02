@@ -25,6 +25,7 @@
     import { BoardType } from "./boardList";
     import SelectColumn from "./SelectColumn.svelte";
     import { encodeHashToBase64 } from "@holochain/client";
+    import { scale } from 'svelte/transition';
 
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
@@ -71,8 +72,15 @@
 {#if activeBoard && showAddColumnModal}
 {@const columnTypes = Object.values(ColumnType).filter((key) => isNaN(Number(key)))}
 
-<div class="modal">
-  <div class="modal-content">
+<div class="modal"
+on:click={
+  (e)=>{
+    if (e.target == e.currentTarget) {
+      showAddColumnModal = false;
+    }
+  }
+}>
+  <div class="modal-content" transition:scale="{{ duration: 200 }}">
     <div class="form-group">
       <h2>Add a field</h2>
     </div>
@@ -194,14 +202,17 @@
     background-color: rgb(0, 0, 0);
     background-color: rgba(0, 0, 0, 0.6);
     border:0;
+    /* transform: scale(1.5); */
+    transition: transform 0.5s;
   }
   
   .modal-content {
-    background-color: #fefefe;
+    background-color: #ffecd4;
     position: static;
     left: 0;
     margin: 15% auto;
     padding: 20px;
+    border-radius: 6px;
     border: 1px solid #888;
     width: fit-content;
     max-width: 80%;

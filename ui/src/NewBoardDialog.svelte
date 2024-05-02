@@ -17,9 +17,11 @@
 
     const addBoard = async (name: string, labelDefs: LabelDef[], columnDefs: ColumnDef[], props: BoardProps) => {
         const state:Partial<BoardState> = {name, labelDefs, columnDefs, props, status:""}
+        console.log("state", state)
         state.feed = {}
         state.feed[newFeedKey(store.myAgentPubKeyB64)] = {delta:{type:"create", name}, context:null}
         const board = await store.boardList.makeBoard(state)
+        console.log("board", board)
         await board.join()        
         store.setUIprops({showMenu:false})
         dialog.hide()

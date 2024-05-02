@@ -60,9 +60,9 @@
   {#each $state.columnDefs as def, x} -->
     <div class:column-summary={!embedded} style="width:{width}px;">
       {#if store.weClient && !embedded}
-        <span style="" title="Add this card to pocket" on:click={()=>copyWalToPocket(def.id)}>
-          <SvgIcon color="#fff" icon=addToPocket size="25px"/>
-        </span>
+        <button class="copyWal" title="Add this card to pocket" on:click={()=>copyWalToPocket(def.id)}>
+          <SvgIcon color="#baa480" icon=addToPocket size="25px"/>
+        </button>
       {/if}
         
         {#if sumType == SumType.Sum}
@@ -184,7 +184,7 @@
         {/if}
 
         {#if !embedded}
-          <div style="float: right; color: #baa480;">
+          <div style="float: right; color: #baa480; margin: 2px;">
             {SumType[sumType]}
           {#if def.type == ColumnType.Number}
             <select
@@ -263,8 +263,8 @@
   .column-summary, .header-cell {
     padding-right: 2px;
     padding-left: 2px;
-    border-right: 1px dashed;
-    border-bottom: 1px dashed;
+    border-right: 1px solid;
+    border-bottom: 1px solid;
     overflow: hidden;
     text-overflow: ellipsis;
     background-color: #a9a9a9; 
@@ -281,6 +281,21 @@
     background-color: #baa480;
     color: #ece0cc;
     border: none;
+    height: 18px;
+    padding: 0;
+  }
+
+  .copyWal {
+    height: 26px;
+    border: none;
+    border-radius: 100%;
+    background-color: transparent;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .copyWal:hover {
+    background-color: #da7c25;
   }
 
 </style>

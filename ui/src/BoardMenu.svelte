@@ -65,7 +65,7 @@
             {#each $archivedBoards.value as hash}
                 <div
                     on:click={()=>unarchiveBoard(hash)}
-                    class="board" >
+                    class="board" style="height: 45px; border-radius: 4px">
                     <BoardMenuItem boardType={BoardType.archived} boardHash={hash}></BoardMenuItem>
                     <!-- <div class="board-bg" style="background-image: url({bgUrl});"></div> -->
                 </div>
@@ -93,7 +93,7 @@
     .board-menu {
         /* overflow-y: auto; */
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         flex: 0 0 auto;
         align-items: flex-start;
         position: relative;
@@ -117,9 +117,10 @@
         font-weight: normal;
         color: #fff;
         opacity: .6;
-        margin-top: 20px;
-        margin-bottom: 10px;
-        margin-left: 5px;
+        margin-top: 40px;
+        /* margin-bottom: 10px; */
+        margin-left: 10px;
+        font-size: 18px;
     }
 
 
@@ -154,16 +155,19 @@
 
     .board {
         width: 200px;
-        height: 100px;
-        border-radius: 5px;
-        padding: 5px;
+        height: 90px;
+        /* border-radius: 5px;
+        padding: 5px; */
+        border-radius: 2px 2px 30px 30px;
+        padding: 8px;
         margin-top: 20px;
         margin-right: 20px;
         /* margin: 5px; */
         transition: all .25s ease;
         border: 1px solid rgb(84 54 19 / 50%);
         /* background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgb(200 221 237) 100%); */
-        background: linear-gradient(180deg, rgb(101 71 14) 0%, rgb(178 125 28) 100%);
+        /* background: linear-gradient(180deg, rgb(101 62 14) 0%, rgb(193 120 34) 100%); */
+        background: linear-gradient(180deg,  rgb(101 62 14 / 84%) 0%, rgb(193 120 34 / 88%) 100%);
         position: relative;
         display: block;
         box-shadow: 0px 4px 8px rgb(74 58 32 / 80%);
@@ -175,11 +179,12 @@
         padding: 9px;
         width: 220px;
         /* background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%); */
-        background: linear-gradient(180deg, rgb(141, 98, 19) 0%, rgb(214, 151, 33) 100%);
+        background: linear-gradient(180deg, rgb(147, 92, 25) 0%, rgb(209, 131, 40) 100%);
         margin: 0 -1px 0 -10px;
         margin-right: 10px;
+        margin-bottom: -14px;
         margin-top: 14px;
-        height: 120px;
+        height: 110px;
         box-shadow: 0px 4px 14px rgba(35, 32, 74, 0.8);
         z-index: 100;
     }

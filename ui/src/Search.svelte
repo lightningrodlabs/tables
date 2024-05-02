@@ -47,20 +47,20 @@
 
                 if (state.name.toLocaleLowerCase().includes(searchText) 
                     ) fb.push({hash,state:state})
-                state.cards.forEach((c)=>{
-                    if (c.props.title.toLocaleLowerCase().includes(searchText)
-                    || c.props.description.toLocaleLowerCase().includes(searchText)
-                    || Object.values(c.comments).find(c=>c.text.includes(searchText))
+                // state.cards.forEach((c)=>{
+                //     if (c.props.title.toLocaleLowerCase().includes(searchText)
+                //     || c.props.description.toLocaleLowerCase().includes(searchText)
+                //     || Object.values(c.comments).find(c=>c.text.includes(searchText))
 
-                    ) {
-                        fc.push({
-                            hash,
-                            state,
-                            card: c.id,
-                            title: c.props.title,
-                        })
-                    }
-                })
+                //     ) {
+                //         fc.push({
+                //             hash,
+                //             state,
+                //             card: c.id,
+                //             title: c.props.title,
+                //         })
+                //     }
+                // })
             }
         }
         foundBoards = fb
@@ -113,7 +113,7 @@
         {/if}
         {#if foundBoards.length>0}
             {#if foundCards.length> 0}<sl-divider></sl-divider>{/if}
-            <sl-menu-label>Boards</sl-menu-label>
+            <sl-menu-label>Data Tubs</sl-menu-label>
             {#each foundBoards as found}
                 <sl-menu-item
                     on:mousedown={(e)=>{
@@ -155,5 +155,9 @@ sl-input::part(base) {
 
 sl-input::part(input) {
     color: #fff;
+}
+
+:global(sl-input) {
+--sl-input-placeholder-color: #fff;
 }
 </style>

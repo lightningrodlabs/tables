@@ -76,6 +76,10 @@
   </div>
 </div>
 <style>
+  * {
+    color: black;
+  }
+
   .app {
     margin: 0;
     padding-bottom: 10px;
