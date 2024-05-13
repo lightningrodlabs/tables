@@ -79,6 +79,11 @@
     font-size: 18px;
     font-weight: bold;
     margin-right: 10px;
+    height: 25px;
+    width: 600px;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .board-detail {
     font-size: 12px;

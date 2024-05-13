@@ -57,7 +57,7 @@
         <Toolbar
           profilesStore={profilesStore}/>
       </div>
-      <div class="workspace" style="display:flex">
+      <div class="workspace" style="display:flex;">
 
         {#if $activeBoardHash !== undefined}
           <TablePane activeBoard={$activeBoard}/>
@@ -84,11 +84,13 @@
     flex-direction: column;
     min-height: 0;
     /* background-color: #fff; */
-    background-image: url('/datatub.png');
+    /* background-image: url('/datatub.png'); */
+    background-color: #805b1d;
     /* make background image vertically centered */
     background-position: center;
     height: 100vh;
     position: relative;
+    overflow: auto;
   }
 
   .new-board {

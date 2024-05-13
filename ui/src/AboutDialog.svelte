@@ -6,16 +6,17 @@
     import {asyncDerived, toPromise} from '@holochain-open-dev/stores'
     import { BoardType } from "./boardList";
     import type { Board, BoardEphemeralState, BoardState } from "./board";
+    import { ColumnDef, Row, SumType } from "./board";
     import { deserializeExport, exportBoards } from "./export";
     import { DocumentStore, WorkspaceStore } from "@holochain-syn/core";
     import { encodeHashToBase64 } from "@holochain/client";
-
-
+    import { v1 as uuidv1 } from "uuid";
+    import Papa from "papaparse";
+    
     const { getStore } :any = getContext('store');
-
+    
     const store:TablesStore = getStore();
-
-
+    
     let dialog
     export const open = ()=>{dialog.show()}
 
@@ -42,6 +43,70 @@
                     store.setActiveBoard(boards[0].hash)
                 }
             }
+            importing = false
+        }, false);
+        importing = true
+        reader.readAsText(file);
+    };
+    let csvfileinput;
+    const onCSVSelected = (e)=>{
+        console.log("1")
+        let file = e.target.files[0];
+        let reader = new FileReader();
+        console.log("2")
+        reader.addEventListener("load", async () => {
+            console.log("3")
+            // console.log(reader.result)
+            // create object out of csv
+            const csv = Papa.parse(reader.result as string)
+            console.log(csv)
+
+            // export interface BoardState {
+            // status: string;
+            // name: string;
+            // rows: Array<Row>;
+            // queries: Query[];
+            // summaryRows: SummaryRow[];
+            // labelDefs: LabelDef[];
+            // columnDefs: ColumnDef[];
+            // props: BoardProps;
+            // boundTo: Array<WALUrl>
+            // feed: Feed
+            // }
+
+            let boardState = {
+                status: "complete",
+                name: "Imported Board",
+                rows: [],
+                queries: [],
+                summaryRows: [],
+                labelDefs: [],
+                columnDefs: csv.data[0].map(cell=>{return {id: uuidv1(), name: cell, type: 0}}),
+                boundTo: [],
+            }
+
+            for (let i = 1; i < csv.data.length; i++) {
+                // let row = {}
+                // for (let j = 0; j < csv.data[i].length; j++) {
+                //     row[csv.data[0][j]] = csv.data[i][j]
+                // }
+                const row = new Row(store.myAgentPubKeyB64, {})
+
+                // cell structure: {"7e6e65b0-111e-11ef-af33-33f0d499e386":{"attachments":[],"value":"1"},"80f389f0-111e-11ef-af33-33f0d499e386":{"attachments":[],"value":"2"}}
+
+                for (let j = 0; j < csv.data[i].length; j++) {
+                    let cellData = {attachments:[], value: csv.data[i][j]};
+                    row.cells[boardState.columnDefs[j].id] = cellData;
+                    console.log("added", boardState.columnDefs[j].id, row.cells[boardState.columnDefs[j]]);
+                }
+
+                boardState.rows.push(row)
+            }
+
+            let newBoard = await store.boardList.makeBoard(boardState)
+            store.setActiveBoard(newBoard.hash)
+            console.log("new board", newBoard)
+            
             importing = false
         }, false);
         importing = true
@@ -93,7 +158,10 @@
         </div>
     {:else}
         <div class="export-import" on:click={()=>{fileinput.click();}} title="Import Boards">
-            <SvgIcon color="#fff" icon=faFileImport size=20px style="margin-left: 15px;"/><span>Import Boards </span>
+            <SvgIcon color="#fff" icon=faFileImport size=20px style="margin-left: 15px;"/><span>Import from json</span>
+        </div>
+        <div class="export-import" on:click={()=>{csvfileinput.click();}} title="Import Boards">
+            <SvgIcon color="#fff" icon=faFileImport size=20px style="margin-left: 15px;"/><span>Import from csv</span>
         </div>
     {/if}
     {#if exporting}
@@ -101,7 +169,7 @@
             <div class="spinning" style="margin:auto"><SvgIcon icon=faSpinner  color="#fff"></SvgIcon></div>
         </div>
     {:else}
-        <div class="export-import" on:click={()=>{exportAllBoards()}} title="Export All Boards"><SvgIcon color="#fff" icon=faFileExport size=20px style="margin-left: 15px;"/><span>Export All Boards</span></div>
+        <div class="export-import" on:click={()=>{exportAllBoards()}} title="Export All Boards"><SvgIcon color="#fff" icon=faFileExport size=20px style="margin-left: 15px;"/><span>Export All</span></div>
     {/if}
 
 
@@ -109,7 +177,7 @@
         <div class="spinning" style="display:inline-block"> <SvgIcon icon=faSpinner  color="black"></SvgIcon></div>
     {:else if $allBoards.status == "complete"}
         <sl-dropdown skidding=15>
-            <sl-button slot="trigger" caret><SvgIcon icon=faClone size=20px style="margin-right: 10px"/><span>New Board From </span></sl-button>
+            <sl-button slot="trigger" caret><SvgIcon icon=faClone size=20px style="margin-right: 10px"/><span>New table From </span></sl-button>
             <sl-menu>
                 {#each Array.from($allBoards.value.entries()) as [key,board]}
                     <sl-menu-item on:click={()=>{
@@ -125,6 +193,7 @@
     {/if}
 
     <input style="display:none" type="file" accept=".json" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
+    <input style="display:none" type="file" accept=".csv" on:change={(e)=>onCSVSelected(e)} bind:this={csvfileinput} >
     </div>
 </sl-dialog>
 

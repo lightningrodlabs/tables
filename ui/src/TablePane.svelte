@@ -555,7 +555,7 @@
       </div>
   {/if}
   {/if}
-  <div class="bottom-fade"></div>
+  <!-- <div class="bottom-fade"></div> -->
 </div>
 <style>
 
@@ -728,7 +728,6 @@
   .board-name {
     font-size: 24px;
     padding-left: 5px;
-
   }
   .right-items {
     display: flex;

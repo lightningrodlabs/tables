@@ -19,7 +19,9 @@
         <Avatar size={size} agentPubKey={agentPubKey} showNickname={false} />
       {/each}
       {#if extra != 0}
-        + {extra} more
+        <div style="font-size: 12px; height: 10px; padding: 4px">
+          + {extra} more
+        </div>
       {/if}
     {/if}
 </div>

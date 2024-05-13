@@ -154,7 +154,7 @@
     }
 
     .board {
-        width: 200px;
+        width: 260px;
         height: 90px;
         /* border-radius: 5px;
         padding: 5px; */
@@ -177,7 +177,7 @@
         cursor: pointer;
         z-index: 100;
         padding: 9px;
-        width: 220px;
+        width: 280px;
         /* background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%); */
         background: linear-gradient(180deg, rgb(147, 92, 25) 0%, rgb(209, 131, 40) 100%);
         margin: 0 -1px 0 -10px;
