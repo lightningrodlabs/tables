@@ -33,7 +33,6 @@
       let subbedQuery = query
       Object.keys(row.cells).forEach((cellId) => {
         let value: any = '"' + row.cells[cellId]?.value + '"'
-        console.log($state.columnDefs.find((col) => col.id === cellId)?.type)
         if ($state.columnDefs.find((col) => col.id === cellId)?.type === 1) {
           const tempValue = parseInt(row.cells[cellId]?.value)
           if (!isNaN(tempValue)) {
@@ -43,7 +42,6 @@
         subbedQuery = subbedQuery.replace(new RegExp(cellId, 'g'), value);
         subbedQuery = subbedQuery.replace(new RegExp('contains', 'g'), 'includes');
       })
-      console.log("subbedQuery", subbedQuery)
       try {
         return eval(subbedQuery) ? true : false
       } catch {

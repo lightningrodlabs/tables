@@ -50,29 +50,10 @@
     };
     let csvfileinput;
     const onCSVSelected = (e)=>{
-        console.log("1")
         let file = e.target.files[0];
         let reader = new FileReader();
-        console.log("2")
         reader.addEventListener("load", async () => {
-            console.log("3")
-            // console.log(reader.result)
-            // create object out of csv
             const csv = Papa.parse(reader.result as string)
-            console.log(csv)
-
-            // export interface BoardState {
-            // status: string;
-            // name: string;
-            // rows: Array<Row>;
-            // queries: Query[];
-            // summaryRows: SummaryRow[];
-            // labelDefs: LabelDef[];
-            // columnDefs: ColumnDef[];
-            // props: BoardProps;
-            // boundTo: Array<WALUrl>
-            // feed: Feed
-            // }
 
             let boardState = {
                 status: "complete",
@@ -86,13 +67,7 @@
             }
 
             for (let i = 1; i < csv.data.length; i++) {
-                // let row = {}
-                // for (let j = 0; j < csv.data[i].length; j++) {
-                //     row[csv.data[0][j]] = csv.data[i][j]
-                // }
                 const row = new Row(store.myAgentPubKeyB64, {})
-
-                // cell structure: {"7e6e65b0-111e-11ef-af33-33f0d499e386":{"attachments":[],"value":"1"},"80f389f0-111e-11ef-af33-33f0d499e386":{"attachments":[],"value":"2"}}
 
                 for (let j = 0; j < csv.data[i].length; j++) {
                     let cellData = {attachments:[], value: csv.data[i][j]};
@@ -105,7 +80,6 @@
 
             let newBoard = await store.boardList.makeBoard(boardState)
             store.setActiveBoard(newBoard.hash)
-            console.log("new board", newBoard)
             
             importing = false
         }, false);
