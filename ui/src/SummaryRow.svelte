@@ -217,7 +217,7 @@
               <option value={SumType.Empty}>Percent Empty</option>
               <option value={SumType.Unique}>Percent Unique</option>
             </select>
-          {:else if [ColumnType.String, ColumnType.Date, ColumnType.Email, ColumnType.WeaveAsset, ColumnType.TableLink, ColumnType.Label].includes(def.type)}
+          {:else if [ColumnType.String, ColumnType.Date, ColumnType.Email, ColumnType.WeaveAsset, ColumnType.TableLink, ColumnType.Label, ColumnType.WALEmbed].includes(def.type)}
             <select
               style="width: 15px;"
               bind:value={sumType}

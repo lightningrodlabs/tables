@@ -39,7 +39,7 @@
     let closing = ""
     let label = "";
     $: filteredSuggestions = [
-        ...new Set(allColumnValues.filter(value => value !== undefined && value.includes(label))),
+        ...new Set(allColumnValues.filter(value => value !== undefined && value?.includes(label))),
         ...(label !== "" ? [label] : [])
     ];
     $: label;

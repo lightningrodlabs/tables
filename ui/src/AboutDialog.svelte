@@ -72,7 +72,6 @@
                 for (let j = 0; j < csv.data[i].length; j++) {
                     let cellData = {attachments:[], value: csv.data[i][j]};
                     row.cells[boardState.columnDefs[j].id] = cellData;
-                    console.log("added", boardState.columnDefs[j].id, row.cells[boardState.columnDefs[j]]);
                 }
 
                 boardState.rows.push(row)
