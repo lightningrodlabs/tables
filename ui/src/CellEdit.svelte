@@ -12,8 +12,8 @@
     import { encodeHashToBase64, decodeHashFromBase64 } from "@holochain/client";
     import type { TablesStore } from './store';
     import Avatar from './Avatar.svelte';
+    import { stringToColor } from './util';
     import SelectRowAndValue from './SelectRowAndValue.svelte';
-    import type { HrlWithContext } from '@lightningrodlabs/we-applet';
 
     import "@holochain-open-dev/profiles/dist/elements/search-agent.js";
     import "@holochain-open-dev/profiles/dist/elements/profiles-context.js";
@@ -37,6 +37,12 @@
     let searchAgentOpen = false;
     let origValue = ""
     let closing = ""
+    let label = "";
+    $: filteredSuggestions = [
+        ...new Set(allColumnValues.filter(value => value !== undefined && value.includes(label))),
+        ...(label !== "" ? [label] : [])
+    ];
+    $: label;
 
     function checkKey(e: any) {
         if (e.key === "Escape" && !e.shiftKey) {
@@ -57,7 +63,7 @@
     // assign boardhash as columndef.linkedtable and change type to EntryHash
     const copyWalToPocket = () => {
         console.log("copyWalToPocket", boardHash)
-        const attachment: HrlWithContext = { hrl: [store.dnaHash, boardHash], context: {cellId: cellId, def: columnDef, assetType: "Cell"} }
+        const attachment: WAL = { hrl: [store.dnaHash, boardHash], context: {cellId: cellId, def: columnDef, assetType: "Cell"} }
         console.log("attachment", attachment)
         store.weClient?.walToPocket(attachment)
         dispatch("cancel")
@@ -69,9 +75,8 @@
         origValue = value
         if (inputElement) {
             onVisible(inputElement,()=>{
-                console.log("FISH")
-                    inputElement.focus()
-                    inputElement.select()
+                inputElement.focus()
+                inputElement.select()
             })
         }
 	});
@@ -170,7 +175,6 @@
             <SvgIcon icon="faUser" size="16px"/>
         </button>
         {#if searchAgentOpen}
-        <!-- <profiles-context store={store.profilesStore}> -->
         <search-agent
             on:agent-selected={(e)=>{
                 console.log("Agent selected", e.detail)
@@ -178,10 +182,9 @@
                 searchAgentOpen = false
             }}
         ></search-agent>
-        <!-- </profiles-context> -->
         {/if}
     </div>
-{:else if type==ColumnType.WeaveAsset}
+{:else if type==ColumnType.WeaveAsset || type==ColumnType.WALEmbed}
     <div style="display:flex"
                       >
         {#if value}
@@ -200,6 +203,29 @@
         }} >          
             <SvgIcon icon="link" size="20px"/>
         </button>
+    </div>
+{:else if type==ColumnType.Label}
+    <div style="display:flex; flex-direction: column">
+        <!-- type any string but auto-suggest all previous values from other cells in this column -->
+        <input
+        bind:this={inputElement}
+        class="edit-cell-input"
+        type="text" placeholder="Type to search..." bind:value={label} on:input={() => {}} />
+        {#if filteredSuggestions.length > 0}
+            <ul class="label-suggestions">
+                {#each filteredSuggestions as item}
+                    <li
+                        style="background-color: {stringToColor(item)};"
+                        class="label-suggestion"
+                        on:click={() => {
+                            value = item
+                            dispatch("save", item)
+                        }}>
+                        {item}
+                    </li>
+                {/each}
+            </ul>
+        {/if}
     </div>
 {:else if type==ColumnType.TableLink}
     <div style="display:flex">
@@ -252,4 +278,27 @@
         --sl-input-background-color: #e6a85d !important;
         --sl-input-focus-ring-color: transparent;
     } */
+    ul.label-suggestions {
+        list-style: none;
+        padding: 0;
+        margin-top: 5px;
+        background: white;
+        border: 1px solid #ccc;
+        width: 196px;
+        position:absolute; 
+        margin-top: 29px;
+        border: 4px solid rgb(173, 173, 173);
+    }
+
+    li.label-suggestion {
+        background-color: white;
+        border: 1px solid #ccc;
+        cursor: pointer;
+        padding: 4px 8px;
+        color: black;
+        font-size: 13px; 
+        font-weight: bold; 
+        margin: 0; 
+        padding: 0 4px;
+    }
 </style>

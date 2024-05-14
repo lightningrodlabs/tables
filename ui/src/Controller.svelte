@@ -85,7 +85,7 @@
     min-height: 0;
     /* background-color: #fff; */
     /* background-image: url('/datatub.png'); */
-    background-color: #805b1d;
+    background-color: #ac7c3f;
     /* make background image vertically centered */
     background-position: center;
     height: 100vh;
@@ -96,49 +96,49 @@
   .new-board {
     margin-left:10px;
     padding:5px;
-        box-sizing: border-box;
-        position: relative;
-        width: 160px;
-        height: 35px;
-        /* background: rgba(24, 55, 122, 1.0);
-        border: 1px solid #4A559D; */
-        background: #774914;
-        border: 1px solid #583409;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        border-radius: 5px;
-        font-size: 16px;
-        font-weight: bold;
-        transition: all .25s ease;
-        top: 3px;
-        padding: 15px 4px;
-        box-shadow: 0px 4px 8px rgba(35, 32, 74, 0);
-    }
+    box-sizing: border-box;
+    position: relative;
+    width: 160px;
+    height: 35px;
+    /* background: rgba(24, 55, 122, 1.0);
+    border: 1px solid #4A559D; */
+    background: #774914;
+    border: 1px solid #583409;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all .25s ease;
+    top: 3px;
+    padding: 15px 4px;
+    box-shadow: 0px 4px 8px rgba(35, 32, 74, 0);
+  }
 
-    .new-board:hover {
-        cursor: pointer;
-        padding: 20px 5px;
-        width: 180px;
-        /* border: 1px solid #252d5d; */
-        /* background: rgb(10, 25, 57); */
-        border: 1px solid #885415;
-        background: #a66721;
-        /* margin: 0 -5px 0 -5px; */
-        margin: 0px -5px -7px 0px;
-        box-shadow: 0px 4px 15px rgba(35, 32, 74, 0.8);
-    }
-    @keyframes slideIn {
-        from {
-            margin-left: var(--margin-start-position);
-            backdrop-filter: blur(10px);
-        }
+  .new-board:hover {
+    cursor: pointer;
+    padding: 20px 5px;
+    width: 180px;
+    /* border: 1px solid #252d5d; */
+    /* background: rgb(10, 25, 57); */
+    border: 1px solid #885415;
+    background: #a66721;
+    /* margin: 0 -5px 0 -5px; */
+    margin: 0px -5px -7px 0px;
+    box-shadow: 0px 4px 15px rgba(35, 32, 74, 0.8);
+  }
+  @keyframes slideIn {
+      from {
+          margin-left: var(--margin-start-position);
+          backdrop-filter: blur(10px);
+      }
 
-        to {
-            margin-left: var(--margin-end-position);
-            backdrop-filter: blur(0px);
-        }
-    }
+      to {
+          margin-left: var(--margin-end-position);
+          backdrop-filter: blur(0px);
+      }
+  }
 
 
 

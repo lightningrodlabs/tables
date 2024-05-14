@@ -690,7 +690,7 @@
   .data-cell {
     background-color: #f2e3cb;
     color: rgb(20, 20, 20);
-    height: 23px;
+    /* height: 23px; */
   }
 
   .board {

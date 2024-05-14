@@ -34,9 +34,11 @@ export enum ColumnType {
   Date,
   Email,
   URL,
+  Label,
   User,
   TableLink,
   WeaveAsset,
+  WALEmbed,
 }
 
 export enum SumType {

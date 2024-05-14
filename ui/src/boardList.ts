@@ -61,7 +61,7 @@ export class BoardList {
                                         const key = `${feedItem.author}.${feedItem.timestamp.getTime()}`
                                         if (! this.notifiedItems[key] ) {
                                             let body = `${feedItem.author} ${deltaToFeedString(boardState, feedItem.content)}`
-                                            this.weClient.notifyWe([{
+                                            this.weClient.notifyFrame([{
                                                 title: `${boardState.name} updated`,
                                                 body,
                                                 notification_type: "change",

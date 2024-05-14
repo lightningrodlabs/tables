@@ -49,6 +49,7 @@
         {#if state && context.assetType == "Column Summary"}
           {@const def = $state.columnDefs.find(c=>c.id == context.columnId)}
           <SummaryRow
+            color={"#000000"}
             activeBoard={$activeBoard}
             query={context.query ? context.query : "true"}
             sumType={context.sumType}
@@ -87,7 +88,7 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
-    background-color: #fff;
+    background-color: transparent;
     height: 100vh;
     position: relative;
   }

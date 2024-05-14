@@ -12,6 +12,7 @@
   export let embedded = false;
   export let query = "true";
   export let sumType;
+  export let color = "#baa480";
 
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
@@ -28,7 +29,6 @@
   $: x = Number($state.columnDefs.findIndex(c => c.id == def.id))
   let querriedData = []
   $: if ($state && $state.rows) {
-    console.log("query", query)
     querriedData = $state.rows.filter(row => {
       let subbedQuery = query
       Object.keys(row.cells).forEach((cellId) => {
@@ -56,7 +56,7 @@
   <div style="width:22px; cursor: pointer; border-right: 1px dashed">
   </div>
   {#each $state.columnDefs as def, x} -->
-    <div class:column-summary={!embedded} style="width:{width}px;">
+    <div class:column-summary={!embedded} style="width:{width}px; color: {color}">
       {#if store.weClient && !embedded}
         <button class="copyWal" title="Add this card to pocket" on:click={()=>copyWalToPocket(def.id)}>
           <SvgIcon color="#baa480" icon=addToPocket size="25px"/>
@@ -217,7 +217,7 @@
               <option value={SumType.Empty}>Percent Empty</option>
               <option value={SumType.Unique}>Percent Unique</option>
             </select>
-          {:else if def.type == ColumnType.String || def.type == ColumnType.Date || def.type == ColumnType.Email || def.type == ColumnType.WeaveAsset || def.type == ColumnType.TableLink}
+          {:else if [ColumnType.String, ColumnType.Date, ColumnType.Email, ColumnType.WeaveAsset, ColumnType.TableLink, ColumnType.Label].includes(def.type)}
             <select
               style="width: 15px;"
               bind:value={sumType}
@@ -272,7 +272,6 @@
   .column-summary {
     background-color: #964d08;
     border: 1px solid rgb(108, 53, 1);
-    color: #baa480;
   }
 
   select {
