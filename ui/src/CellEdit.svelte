@@ -88,6 +88,7 @@
     slTypes[ColumnType.Email] = "email"
     slTypes[ColumnType.Date] = "date"
     slTypes[ColumnType.URL] = "text"
+    slTypes[ColumnType.Currency] = "currency"
 
     let value
 </script>
@@ -115,7 +116,7 @@
     }}
     type={slTypes[type]} 
     style="width:{width}px" 
-    value={value} 
+    value={value}
     on:sl-input={(e)=>{
         value = e.target.value
     }}

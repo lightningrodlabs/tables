@@ -32,6 +32,7 @@ export enum ColumnType {
   String,
   Number,
   Date,
+  Currency,
   Email,
   URL,
   Label,

@@ -58,6 +58,7 @@
   $: showEditHeader = false;
   $: editHeaderIndex = null;
   $: dataView = false;
+  $: addUniqueSummaryFromColumn = null;
 
   function setFilterOption(newOption) {
     filterOption = newOption;
@@ -542,6 +543,41 @@
                 <h3>{query.label}</h3>
               </div>
             {/each}
+            <!-- allow adding a new summary row for each label from a label row -->
+            Summary by unique value: 
+            <select
+              on:change={(e)=>{
+                addUniqueSummaryFromColumn = e.target.value
+              }}
+            >
+              <option></option>
+              {#each $state.columnDefs as def}
+                <option value={def.id}>{def.name}</option>
+              {/each}
+            </select>
+            {#if addUniqueSummaryFromColumn}
+              {@const columnValues = $state.rows.map(row=>row.cells[addUniqueSummaryFromColumn]?.value)}
+              {#each Array.from(new Set(columnValues)) as value}
+                <div class="modal-body" style="display:flex; margin: 10px 0">
+                  <button
+                    class="add-summary-row-button"
+                    on:click={()=>{
+                      // add summary row to board
+                      let summaryDefs = {}
+                      $state.columnDefs.forEach(def=> {
+                        // if (def.type) {
+                        //   summaryDefs[def.id] = def.type
+                        // }
+                        summaryDefs[def.id] = 0
+                      })
+                      activeBoard.requestChanges([{ type: "add-summary-row", summaryRow: {id: uuidv1(), query: `${addUniqueSummaryFromColumn} == ${JSON.stringify(value)}`, queryLabel: `${value}`, summaryDefs: summaryDefs}}]);
+                    }}>
+                    <SvgIcon icon=faPlus size=10 style="height:20px;"/>
+                  </button>&nbsp;
+                  <h3>{$state.columnDefs.find(def=>def.id == addUniqueSummaryFromColumn).name} = {value}</h3>
+                </div>
+              {/each}
+            {/if}
             <!-- <button on:click={()=>{newSummaryRowModal = false}}>Done</button> -->
           </div>
         </div>

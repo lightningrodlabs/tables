@@ -67,7 +67,7 @@
           {@const sum = Object.values(querriedData).reduce((acc, row) => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
-              return acc + Number(cell.value);
+              return acc + Number(cell.value.replace(/[^0-9-.]/g, ''));
             }
             return acc;
           }, 0)}
@@ -76,7 +76,7 @@
           {@const sum = Object.values(querriedData).reduce((acc, row) => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
-              return acc + Number(cell.value);
+              return acc + Number(cell.value.replace(/[^0-9-.]/g, ''));
             }
             return acc;
           }, 0)}
@@ -94,7 +94,7 @@
                 }
               } else {
                 console.log(Math.max(acc, Number(cell.value)))
-                return Math.max(acc, Number(cell.value));
+                return Math.max(acc, Number(cell.value.replace(/[^0-9-.]/g, '')));
               }
             }
             return acc;
@@ -114,7 +114,7 @@
                   return Math.min(acc, dateNumber);
                 }
               }
-              return Math.min(acc, Number(cell.value));
+              return Math.min(acc, Number(cell.value.replace(/[^0-9-.]/g, '')));
             }
             return acc;
           }, 
@@ -126,7 +126,7 @@
           {@const values = Object.values(querriedData).map(row => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
-              return Number(cell.value);
+              return Number(cell.value.replace(/[^0-9-.]/g, ''));
             }            
           }).sort((a, b) => a - b).filter(value => value !== undefined)}
 
@@ -135,7 +135,7 @@
           {@const values = Object.values(querriedData).map(row => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
-              return Number(cell.value);
+              return Number(cell.value.replace(/[^0-9-.]/g, ''));
             }
           }).filter(value => value !== undefined)}
           {@const counts = values.reduce((acc, value) => {
@@ -152,7 +152,7 @@
           {@const values = Object.values(querriedData).map(row => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
-              return Number(cell.value);
+              return Number(cell.value.replace(/[^0-9-.]/g, ''));
             }
           }).sort((a, b) => a - b).filter(value => value !== undefined)}
           {values[values.length - 1] - values[0]}
@@ -160,7 +160,7 @@
           {@const values = Object.values(querriedData).map(row => {
             const cell = row.cells[def.id];
             if (cell && cell.value) {
-              return Number(cell.value);
+              return Number(cell.value.replace(/[^0-9-.]/g, ''));
             }
           }).filter(value => value !== undefined)}
           {@const mean = values.reduce((acc, value) => acc + value, 0) / values.length}
@@ -184,7 +184,7 @@
         {#if !embedded}
           <div style="float: right; color: #baa480; margin: 2px;">
             {SumType[sumType]}
-          {#if def.type == ColumnType.Number}
+          {#if def.type == ColumnType.Number || def.type == ColumnType.Currency}
             <select
               style="width: 15px;"
               bind:value={sumType}

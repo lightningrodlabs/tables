@@ -37,22 +37,16 @@ const queryStore = writable(initialQuery);
 
 function changeQuery(newQuery) {
   currentQuery[activeHashB64] = newQuery
-  console.log("new query", newQuery)
   queriedData[activeHashB64] = []
   $state.rows.forEach((row) => {
     if (newQuery.length === 0) {
       queriedData[activeHashB64].push(row.id)
     } else {
-      console.log("jjk")
       // for key and value in row.cells
       let subbedQuery = newQuery
-      // console.log("subbedQuery", subbedQuery)
 
       Object.keys(row.cells).forEach((cellId) => {
-        console.log("cellId", cellId)
         let value: any = '"' + row.cells[cellId]?.value + '"'
-
-        console.log($state.columnDefs.find((col) => col.id === cellId)?.type)
 
         if ($state.columnDefs.find((col) => col.id === cellId)?.type === 1) {
           const tempValue = parseInt(row.cells[cellId]?.value)
@@ -62,18 +56,15 @@ function changeQuery(newQuery) {
         }
         
         subbedQuery = subbedQuery.replace(new RegExp(cellId, 'g'), value);
-        console.log("subbedQuery", subbedQuery, value, cellId)
         subbedQuery = subbedQuery.replace(new RegExp('contains', 'g'), 'includes');
       })
 
-      console.log("subbedQuery", subbedQuery)
-      if (eval(subbedQuery)) {
+      // console.log("subbedQuery", subbedQuery)
+      if (subbedQuery && eval(subbedQuery)) {
         queriedData[activeHashB64].push(row.id)
       }
     }
   })
-
-  console.log("queried data", queriedData[activeHashB64])
 }
 
 // Function to handle query changes
