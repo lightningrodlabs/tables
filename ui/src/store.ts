@@ -13,6 +13,7 @@ import {
   } from '@holochain/client';
 import { SynStore,  SynClient} from '@holochain-syn/core';
 import { BoardList } from './boardList';
+import { MirrorList } from './mirrorList';
 import TimeAgo from "javascript-time-ago"
 import en from 'javascript-time-ago/locale/en'
 import type { v1 as uuidv1 } from "uuid";
@@ -59,6 +60,7 @@ export class TablesStore {
     timeAgo = new TimeAgo('en-US')
     service: TablesService;
     boardList: BoardList;
+    mirrorList: MirrorList;
     updating = false
     synStore: SynStore;
     client: AppAgentClient;
@@ -86,6 +88,7 @@ export class TablesStore {
         );
         this.synStore = new SynStore(new SynClient(this.client,this.roleName,this.zomeName))
         this.boardList = new BoardList(profilesStore, this.synStore, weClient)
+        this.mirrorList = new MirrorList(profilesStore, this.synStore, weClient)
         this.boardList.activeBoard.subscribe((board)=>{
             if (this.unsub) {
                 this.unsub()
@@ -95,6 +98,19 @@ export class TablesStore {
                 this.unsub = board.workspace.tip.subscribe((tip)=>{
                     if (tip.status == "complete" && tip.value) {
                         this.updateSeenTip(board.hash, tip.value.entryHash)
+                    }
+                })
+            }
+        })
+        this.mirrorList.activeMirror.subscribe((mirror)=>{
+            if (this.unsub) {
+                this.unsub()
+                this.unsub = undefined
+            }
+            if (mirror != undefined) {
+                this.unsub = mirror.workspace.tip.subscribe((tip)=>{
+                    if (tip.status == "complete" && tip.value) {
+                        this.updateSeenTip(mirror.hash, tip.value.entryHash)
                     }
                 })
             }
@@ -168,11 +184,20 @@ export class TablesStore {
         this.setUIprops({showMenu:false/*, bgUrl*/})
     }
 
+    async setActiveMirror(hash: EntryHash | undefined) {
+        const mirror = await this.mirrorList.setActiveMirror(hash)
+        this.setUIprops({showMenu:false})
+    }
+
     async closeActiveBoard(leave: boolean) {
         await this.boardList.closeActiveBoard(leave)
         this.setUIprops({showMenu:true, bgUrl:""})
     }
 
+    async closeActiveMirror(leave: boolean) {
+        await this.mirrorList.closeActiveMirror(leave)
+        this.setUIprops({showMenu:true, bgUrl:""})
+    }
 
     async archiveBoard(documentHash: EntryHash) {
         const wasActive = this.boardList.archiveBoard(documentHash)

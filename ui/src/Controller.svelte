@@ -10,6 +10,9 @@
     import NewBoardDialog from './NewBoardDialog.svelte';
     import SvgIcon from "./SvgIcon.svelte";
     import BoardMenu from "./BoardMenu.svelte";
+    import MirrorMenu from "./MirrorMenu.svelte";
+    import NewMirrorDialog from './NewMirrorDialog.svelte';
+    import MirrorPane from './MirrorPane.svelte'
 
     export let roleName = ""
     export let client : AppAgentClient
@@ -25,7 +28,9 @@
     let synStore: SynStore = store.synStore
 
     $: activeBoardHash = store.boardList.activeBoardHash
+    $: activeMirrorHash = store.mirrorList.activeMirrorHash
     $: activeBoard = store.boardList.activeBoard
+    $: activeMirror = store.mirrorList.activeMirror
 
     setContext('synStore', {
       getStore: () => synStore,
@@ -43,9 +48,11 @@
     $: bgUrl = DEFAULT_KD_BG_IMG  // FIXME$activeBoard ?   ($activeBoard.state.props && $boardState.props.bgUrl) ? $boardState.props.bgUrl : DEFAULT_KD_BG_IMG
     $: bgImage = `background-image: url("`+ bgUrl+`");`
     let newBoardDialog
+    let newMirrorDialog
 
   </script>
       <NewBoardDialog bind:this={newBoardDialog}></NewBoardDialog>
+      <NewMirrorDialog bind:this={newMirrorDialog}></NewMirrorDialog>
 
   <div class="flex-scrollable-parent">
     <div class="flex-scrollable-container">
@@ -61,11 +68,17 @@
 
         {#if $activeBoardHash !== undefined}
           <TablePane activeBoard={$activeBoard}/>
+        {:else if $activeMirrorHash !== undefined}
+          <MirrorPane activeMirror={$activeMirror}/>
         {:else}
           <div style="margin:20px;">
-            <!-- <h2>Data Tubs</h2> -->
+            <div style="display:flex; flex-wrap:wrap;">
             <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Tub"><SvgIcon color="#ad7d2b" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Tub</span></div>
+            <div class="new-board" on:click={()=>newMirrorDialog.open()} title="New Mirror"><SvgIcon color="#ad7d2b" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Mirror</span></div>
+            </div>
+
             <BoardMenu mainpage={true} />
+            <MirrorMenu mainpage={true} />
             
           </div>
         {/if}
