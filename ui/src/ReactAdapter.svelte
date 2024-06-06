@@ -28,8 +28,10 @@
 
 <style>
   :global(.ruleGroup) {
-    background-color: #b789327b;
-    border-color: #b78932db;
+    /* background-color: #b789327b;
+    border-color: #b78932db; */
+    background-color: #6f6f6f7b;
+    border-color: #dbdbdbdb;
     width: fit-content;
     border-radius: 0;
     /* border: 0; */
@@ -38,14 +40,16 @@
   }
 
   :global(.ruleGroup select, .ruleGroup button, .ruleGroup input) {
-    background-color: #986526;
-    border: 1px solid #b78932db;
+    /* background-color: #986526;
+    border: 1px solid #b78932db; */
+    background-color: #6f6f6f7b;
+    border: 1px solid #dbdbdbdb;
     color: #ffffffca;
     padding: 2px 4px;
     font-weight: bold;
   }
 
   :global(.ruleGroup select:hover, .ruleGroup button:hover, .ruleGroup input:focus) {
-    background-color: #c27b24;
+    background-color: #c5c5c5;
   }
 </style>

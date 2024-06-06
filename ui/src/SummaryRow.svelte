@@ -12,7 +12,7 @@
   export let embedded = false;
   export let query = "true";
   export let sumType;
-  export let color = "#baa480";
+  export let color = "#c2c2c2";
 
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
@@ -59,7 +59,7 @@
     <div class:column-summary={!embedded} style="width:{width}px; color: {color}">
       {#if store.weClient && !embedded}
         <button class="copyWal" title="Add this card to pocket" on:click={()=>copyWalToPocket(def.id)}>
-          <SvgIcon color="#baa480" icon=addToPocket size="25px"/>
+          <SvgIcon color="#c2c2c2" icon=addToPocket size="25px"/>
         </button>
       {/if}
         
@@ -182,7 +182,7 @@
         {/if}
 
         {#if !embedded}
-          <div style="float: right; color: #baa480; margin: 2px;">
+          <div style="float: right; color: #c2c2c2; margin: 2px;">
             {SumType[sumType]}
           {#if def.type == ColumnType.Number || def.type == ColumnType.Currency}
             <select
@@ -270,12 +270,14 @@
   }
 
   .column-summary {
-    background-color: #964d08;
-    border: 1px solid rgb(108, 53, 1);
+    /* background-color: #964d08;
+    border: 1px solid rgb(108, 53, 1); */
+    background-color: #909090;
+    border: 1px solid rgb(97, 97, 97);
   }
 
   select {
-    background-color: #baa480;
+    background-color: #c2c2c2;
     color: #ece0cc;
     border: none;
     height: 18px;
@@ -292,7 +294,7 @@
   }
 
   .copyWal:hover {
-    background-color: #da7c25;
+    background-color: #b9b9b9;
   }
 
 </style>

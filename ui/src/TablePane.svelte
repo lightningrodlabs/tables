@@ -720,11 +720,11 @@
   }
 
   .header-cell {
-    background-color: #baa480;
+    background-color: #c2c2c2;
   }
 
   .data-cell {
-    background-color: #f2e3cb;
+    background-color: #eeeeee;
     color: rgb(20, 20, 20);
     /* height: 23px; */
   }
@@ -747,7 +747,8 @@
     align-items: center;
     justify-content: space-between;
     /* background-color: #fff; */
-    background-color: #b789327b;
+    /* background-color: #b789327b; */
+    background-color: #6f6f6f7b;
     padding-left: 10px;
     padding-right: 10px;
     border-radius: 0;
@@ -836,7 +837,7 @@
   .board-button {
     width: 30px;
     height: 30px;
-    background: #e6a85d;
+    background: #dbdbdbdb;
     border: 1px solid rgba(35, 32, 74, 0.1);
     box-shadow: 0px 4px 4px rgba(66, 66, 66, 0.1);
     border-radius: 5px;
@@ -1196,8 +1197,9 @@
     height: 30px;
     padding: 4px;
     border-radius: 50%;
-    border: 1px solid #f2bb78;
-    background-color: #e6a85d;    
+    /* border: 1px solid #f2bb78;
+    background-color: #e6a85d;     */
+    border: 1px solid #dbdbdbdb;
     transition: all .25s ease;
   }
 
@@ -1272,8 +1274,8 @@
   }
 
   .expand-button, .trash-button {
-    background-color:#baa480; 
-    color:#462700; 
+    background-color:#c2c2c2; 
+    color:#3c3c3c; 
     font-weight: bold; 
     display:flex; 
     align-items: center; 
@@ -1290,16 +1292,16 @@
   }
   
   .trash-button:hover {
-    background-color:#f9ddb1; 
+    background-color:#a4a4a4; 
   }
 
   .expand-button:hover {
-    background-color:rgb(94, 86, 70);
+    background-color:#a4a4a4
   }
 
   .add-column-button {
-    background-color:#baa480; 
-    color:#462700; 
+    background-color:#c2c2c2; 
+    color:#3c3c3c; 
     font-weight: bold; 
     display:flex; 
     align-items: center; 
@@ -1312,12 +1314,12 @@
   }
 
   .add-column-button:hover {
-    background-color:rgb(246, 214, 161);
+    background-color:rgb(210, 210, 210);
   }
 
   .add-summary-row-button {
-    background-color:#baa480; 
-    color:#462700; 
+    background-color:#c2c2c2; 
+    color:#424242; 
     font-weight: bold; 
     display:flex; 
     align-items: center; 
@@ -1330,6 +1332,6 @@
   }
 
   .add-summary-row-button:hover {
-    background-color:rgb(246, 214, 161);
+    background-color:rgb(210, 210, 210);
   }
 </style>

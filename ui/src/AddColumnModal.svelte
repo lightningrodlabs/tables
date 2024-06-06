@@ -207,7 +207,7 @@ on:click={
   }
   
   .modal-content {
-    background-color: #ffecd4;
+    background-color: #959595;
     position: static;
     left: 0;
     margin: 15% auto;

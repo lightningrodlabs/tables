@@ -263,13 +263,14 @@
     }
 
     .copyWal:hover {
-        background-color: #e6a85d;
+        background-color: #bababa;
     }
 
     .edit-cell-input {
-        background-color: rgb(251, 216, 174);
+        /* background-color: rgb(251, 216, 174); */
+        background-color: #aedcfb;
         border: 0;
-        outline: 1px solid #e6a85d;
+        outline: 1px solid #b3b3b3;
         margin: 2px;
         display: inline-block;
         width: 100%;

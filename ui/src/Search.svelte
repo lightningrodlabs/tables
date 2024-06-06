@@ -113,7 +113,7 @@
         {/if}
         {#if foundBoards.length>0}
             {#if foundCards.length> 0}<sl-divider></sl-divider>{/if}
-            <sl-menu-label>Data Tubs</sl-menu-label>
+            <sl-menu-label>Data Tables</sl-menu-label>
             {#each foundBoards as found}
                 <sl-menu-item
                     on:mousedown={(e)=>{
@@ -149,8 +149,10 @@ sl-input::part(base) {
     color: #fff;
     /* background-color: rgb(10 17 76); */
     /* border: 1px solid rgba(71, 76, 154, 1.0); */
-    background-color: rgb(188, 128, 25);
-    border: 1px solid rgb(188, 128, 25);
+    /* background-color: rgb(188, 128, 25); */
+    background-color: #1999bc;
+    /* border: 1px solid rgb(188, 128, 25); */
+    border: 1px solid #055a72;
 }
 
 sl-input::part(input) {

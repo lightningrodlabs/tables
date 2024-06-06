@@ -9,15 +9,45 @@
   import type SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog';
   import SelectRowAndValue from './SelectRowAndValue.svelte';
   import BoardSelect from './BoardSelect.svelte';
+  import { getValueOfCell } from './DataHelpers';
+  import { weaveUrlFromWal, weaveUrlToWAL } from '@lightningrodlabs/we-applet';
 
   let editLabelDefs = []
   let editColumnDefs = []
   let dialog: SlDialog
   let nameInput;
+  let cellValues = {}
+  let variables = []
+  let previousVariables = [];
+
+  $: variables;
   $: name = ""
   $: raw = ""
-  $: variables = []
   $: boardHash = ""
+  // $: {
+  //   const currentVariables = JSON.parse(JSON.stringify(variables)); // create a deep copy of variables
+
+  //   if (JSON.stringify(currentVariables) !== JSON.stringify(previousVariables)) { // compare the current and previous variables
+  //     if (currentVariables.length) {
+  //       for (const variable of currentVariables) { // use a for...of loop
+  //         console.log("1", variable);
+  //         if (variable.value) {
+  //           console.log("trying to get value of ", variable?.value?.hrl[1], variable?.value?.context?.cellId?.rowId, "--------", variable?.value?.context?.cellId?.columnId);
+  //           getValueOfCell(variable?.value?.hrl[1], variable?.value?.context?.cellId?.rowId, variable?.value?.context?.cellId?.columnId, store)
+  //           .then(cellValue => {
+  //             console.log("cell value", cellValue);
+  //             cellValues[variable.name] = cellValue; // use the variable's name as the key
+  //           }).catch(e => {
+  //             console.log(e)
+  //           })
+  //         }
+  //       }
+  //       console.log(currentVariables, cellValues);
+  //     }
+
+  //     previousVariables = currentVariables; // update previousVariables
+  //   }
+  // }
   
   const { getStore } :any = getContext('store');
 
@@ -42,7 +72,7 @@
   let mirrorEditor
 
 </script>
-<sl-dialog bind:this={dialog} label="New Mirror"
+<sl-dialog bind:this={dialog} label="New View"
   on:sl-initial-focus={(e)=>{
       mirrorEditor.initialFocus()
       e.preventDefault()
@@ -54,27 +84,23 @@
 
 <div class='mirror-editor'>
   <sl-input class='textarea' placeholder="test" maxlength="60" bind:this={nameInput} on:input={e => name= e.target.value}></sl-input>
-  <!-- {JSON.stringify($activeBoards)} -->
-  <BoardSelect />
-  <!-- as many variables as wanted -->
+  <!-- <BoardSelect /> -->
   <div class="variables">
     {#each variables as variable, i}
       <div class="variable">
         <input class='textarea' placeholder="variable name" maxlength="60" bind:value={variable.name} on:input={() => variables[i] = variable}/>
-        <!-- select boardhash from boards -->
-        <!-- <select bind:value={boardHash} on:change={() => variables[i].boardHash = boardHash}>
-          {#each $activeBoards.value as boardHash}
-            <option value={boardHash}>{store.mirrorList.mirrorData2.get(boardHash).value?.latestState?.name}</option>
-          {/each}
-        </select> -->
-      
-        <!--   export let boardHash: EntryHash;
-  export let keyColumn;
-  export let displayColumn;
-  export let selectedRow = null -->
-        
-        <!-- <SelectRowAndValue {boardHash} /> -->
-        <!-- <input class='textarea' placeholder="variable value" maxlength="60" bind:value={variable.value} on:input={() => variables[i] = variable}/> -->
+        {#if variable.value}
+          {cellValues[i]}
+        {/if}
+        <button
+          on:click={async ()=>{
+            const wal = await store.weClient.userSelectWal()
+            // TODO: check if wal is a datatub cell or summary
+            let valueOfCell = await getValueOfCell(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId, store)
+            variables[i].value = weaveUrlFromWal(wal)
+            cellValues[i] = valueOfCell
+          }}
+        >Assign WAL</button>
         <button on:click={() => variables = variables.filter((v, j) => j !== i)}>Remove</button>
       </div>
     {/each}

@@ -82,7 +82,7 @@
     align-items:center;
     padding: 4px;
     border-radius: 4px;
-    background-color: #fbd8ae;
+    background-color: #aedcfb;
     border: 0;
     cursor: pointer;
     width: fit-content;
@@ -97,8 +97,7 @@
     flex-direction:row;
     flex-wrap: wrap;
   }
-  .attachment-item {
-  }
+ 
   .attachment-item-with-delete {
     border:1px solid #aaa; 
     background-color:rgba(0,255,0,.1); 

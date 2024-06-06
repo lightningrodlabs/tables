@@ -55,7 +55,8 @@
     background-color: #ddd;
   }
   .toolbar {
-    background: linear-gradient(90.1deg, rgb(101 62 14) 0%, rgb(118, 75, 26) 100%);
+    /* background: linear-gradient(90.1deg, rgb(101 62 14) 0%, rgb(118, 75, 26) 100%); */
+    background: linear-gradient(90.1deg, rgb(26, 14, 101) 0%, rgb(26, 72, 118) 100%);
     align-items: center;
     justify-content: space-between;
     color: #fff;

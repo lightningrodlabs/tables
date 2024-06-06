@@ -34,7 +34,7 @@
     let boardEditor
 
 </script>
-<sl-dialog bind:this={dialog} label="New Tub"
+<sl-dialog bind:this={dialog} label="New Table"
     on:sl-initial-focus={(e)=>{
         boardEditor.initialFocus()
         e.preventDefault()

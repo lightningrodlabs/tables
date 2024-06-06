@@ -42,7 +42,7 @@
 <AboutDialog bind:this={aboutDialog} />
 <div class="mirror-menu" >
 
-    <h1 class="type-header">Mirrors</h1>
+    <h1 class="type-header">Views</h1>
 
     <div class="mirrors-section">
         {#if $activeMirrors.status == "complete" && $activeMirrors.value.length > 0}
@@ -57,12 +57,12 @@
         {/if}
 
         {#if !mainpage}
-            <div class="new-mirror" on:click={()=>newMirrorDialog.open()} title="New Tub"><SvgIcon color="white" size=25px icon=faSquarePlus style="margin-left: 15px;"/></div>
+            <div class="new-mirror" on:click={()=>newMirrorDialog.open()} title="New Table"><SvgIcon color="white" size=25px icon=faSquarePlus style="margin-left: 15px;"/></div>
         {/if}
     </div>
     
     {#if $archivedMirrors.status == "complete" && $archivedMirrors.value.length > 0}
-        <h3 class="type-header">Archived Mirrors</h3>
+        <h3 class="type-header">Archived Views</h3>
         <div class="mirrors-section">
             {#each $archivedMirrors.value as hash}
                 <div
@@ -149,23 +149,24 @@
     }
 
     .mirror {
+        color: black;
         width: 260px;
         height: 90px;
-        /* border-radius: 5px;
-        padding: 5px; */
+        border-radius: 5px;
+        padding: 5px;
         /* border-radius: 2px 2px 30px 30px; */
         padding: 8px;
         margin-top: 20px;
         margin-right: 20px;
         /* margin: 5px; */
         transition: all .25s ease;
-        border: 1px solid rgb(84 54 19 / 50%);
+        border: 1px solid rgba(68, 68, 68, 0.5);
         /* background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgb(200 221 237) 100%); */
         /* background: linear-gradient(180deg, rgb(101 62 14) 0%, rgb(193 120 34) 100%); */
-        background: linear-gradient(180deg, #0e4965 0%, #22adc1e0 100%);
+        background: linear-gradient(180deg, #dbdbdb 0%, #696a6ae0 100%);
         position: relative;
         display: block;
-        box-shadow: 0px 4px 8px rgb(74 58 32 / 80%);
+        box-shadow: 0px 4px 8px rgba(74, 74, 74, 0.8);
     }
 
     .mirror:hover {
@@ -174,7 +175,7 @@
         padding: 9px;
         width: 280px;
         /* background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%); */
-        background: linear-gradient(180deg, #0e4965 0%, #22adc1e0 100%);
+        background: linear-gradient(180deg, #c2c2c2 0%, #494949e0 100%);
         margin: 0 -1px 0 -10px;
         margin-right: 10px;
         margin-bottom: -14px;

@@ -74,10 +74,10 @@ body {
   background: linear-gradient(360deg, rgba(86, 94, 109, .10) 1.94%, rgba(86, 94, 109, 0) 90.23%);
 }
 
-p, div, span, h1, h2, h3 {
+/* p, div, span, h1, h2, h3 { */
   /* color: rgba(86, 94, 109, 1.0); */
-  color: rgb(202 184 148);
-}
+  /* color: rgb(255, 255, 255); */
+/* } */
 
 #content {
   height: 100%;
@@ -96,14 +96,14 @@ button {
 input, button, select {
   font-family: inherit;
   font-size: inherit;
-  background-color: rgb(251, 216, 174);
+  background-color: rgb(225, 225, 225);
   border: none;
   padding: 4px 8px;
-  color: rgb(57, 36, 10)
+  color: rgb(10, 33, 57)
 }
 
 input:hover, button:hover, select:hover {
-  background-color: rgb(234, 191, 138);
+  background-color: rgb(204, 204, 204);
 }
   
 .container {
@@ -121,10 +121,10 @@ body {
   --dark-text-color: #333;
   --border-color: #DDD;
 
-  --sl-panel-background-color: #ffd796;;
+  --sl-panel-background-color: #e1e1e1;;
 
   /* Changes the primary theme color to purple using primitives */
-  --sl-color-primary-50: #ed932c;
+  /* --sl-color-primary-50: #ed932c;
   --sl-color-primary-100: #db8728;
   --sl-color-primary-200: #db8728;
   --sl-color-primary-300: #c47821;
@@ -134,7 +134,7 @@ body {
   --sl-color-primary-700: #633d11;
   --sl-color-primary-800: #4a2e0d;
   --sl-color-primary-900: #342009;
-  --sl-color-primary-950: #261808;
+  --sl-color-primary-950: #261808; */
 }
 
 /* Layout and Spacing */

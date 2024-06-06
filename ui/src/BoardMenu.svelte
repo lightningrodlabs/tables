@@ -55,7 +55,7 @@
         {/if}
 
         {#if !mainpage}
-            <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Tub"><SvgIcon color="white" size=25px icon=faSquarePlus style="margin-left: 15px;"/></div>
+            <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Table"><SvgIcon color="white" size=25px icon=faSquarePlus style="margin-left: 15px;"/></div>
         {/if}
     </div>
     
@@ -154,23 +154,26 @@
     }
 
     .board {
+        color: white;
         width: 260px;
         height: 90px;
-        /* border-radius: 5px;
-        padding: 5px; */
-        border-radius: 2px 2px 30px 30px;
+        border-radius: 5px;
+        padding: 5px;
+        /* border-radius: 2px 2px 30px 30px; */
         padding: 8px;
         margin-top: 20px;
         margin-right: 20px;
         /* margin: 5px; */
         transition: all .25s ease;
-        border: 1px solid rgb(84 54 19 / 50%);
+        /* border: 1px solid rgb(84 54 19 / 50%); */
+        border: 1px solid rgb(136, 136, 136);
         /* background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgb(200 221 237) 100%); */
         /* background: linear-gradient(180deg, rgb(101 62 14) 0%, rgb(193 120 34) 100%); */
-        background: linear-gradient(180deg,  rgb(101 62 14 / 84%) 0%, rgb(193 120 34 / 88%) 100%);
+        /* background: linear-gradient(180deg,  rgb(101 62 14 / 84%) 0%, rgb(193 120 34 / 88%) 100%); */
+        background: linear-gradient(180deg, rgb(87 87 87 / 84%) 0%, #000000 100%);
         position: relative;
         display: block;
-        box-shadow: 0px 4px 8px rgb(74 58 32 / 80%);
+        box-shadow: 0px 4px 8px rgba(47, 47, 47, 0.8);
     }
 
     .board:hover {
@@ -179,7 +182,8 @@
         padding: 9px;
         width: 280px;
         /* background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 100%); */
-        background: linear-gradient(180deg, rgb(147, 92, 25) 0%, rgb(209, 131, 40) 100%);
+        /* background: linear-gradient(180deg, rgb(147, 92, 25) 0%, rgb(209, 131, 40) 100%); */
+        background: linear-gradient(180deg, rgba(226, 226, 226, 0.84) 0rgb(101, 113, 179)b85 100%);
         margin: 0 -1px 0 -10px;
         margin-right: 10px;
         margin-bottom: -14px;

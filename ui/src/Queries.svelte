@@ -142,7 +142,7 @@ function onQueryChange(newQuery) {
 <div style="display:flex; margin-left: 12px;">
   <input
     bind:value={queryName}
-   type="text" placeholder="Query Name" style="width: 100px; margin-right: 4px; background-color: #fbd8ae; border: 0; padding: 4px"/>
+   type="text" placeholder="Query Name" style="width: 100px; margin-right: 4px; background-color: #aedcfb; border: 0; padding: 4px"/>
   <button class="query-button" on:click={()=>{newQueryBool = false; changeQuery("true")}}>Cancel</button>
   <button class="query-button" on:click={()=>{
     if (queryName === "") {
@@ -174,14 +174,14 @@ function onQueryChange(newQuery) {
 <style>
   .query-button {
     margin-right: 4px;
-    background-color: #fbd8ae;
+    background-color: #aedcfb;
     border: 0;
     padding: 4px;
-    color: #986526;
+    color: #263798;
   }
 
   .query-button:hover {
-    background-color: #fff2e2 !important;
+    background-color: #83cdfe !important;
   }
 
   .query-button-select {
@@ -195,11 +195,11 @@ function onQueryChange(newQuery) {
   }
 
   .query-button-select:hover {
-    background-color: #fbd8ae46 !important;
+    background-color: #83cdfe !important;
   }
 
   .selected-query {
-    background-color: #986526 !important;
+    background-color: #263798 !important;
     border: 2px solid !important;
     padding: 4px !important;
   }
@@ -213,7 +213,7 @@ function onQueryChange(newQuery) {
     padding: 0px;
     font-size: 12px;
     height: 33px;
-    background-color: #986526;
+    background-color: #263798;
     color: white;
     font-weight: bold;
     border: 0;
@@ -223,7 +223,7 @@ function onQueryChange(newQuery) {
   }
 
   .new-query:hover {
-    background-color: #ee9127;
+    background-color: #586de4;
     /* transition */
     transition: background-color 0.2s;
   }

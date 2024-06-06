@@ -73,8 +73,8 @@
         {:else}
           <div style="margin:20px;">
             <div style="display:flex; flex-wrap:wrap;">
-            <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Tub"><SvgIcon color="#ad7d2b" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Tub</span></div>
-            <div class="new-board" on:click={()=>newMirrorDialog.open()} title="New Mirror"><SvgIcon color="#ad7d2b" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Mirror</span></div>
+            <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Table"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Table</span></div>
+            <div class="new-board" on:click={()=>newMirrorDialog.open()} title="New View"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New View</span></div>
             </div>
 
             <BoardMenu mainpage={true} />
@@ -98,7 +98,8 @@
     min-height: 0;
     /* background-color: #fff; */
     /* background-image: url('/datatub.png'); */
-    background-color: #ac7c3f;
+    /* background-color: #ac7c3f; */
+    background-color: #d7ddde;
     /* make background image vertically centered */
     background-position: center;
     height: 100vh;
@@ -115,8 +116,8 @@
     height: 35px;
     /* background: rgba(24, 55, 122, 1.0);
     border: 1px solid #4A559D; */
-    background: #774914;
-    border: 1px solid #583409;
+    background: #b0b0b0;
+    border: 1px solid #727272;
     color: #fff;
     display: flex;
     align-items: center;
@@ -131,12 +132,12 @@
 
   .new-board:hover {
     cursor: pointer;
-    padding: 20px 5px;
+    padding: 10px 5px;
     width: 180px;
     /* border: 1px solid #252d5d; */
     /* background: rgb(10, 25, 57); */
-    border: 1px solid #885415;
-    background: #a66721;
+    border: 1px solid #4e4e4e;
+    background: #909090;
     /* margin: 0 -5px 0 -5px; */
     margin: 0px -5px -7px 0px;
     box-shadow: 0px 4px 15px rgba(35, 32, 74, 0.8);

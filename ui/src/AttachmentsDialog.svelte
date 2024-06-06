@@ -3,7 +3,7 @@
   import { cloneDeep } from "lodash";
   import type { Board } from "./board";
   import { getContext } from "svelte";
-  import type { CalcyStore } from "./store";
+  import type { TablesStore } from "./store";
   import '@shoelace-style/shoelace/dist/components/button/button.js';
   import '@shoelace-style/shoelace/dist/components/dialog/dialog.js';
   import AttachmentsList from "./AttachmentsList.svelte";
@@ -11,7 +11,7 @@
   import type { WALUrl } from "./util";
 
   const { getStore } :any = getContext("store");
-  let store: CalcyStore = getStore();
+  let store: TablesStore = getStore();
   //let card: Card | undefined
   let attachments: Array<WALUrl> = []
  

@@ -6,6 +6,7 @@ import { MirrorType } from "./mirrorList";
 import type { WALUrl } from "./util";
 import { cloneDeep } from "lodash";
 import { reorder } from "svelte-dnd-list";
+import type { WAL } from "@lightningrodlabs/we-applet";
 
 export type MirrorProps = {
   bgUrl: string,
@@ -14,7 +15,7 @@ export type MirrorProps = {
 
 export type Variable = {
   name: string,
-  value: string,
+  value: WALUrl,
 }
 
 const MAX_FEED_ITEMS = 50

@@ -12,7 +12,8 @@
   import CellEdit from "./CellEdit.svelte";
   import Avatar from "./Avatar.svelte";
   import SummaryRow from "./SummaryRow.svelte";
-  import { decodeHashFromBase64, type Timestamp } from "@holochain/client";
+  import { decodeHashFromBase64 } from "@holochain/client";
+  import type { EntryHash, ActionHash, Timestamp } from "@holochain/client";
   import { cloneDeep, isEqual } from "lodash";
   import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
   import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
@@ -29,6 +30,8 @@
   import DataView from "./DataView.svelte";
   import Queries from './Queries.svelte'
   import { scale } from 'svelte/transition';
+  import { getValueOfCell } from './DataHelpers';
+  import { weaveUrlToWAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
 
   class MyRenderer extends Renderer {
     override link(href: string, title : string, text: string) {
@@ -79,14 +82,6 @@
   // let columnDefs: Array<ColumnDef> = []
 
   $: state = activeMirror.readableState()
-  // $: if ($state) {
-  //   console.log("hi")
-  //   rawSubbed = state.raw;
-  //   console.log("ho", rawSubbed)
-  //   for (const variable of state.variables) {
-  //     rawSubbed = rawSubbed.replace(`<weave>${variable.name}</weave>`, variable.value);
-  //   }
-  // }
   let queriedData = {};
   $: queriedData;
   let newSummaryRowModal = false;
@@ -94,6 +89,20 @@
   function init(el){
     //if (el)
      // el.focus()
+  }
+
+  let cellValues = {}
+
+  async function setCellValues() {
+    if ($state.variables) {
+      for (const variable of $state.variables) {
+        if (variable.value) {
+          let wal: WAL = weaveUrlToWAL(variable.value);
+          const cellValue = await getValueOfCell(wal.hrl[1], wal.context.cellId.rowId, wal.context.cellId.columnId, store);
+          cellValues[variable.name] = cellValue;
+        }
+      }
+    }
   }
 
   const download = (filename: string, text: string) => {
@@ -117,10 +126,16 @@
     await store.closeActiveMirror(true);
   };
 
-  onMount(() => {
-    
+  onMount(async () => {
+    await setCellValues();
   });
 </script>
+
+<button on:click={
+  () => {
+   setCellValues();
+  }
+}>set</button>
 
 <div class="mirror" >
   <div class="top-bar">
@@ -136,10 +151,9 @@
     </div>
   </div>
   {#if $state}
-    {@const rawSubbed = $state.raw.replace(/<weave>(.*?)<\/weave>/g, (match, p1) => {
+    {@const rawSubbed = $state.raw.replace(/!weave{(.*?)}/g, (match, p1) => {
       const variable = $state.variables.find(v => v.name === p1);
-      console.log("variable", variable)
-      return variable ? variable.value : match;
+      return variable ? cellValues[p1] : match;
     })}
     <!-- <button on:click={
       () => {
