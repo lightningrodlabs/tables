@@ -3,13 +3,14 @@
   import type { TablesStore } from './store';
   import { getContext } from 'svelte';
   import type { Variable, MirrorState } from './mirror';
+  import {Board, ColumnType, ColumnDef, SumType } from "./board";
   import '@shoelace-style/shoelace/dist/components/dialog/dialog.js';
   import '@shoelace-style/shoelace/dist/components/button/button.js';
   import '@shoelace-style/shoelace/dist/components/input/input.js';
   import type SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog';
   import SelectRowAndValue from './SelectRowAndValue.svelte';
   import BoardSelect from './BoardSelect.svelte';
-  import { getValueOfCell } from './DataHelpers';
+  import { getTableValues, getRowValues, getColumnValues, getValueOfCell, getValueOfColumnSummary } from './DataHelpers';
   import { weaveUrlFromWal, weaveUrlToWAL } from '@lightningrodlabs/we-applet';
 
   let editLabelDefs = []
@@ -24,43 +25,17 @@
   $: name = ""
   $: raw = ""
   $: boardHash = ""
-  // $: {
-  //   const currentVariables = JSON.parse(JSON.stringify(variables)); // create a deep copy of variables
 
-  //   if (JSON.stringify(currentVariables) !== JSON.stringify(previousVariables)) { // compare the current and previous variables
-  //     if (currentVariables.length) {
-  //       for (const variable of currentVariables) { // use a for...of loop
-  //         console.log("1", variable);
-  //         if (variable.value) {
-  //           console.log("trying to get value of ", variable?.value?.hrl[1], variable?.value?.context?.cellId?.rowId, "--------", variable?.value?.context?.cellId?.columnId);
-  //           getValueOfCell(variable?.value?.hrl[1], variable?.value?.context?.cellId?.rowId, variable?.value?.context?.cellId?.columnId, store)
-  //           .then(cellValue => {
-  //             console.log("cell value", cellValue);
-  //             cellValues[variable.name] = cellValue; // use the variable's name as the key
-  //           }).catch(e => {
-  //             console.log(e)
-  //           })
-  //         }
-  //       }
-  //       console.log(currentVariables, cellValues);
-  //     }
-
-  //     previousVariables = currentVariables; // update previousVariables
-  //   }
-  // }
-  
   const { getStore } :any = getContext('store');
 
   const store:TablesStore = getStore();
 
   const addMirror = async (name: string, variables: Array<Variable>, raw: string ) => {
       const state:Partial<MirrorState> = {name, variables, raw}
-      console.log("state", state)
       state.feed = {}
       // state.feed[newFeedKey(store.myAgentPubKeyB64)] = {delta:{type:"create", name}, context:null}
       const mirror = await store.mirrorList.makeMirror(state)
-      console.log("mirror", mirror)
-      await mirror.join()        
+      await mirror.join()
       store.setUIprops({showMenu:false})
       dialog.hide()
       await store.mirrorList.setActiveMirror(mirror.hash)
@@ -90,15 +65,47 @@
       <div class="variable">
         <input class='textarea' placeholder="variable name" maxlength="60" bind:value={variable.name} on:input={() => variables[i] = variable}/>
         {#if variable.value}
-          {cellValues[i]}
+          {JSON.stringify(cellValues[i])}
         {/if}
         <button
           on:click={async ()=>{
             const wal = await store.weClient.userSelectWal()
             // TODO: check if wal is a datatub cell or summary
-            let valueOfCell = await getValueOfCell(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId, store)
-            variables[i].value = weaveUrlFromWal(wal)
-            cellValues[i] = valueOfCell
+            switch (wal?.context?.assetType) {
+
+              case "Cell":
+                const valueOfCell = await getValueOfCell(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId, store)
+                variables[i].value = weaveUrlFromWal(wal)
+                cellValues[i] = valueOfCell
+                break
+              case "Column Summary":
+                const valueOfSummary = await getValueOfColumnSummary(wal.hrl[1], wal.context?.columnId, wal.context?.sumType, store, "true")
+                console.log(valueOfSummary)
+                variables[i].value = weaveUrlFromWal(wal)
+                cellValues[i] = valueOfSummary
+                break
+              case "Table":
+                console.log("table")
+                const tableValues = await getTableValues(wal.hrl[1], store)
+                console.log(tableValues)
+                variables[i].value = weaveUrlFromWal(wal)
+                cellValues[i] = tableValues
+                break
+              case "Row":
+                console.log("row")
+                const rowValues = await getRowValues(wal.hrl[1], wal.context?.rowId, store)
+                console.log(rowValues)
+                variables[i].value = weaveUrlFromWal(wal)
+                cellValues[i] = rowValues
+                break
+              case "Column":
+                console.log("column")
+                const columnValues = await getColumnValues(wal.hrl[1], wal.context?.columnId, store)
+                console.log(columnValues)
+                variables[i].value = weaveUrlFromWal(wal)
+                cellValues[i] = columnValues
+                break
+            }
           }}
         >Assign WAL</button>
         <button on:click={() => variables = variables.filter((v, j) => j !== i)}>Remove</button>

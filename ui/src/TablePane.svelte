@@ -15,7 +15,6 @@
   import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
   import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
   import { onVisible } from "./util";
-  import { isWeContext, type WAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
   import SvgIcon from "./SvgIcon.svelte";
   import { exportBoard } from "./export";
   import { Marked, Renderer } from "@ts-stack/markdown";
@@ -142,7 +141,17 @@
   }
 
   const walToPocket = () => {
-    const attachment: WAL = { hrl: [store.dnaHash, activeBoard.hash], context: "" }
+    const attachment: WAL = { hrl: [store.dnaHash, activeBoard.hash], context: {assetType: "Table"} }
+    store.weClient?.walToPocket(attachment)
+  }
+
+  const rowToPocket = (rowId: RowId) => {
+    const attachment: WAL = { hrl: [store.dnaHash, activeBoard.hash], context: {assetType: "Row", rowId} }
+    store.weClient?.walToPocket(attachment)
+  }
+
+  const columnToPocket = (columnId: string) => {
+    const attachment: WAL = { hrl: [store.dnaHash, activeBoard.hash], context: {assetType: "Column", columnId} }
     store.weClient?.walToPocket(attachment)
   }
 
@@ -328,6 +337,11 @@
       >
         {@const isDragging = drag?.sourceIndex === index}
         <div class="header-cell" >
+          <button title="Add Row to Pocket" style="padding: 0; background-color: transparent;" on:click={()=>{
+            columnToPocket($state.columnDefs[index].id)
+          }} >
+            <SvgIcon icon="addToPocket" size="20px"/>
+          </button>
           {$state.columnDefs[index].name}
           {#if $state.columnDefs[index].unique}
             *
@@ -404,6 +418,16 @@
                 on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
                 circle size=small> -->
               <div
+              >
+              <!-- style="display:flex; align-items: center; justify-content: center; width:18px; height:18px; cursor: pointer; margin: 2px;" -->
+              
+                <button title="Add Row to Pocket" style="padding: 0" on:click={()=>{
+                  rowToPocket(row.id)
+                }} >          
+                  <SvgIcon icon="addToPocket" size="20px"/>
+                </button>
+              </div>
+              <div
                 class="trash-button"
                 on:click={(e)=>{
                   e.stopPropagation(); 
@@ -465,7 +489,7 @@
         {/if}
       {/each}
       
-      <div size="small" circle style="margin-left:61px; cursor: pointer;" 
+      <div size="small" circle style="margin-left:55px; cursor: pointer;" 
       class="add-column-button"
       on:click={async ()=>{
         const cells = {}
@@ -1285,10 +1309,6 @@
     cursor: pointer; 
     margin: 2px;
     border-radius: 2px;
-  }
-
-  .trash-button {
-    margin-left: 30px;
   }
   
   .trash-button:hover {

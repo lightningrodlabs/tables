@@ -6,7 +6,7 @@
   import LabelSelector from "./LabelSelector.svelte";
   import { v1 as uuidv1 } from "uuid";
   // import {Mirror, type MirrorProps, type Feed, type FeedItem, sortedFeedKeys, feedItems, deltaToFeedString } from "./mirror";
-  // import EditMirrorDialog from "./EditMirrorDialog.svelte";
+  import EditMirrorDialog from "./EditMirrorDialog.svelte";
   import AddColumnModal from "./AddColumnModal.svelte";
   import EditHeader from "./EditHeader.svelte";
   import CellEdit from "./CellEdit.svelte";
@@ -30,7 +30,7 @@
   import DataView from "./DataView.svelte";
   import Queries from './Queries.svelte'
   import { scale } from 'svelte/transition';
-  import { getValueOfCell } from './DataHelpers';
+  import { getTableValues, getRowValues, getColumnValues, getValueOfCell, getValueOfColumnSummary } from './DataHelpers';
   import { weaveUrlToWAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
 
   class MyRenderer extends Renderer {
@@ -81,6 +81,7 @@
 
   // let columnDefs: Array<ColumnDef> = []
 
+  let editMirrorDialog: EditMirrorDialog
   $: state = activeMirror.readableState()
   let queriedData = {};
   $: queriedData;
@@ -96,11 +97,36 @@
   async function setCellValues() {
     if ($state.variables) {
       for (const variable of $state.variables) {
-        if (variable.value) {
-          let wal: WAL = weaveUrlToWAL(variable.value);
-          const cellValue = await getValueOfCell(wal.hrl[1], wal.context.cellId.rowId, wal.context.cellId.columnId, store);
-          cellValues[variable.name] = cellValue;
-        }
+        let wal: WAL = weaveUrlToWAL(variable.value);
+        switch (wal?.context?.assetType) {
+          case "Cell":
+            const valueOfCell = await getValueOfCell(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId, store)
+            cellValues[variable.name] = valueOfCell
+            break
+          case "Column Summary":
+            const valueOfSummary = await getValueOfColumnSummary(wal.hrl[1], wal.context?.columnId, wal.context?.sumType, store, "true")
+            console.log(valueOfSummary)
+            cellValues[variable.name] = valueOfSummary
+            break
+          case "Table":
+            console.log("table")
+            const tableValues = await getTableValues(wal.hrl[1], store)
+            console.log(tableValues)
+            cellValues[variable.name] = tableValues
+            break
+          case "Row":
+            console.log("row")
+            const rowValues = await getRowValues(wal.hrl[1], wal.context?.rowId, store)
+            console.log(rowValues)
+            cellValues[variable.name] = rowValues
+            break
+          case "Column":
+            console.log("column")
+            const columnValues = await getColumnValues(wal.hrl[1], wal.context?.columnId, store)
+            console.log(columnValues)
+            cellValues[variable.name] = columnValues
+            break
+          }
       }
     }
   }
@@ -138,6 +164,10 @@
 }>set</button>
 
 <div class="mirror" >
+  {#if activeHashB64}
+    <EditMirrorDialog {activeHashB64} bind:this={editMirrorDialog}></EditMirrorDialog>
+  {/if}
+
   <div class="top-bar">
     <div class="left-items">
       {#if standAlone}
@@ -148,12 +178,15 @@
         </sl-button>
         <h1>{$state.name}</h1>
       {/if}
+      <sl-menu-item on:click={()=> editMirrorDialog.open(cloneDeep(activeMirror.hash))} class="board-settings" >
+        <SvgIcon icon="faEdit"  style="background: transparent; opacity: .5; position: relative; top: -2px;" size="14px"/> <span>Edit</span>
+    </sl-menu-item>
     </div>
   </div>
   {#if $state}
     {@const rawSubbed = $state.raw.replace(/!weave{(.*?)}/g, (match, p1) => {
       const variable = $state.variables.find(v => v.name === p1);
-      return variable ? cellValues[p1] : match;
+      return variable ? JSON.stringify(cellValues[p1]) : match;
     })}
     <!-- <button on:click={
       () => {
