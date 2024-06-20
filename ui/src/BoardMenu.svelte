@@ -42,25 +42,30 @@
 <AboutDialog bind:this={aboutDialog} />
 <div class="board-menu" >
 
-    <div class="boards-section">
+    <!-- <div class="boards-section"> -->
         {#if $activeBoards.status == "complete" && $activeBoards.value.length > 0}
-            {#each $activeBoards.value as hash}
-                <div
-                    on:click={()=>selectBoard(hash)}
-                    class="board" >
-                    <BoardMenuItem largeDisplay={true} boardType={BoardType.active} boardHash={hash}></BoardMenuItem>
-                    <!-- <div class="board-bg" style="background-image: url({bgUrl});"></div> -->
-                </div>
-            {/each}
+            <h3 class="type-header">
+                Tables
+            </h3>
+            <div class="boards-section">
+                {#each $activeBoards.value as hash}
+                    <div
+                        on:click={()=>selectBoard(hash)}
+                        class="board" >
+                        <BoardMenuItem largeDisplay={true} boardType={BoardType.active} boardHash={hash}></BoardMenuItem>
+                        <!-- <div class="board-bg" style="background-image: url({bgUrl});"></div> -->
+                    </div>
+                {/each}
+            </div>
         {/if}
 
         {#if !mainpage}
             <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Table"><SvgIcon color="white" size=25px icon=faSquarePlus style="margin-left: 15px;"/></div>
         {/if}
-    </div>
+    <!-- </div> -->
     
     {#if $archivedBoards.status == "complete" && $archivedBoards.value.length > 0}
-        <h3 class="type-header">Archived Boards</h3>
+        <h3 class="type-header">Archived Tables</h3>
         <div class="boards-section">
             {#each $archivedBoards.value as hash}
                 <div
@@ -75,11 +80,11 @@
 
     <!-- {#if !mainpage} -->
         <NewBoardDialog bind:this={newBoardDialog}></NewBoardDialog>
-        <div class="footer" 
+        <!-- <div class="footer" 
             on:click={()=>aboutDialog.open()}>   
             <div class="logo" title="About Tables"><LogoIcon /></div>
             <div class="cog"><SvgIcon icon=faCog size="20px" color="#fff"/></div>
-        </div>
+        </div> -->
     <!-- {/if} -->
 </div>
 
@@ -115,7 +120,7 @@
     .type-header {
         font-size: 12px;
         font-weight: normal;
-        color: #fff;
+        color: #000000;
         opacity: .6;
         margin-top: 40px;
         /* margin-bottom: 10px; */

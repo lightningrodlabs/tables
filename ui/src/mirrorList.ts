@@ -7,7 +7,7 @@ import type { ProfilesStore } from "@holochain-open-dev/profiles";
 import { cloneDeep } from "lodash";
 import { Mirror, feedItems, type MirrorDelta, type MirrorState, deltaToFeedString, type RowId } from "./mirror";
 import { hashEqual } from "./util";
-import type { WeClient } from "@lightningrodlabs/we-applet";
+import type { WeaveClient } from "@lightningrodlabs/we-applet";
 import { SeenType } from "./store";
 
 export enum MirrorType {
@@ -121,7 +121,7 @@ export class MirrorList {
     allAgentMirrors: AsyncReadable<ReadonlyMap<AgentPubKey, Array<MirrorAndLatestState>>>
     allAuthorAgents: AsyncReadable<AgentPubKey[]>
 
-    constructor(public profilseStore: ProfilesStore, public synStore: SynStore, public weClient : WeClient) {
+    constructor(public profilseStore: ProfilesStore, public synStore: SynStore, public weClient : WeaveClient) {
         this.allAgentMirrors = pipe(this.profilseStore.agentsWithProfile,
             agents=>{
                 console.log("allAgentMirrors")

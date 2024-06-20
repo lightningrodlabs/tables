@@ -110,7 +110,7 @@
     .type-header {
         font-size: 12px;
         font-weight: normal;
-        color: #fff;
+        color: #000000;
         opacity: .6;
         margin-top: 40px;
         /* margin-bottom: 10px; */

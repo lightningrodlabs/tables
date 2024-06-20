@@ -3,7 +3,7 @@
     import TablePane from './TablePane.svelte'
     import { TablesStore } from './store'
     import { setContext } from 'svelte';
-    import type { AppAgentClient } from '@holochain/client';
+    import type { AppClient } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
     import type { ProfilesStore } from "@holochain-open-dev/profiles";
     import type { WeClient } from '@lightningrodlabs/we-applet';
@@ -13,11 +13,13 @@
     import MirrorMenu from "./MirrorMenu.svelte";
     import NewMirrorDialog from './NewMirrorDialog.svelte';
     import MirrorPane from './MirrorPane.svelte'
+    import AboutDialog from './AboutDialog.svelte'
 
     export let roleName = ""
-    export let client : AppAgentClient
+    export let client : AppClient
     export let weClient : WeClient
     export let profilesStore : ProfilesStore
+    let aboutDialog;
 
     let store: TablesStore = new TablesStore (
       weClient,
@@ -80,6 +82,10 @@
             <BoardMenu mainpage={true} />
             <MirrorMenu mainpage={true} />
             
+            <div style="cursor: pointer; margin: 10px; margin-top: 30px;" on:click={()=>aboutDialog.open()}>
+              <SvgIcon icon=faCog size="20px" color="#000"/> v0.10-dev.0
+            </div>
+            <AboutDialog bind:this={aboutDialog} />
           </div>
         {/if}
         </div>
@@ -99,7 +105,8 @@
     /* background-color: #fff; */
     /* background-image: url('/datatub.png'); */
     /* background-color: #ac7c3f; */
-    background-color: #d7ddde;
+    /* background-color: #d7ddde; */
+    background-color: #e1e1e1;
     /* make background image vertically centered */
     background-position: center;
     height: 100vh;
@@ -116,7 +123,7 @@
     height: 35px;
     /* background: rgba(24, 55, 122, 1.0);
     border: 1px solid #4A559D; */
-    background: #b0b0b0;
+    background: #777777;
     border: 1px solid #727272;
     color: #fff;
     display: flex;
@@ -206,20 +213,4 @@
     position: relative;
     z-index: 10;
   }
-
-  /* .my-boards {
-    display: flex;
-  }
-  .my-board {
-    border-radius: 5px;
-    border: 1px solid #222;
-    background-color: lightcyan;
-    cursor: pointer;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100px;
-    width: 100px;
-    margin: 5px;
-  } */
 </style>

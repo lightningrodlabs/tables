@@ -1,17 +1,18 @@
 <script lang="ts">
-    import TablePane from './TablePane.svelte'
+    import MirrorPane from './MirrorPane.svelte'
     import { TablesStore } from './store'
     import { setContext } from 'svelte';
-    import type { AppAgentClient, EntryHash } from '@holochain/client';
+    import type { AppClient, EntryHash } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
     import type { ProfilesStore } from "@holochain-open-dev/profiles";
-    import type { WeaveClient } from '@lightningrodlabs/we-applet';
+    import type { WeClient } from '@lightningrodlabs/we-applet';
+    import { onMount } from 'svelte';
 
     export let roleName = ""
-    export let client : AppAgentClient
-    export let weClient : WeaveClient
+    export let client : AppClient
+    export let weClient : WeClient
     export let profilesStore : ProfilesStore
-    export let board : EntryHash
+    export let mirror : EntryHash
 
     let store: TablesStore = new TablesStore (
       weClient,
@@ -20,9 +21,14 @@
       roleName,
     );
     let synStore: SynStore = store.synStore
-    store.boardList.setActiveBoard(board)
-    $: activeBoardHash = store.boardList.activeBoardHash
-    $: activeBoard = store.boardList.activeBoard
+    store.mirrorList.setActiveMirror(mirror)
+    $: activeMirrorHash = store.mirrorList.activeMirrorHash
+    $: activeMirror = store.mirrorList.activeMirror
+
+    onMount(async () => {
+      console.log("Setting active mirror to: ", mirror)
+      store.mirrorList.setActiveMirror(mirror)
+    })
 
     setContext('synStore', {
       getStore: () => synStore,
@@ -35,7 +41,7 @@
     //const DEFAULT_KD_BG_IMG = "https://img.freepik.com/free-photo/studio-background-concept-abstract-empty-light-gradient-purple-studio-room-background-product-plain-studio-background_1258-54461.jpg"
     const NO_BOARD_IMG = "none"
 
-    $: bgUrl = DEFAULT_KD_BG_IMG  // FIXME$activeBoard ?   ($activeBoard.state.props && $boardState.props.bgUrl) ? $boardState.props.bgUrl : DEFAULT_KD_BG_IMG
+    $: bgUrl = DEFAULT_KD_BG_IMG  // FIXME$activeMirror ?   ($activeMirror.state.props && $mirrorState.props.bgUrl) ? $mirrorState.props.bgUrl : DEFAULT_KD_BG_IMG
   </script>
   <div class="flex-scrollable-parent">
     <div class="flex-scrollable-container">
@@ -46,10 +52,10 @@
       <div class="workspace" style="display:flex">
 
 
-        {#if $activeBoardHash !== undefined}
-          <TablePane activeBoard={$activeBoard} standAlone={true}/>
+        {#if $activeMirrorHash !== undefined}
+          <MirrorPane activeMirror={$activeMirror}/>
         {:else}
-          Unable to find board.
+          Unable to find mirror.
         {/if}
         </div>
         </div>
@@ -70,7 +76,7 @@
   }
 
   .wrapper {
-    background-color: #fff;
+    background-color: #ffffff;
   }
 
   :global(:root) {

@@ -7,7 +7,7 @@ import type { ProfilesStore } from "@holochain-open-dev/profiles";
 import { cloneDeep } from "lodash";
 import { Board, feedItems, type BoardDelta, type BoardState, deltaToFeedString, type RowId } from "./board";
 import { hashEqual } from "./util";
-import type { WeClient } from "@lightningrodlabs/we-applet";
+import type { WeaveClient } from "@lightningrodlabs/we-applet";
 import { SeenType } from "./store";
 
 export enum BoardType {
@@ -121,7 +121,7 @@ export class BoardList {
     allAgentBoards: AsyncReadable<ReadonlyMap<AgentPubKey, Array<BoardAndLatestState>>>
     allAuthorAgents: AsyncReadable<AgentPubKey[]>
 
-    constructor(public profilseStore: ProfilesStore, public synStore: SynStore, public weClient : WeClient) {
+    constructor(public profilseStore: ProfilesStore, public synStore: SynStore, public weClient : WeaveClient) {
         this.allAgentBoards = pipe(this.profilseStore.agentsWithProfile,
             agents=>{
                 console.log("allAgentBoards")

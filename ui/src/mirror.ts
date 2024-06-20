@@ -89,6 +89,14 @@ export type MirrorDelta =
       name: string;
     }
   | {
+      type: "set-raw";
+      raw: string;
+    }
+  | {
+      type: "set-variables";
+      variables: Array<Variable>;
+    }
+  | {
       type: "set-props";
       props: MirrorProps;
     }
@@ -130,6 +138,12 @@ export type MirrorDelta =
         break;
       case "set-name":
         feedText = `set the mirror name to ${delta.name}`
+        break;
+      case "set-raw":
+        feedText = `updated the mirror raw data`
+        break;
+      case "set-variables":
+        feedText = `updated the mirror variables`
         break;
       case "set-props":
         feedText = `upated the mirror settings`
@@ -174,6 +188,22 @@ export type MirrorDelta =
           break;
         case "set-name":
           state.name = delta.name
+          break;
+        case "set-raw":
+          state.raw = delta.raw
+          break;
+        case "set-variables":
+          for (const variable of delta.variables) {
+            console.log("SET VARIABLE", variable)
+            const idx = state.variables.findIndex(v=>v.name === variable.name)
+            if (idx >= 0) {
+              console.log("UPDATING VARIABLE", variable)
+              state.variables[idx]["value"] = variable["value"]
+            } else {
+              console.log("ADDING VARIABLE", variable)
+              state.variables.push(variable)
+            }
+          }
           break;
         case "set-props":
           state.props = delta.props

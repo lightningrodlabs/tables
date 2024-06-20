@@ -20,14 +20,18 @@
     let dialog: SlDialog
     let nameInput;
     let cellValues = {}
-    let variables = []
+    // let variables = []
     let previousVariables = [];
     export let activeHashB64;
+    export let variables = [];
+    export let mirrorHash;
+    export let name;
+    export let raw;
   
     $: variables;
-    $: name = ""
-    $: raw = ""
-    $: boardHash = ""
+    $: name;
+    $: raw;
+    $: mirrorHash;
   
     const { getStore } :any = getContext('store');
   
@@ -44,85 +48,102 @@
         await store.mirrorList.setActiveMirror(mirror.hash)
     }
 
-
-    // const updateBoard = async ( name: string, labelDefs: LabelDef[],  columnDefs: ColumnDef[], props: BoardProps, showArchived: boolean) => {
-    //     const sa:{[key: string]: boolean} = get(store.uiProps).showArchived
-    //     const boardHashB64 = encodeHashToBase64(boardHash)
-    //     sa[boardHashB64] = showArchived
-    //     store.setUIprops({showArchived:sa})
-
-    //     const board: Board | undefined = await store.boardList.getBoard(boardHash)
-    //     if (board) {
-    //     let changes = []
-    //     const state: BoardState = board.state()
-    //     if (state.name != name) {
-    //         changes.push(
-    //         {
-    //             type: 'set-name',
-    //             name: name
-    //         })
-    //     }
-    //     if (!isEqual(props, state.props)) {
-    //         changes.push({type: 'set-props',
-    //         props: props
-    //         })
-    //     }
-    //     if (!isEqual(labelDefs, state.labelDefs)) {
-    //         changes.push({type: 'set-label-defs',
-    //         labelDefs: labelDefs
-    //         })
-    //     }
-    //     if (!isEqual(columnDefs, state.columnDefs)) {
-    //         changes.push({type: 'set-column-defs',
-    //         columnDefs: columnDefs
-    //         })
-    //     }
-    //     if (changes.length > 0) {
-    //         await board.requestChanges(changes)
-    //     }
-    //     }
-    //     close()
-    // }
-
     const updateMirror = async (name: string, variables: Array<Variable>, raw: string ) => {
         console.log("updateMirror")
         const state:Partial<MirrorState> = {name, variables, raw}
         state.feed = {}
         // state.feed[newFeedKey(store.myAgentPubKeyB64)] = {delta:{type:"create", name}, context:null}
-        const mirror = await store.mirrorList.getMirror(activeHashB64)
-        console.log("mirror")
+        const mirror = await store.mirrorList.getMirror(mirrorHash)
         if (mirror) {
-        let changes = []
-        const mirrorState: MirrorState = mirror.state()
-        console.log("mirrorState")
-        if (mirrorState.name != name) {
-            changes.push(
-            {
-                type: 'set-name',
-                name: name
-            })
-        }
-        if (!isEqual(variables, mirrorState.variables)) {
-            changes.push({type: 'set-variables',
-            variables: variables
-            })
-        }
-        if (raw != mirrorState.raw) {
-            changes.push({type: 'set-raw',
-            raw: raw
-            })
-        }
-        if (changes.length > 0) {
+          // console.log("mirror.state()", mirror.state())
+          // let newState = {
+          //   ...mirror.state(),
+          //   name,
+          //   raw,
+          //   variables,
+          // }
+          // console.log("newState", newState)
+          // await mirror.requestChanges([{type: 'set-state', state :  newState}])
+          // console.log("mirror.state()", mirror.state())
+
+          let changes = []
+          const mirrorState: MirrorState = mirror.state()
+          console.log("mirrorState")
+          if (mirrorState.name != name) {
+              changes.push(
+              {
+                  type: 'set-name',
+                  name: name
+              })
+          }
+          if (!isEqual(variables, mirrorState.variables)) {
+              changes.push({type: 'set-variables',
+              variables: variables
+              })
+          }
+          if (raw != mirrorState.raw) {
+              changes.push({type: 'set-raw',
+              raw: raw
+              })
+          }
+          if (changes.length > 0) {
+            console.log("changes", changes)
             await mirror.requestChanges(changes)
+          }
         }
-        }
+        dispatchEvent(new CustomEvent('mirror-updated', {detail: {mirrorHash}}))
         dialog.hide()
     }
 
     export const open = ()=> {
         // mirrorEditor.reset()
         dialog.show()
+        // process all wals
+        variables.forEach((variable, i) => {
+          if (variable.value) {
+            const wal = weaveUrlToWAL(variable.value)
+            processWal(wal, i)
+          }
+        })
     }
+
+    const processWal = async (wal, i) => {
+      switch (wal?.context?.assetType) {
+        case "Cell":
+          const valueOfCell = await getValueOfCell(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId, store)
+          variables[i].value = weaveUrlFromWal(wal)
+          cellValues[i] = valueOfCell
+          break
+        case "Column Summary":
+          const valueOfSummary = await getValueOfColumnSummary(wal.hrl[1], wal.context?.columnId, wal.context?.sumType, store, "true")
+          console.log(valueOfSummary)
+          variables[i].value = weaveUrlFromWal(wal)
+          cellValues[i] = valueOfSummary
+          break
+        case "Table":
+          console.log("table")
+          const tableValues = await getTableValues(wal.hrl[1], store)
+          console.log(tableValues)
+          variables[i].value = weaveUrlFromWal(wal)
+          cellValues[i] = tableValues
+          break
+        case "Row":
+          console.log("row")
+          const rowValues = await getRowValues(wal.hrl[1], wal.context?.rowId, store)
+          console.log(rowValues)
+          variables[i].value = weaveUrlFromWal(wal)
+          cellValues[i] = rowValues
+          break
+        case "Column":
+          console.log("column")
+          const columnValues = await getColumnValues(wal.hrl[1], wal.context?.columnId, store)
+          console.log(columnValues)
+          variables[i].value = weaveUrlFromWal(wal)
+          cellValues[i] = columnValues
+          break
+      }
+    }
+
     let mirrorEditor
   
   </script>
@@ -137,7 +158,7 @@
   }}}>
   
   <div class='mirror-editor'>
-    <sl-input class='textarea' placeholder="test" maxlength="60" bind:this={nameInput} on:input={e => name= e.target.value}></sl-input>
+    <input class='textarea' maxlength="60" bind:value={name} on:input={e => name= e.target.value} />
     <!-- <BoardSelect /> -->
     <div class="variables">
       {#each variables as variable, i}
@@ -149,43 +170,8 @@
           <button
             on:click={async ()=>{
               const wal = await store.weClient.userSelectWal()
-              // TODO: check if wal is a datatub cell or summary
-              console.log(wal?.context?.assetType)
-              switch (wal?.context?.assetType) {
-  
-                case "Cell":
-                  const valueOfCell = await getValueOfCell(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId, store)
-                  variables[i].value = weaveUrlFromWal(wal)
-                  cellValues[i] = valueOfCell
-                  break
-                case "Column Summary":
-                  const valueOfSummary = await getValueOfColumnSummary(wal.hrl[1], wal.context?.columnId, wal.context?.sumType, store, "true")
-                  console.log(valueOfSummary)
-                  variables[i].value = weaveUrlFromWal(wal)
-                  cellValues[i] = valueOfSummary
-                  break
-                case "Table":
-                  console.log("table")
-                  const tableValues = await getTableValues(wal.hrl[1], store)
-                  console.log(tableValues)
-                  variables[i].value = weaveUrlFromWal(wal)
-                  cellValues[i] = tableValues
-                  break
-                case "Row":
-                  console.log("row")
-                  const rowValues = await getRowValues(wal.hrl[1], wal.context?.rowId, store)
-                  console.log(rowValues)
-                  variables[i].value = weaveUrlFromWal(wal)
-                  cellValues[i] = rowValues
-                  break
-                case "Column":
-                  console.log("column")
-                  const columnValues = await getColumnValues(wal.hrl[1], wal.context?.columnId, store)
-                  console.log(columnValues)
-                  variables[i].value = weaveUrlFromWal(wal)
-                  cellValues[i] = columnValues
-                  break
-              }
+              // TODO: verify wal from datatub
+              processWal(wal, i)
             }}
           >Assign WAL</button>
           <button on:click={() => variables = variables.filter((v, j) => j !== i)}>Remove</button>

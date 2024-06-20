@@ -268,10 +268,13 @@
 
     .edit-cell-input {
         /* background-color: rgb(251, 216, 174); */
-        background-color: #aedcfb;
+        /* background-color: #aedcfb; */
+        background-color: white;
         border: 0;
+        padding: 0;
         outline: 1px solid #b3b3b3;
-        margin: 2px;
+        /* outline: none; */
+        /* margin: 2px; */
         display: inline-block;
         width: 100%;
     }

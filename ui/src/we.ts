@@ -3,9 +3,9 @@ import type { BoardEphemeralState, BoardState } from './board';
 import { asyncDerived, pipe, sliceAndJoin, toPromise } from '@holochain-open-dev/stores';
 import { BoardType } from './boardList';
 import { LazyHoloHashMap } from '@holochain-open-dev/utils';
-import type { AppletHash, AppletServices, AssetInfo, WAL, WeServices } from '@lightningrodlabs/we-applet';
+import type { AppletHash, AppletServices, AssetInfo, WAL, WeaveServices, RecordInfo } from '@lightningrodlabs/we-applet';
 import { getMyDna } from './util';
-import type { AppAgentClient, RoleName, ZomeName } from '@holochain/client';
+import type { AppClient, RoleName, ZomeName } from '@holochain/client';
 import { svgIcons } from "./svgIcons"
 
 const ROLE_NAME = "tables"
@@ -33,17 +33,17 @@ export const appletServices: AppletServices = {
         view: "applet-view",
       },
     },
-    bindAsset: async (appletClient: AppAgentClient,
+    bindAsset: async (appletClient: AppClient,
       srcWal: WAL, dstWal: WAL): Promise<void> => {
       console.log("Bind requested.  Src:", srcWal, "  Dst:", dstWal)
     },
     getAssetInfo: async (
-      appletClient: AppAgentClient,
-      roleName: RoleName,
-      integrityZomeName: ZomeName,
-      entryType: string,
-      wal: WAL
+      appletClient: AppClient,
+      wal: WAL,
+      recordInfo: RecordInfo,
     ): Promise<AssetInfo | undefined> => {
+      let entryType = recordInfo.entryType;
+      let roleName = recordInfo.roleName;
       if (entryType == "document") {
         const synClient = new SynClient(appletClient, roleName, ZOME_NAME);
         const synStore = new SynStore(synClient);

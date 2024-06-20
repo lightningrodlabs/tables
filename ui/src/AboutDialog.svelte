@@ -116,9 +116,9 @@
 </script>
 
 
-<sl-dialog label="Tables: UI v0.0.7 for DNA v0.3.0" bind:this={dialog} width={600} >
+<sl-dialog label="Datatub: UI v0.10-dev.0 for DNA v0.10.0-dev.0" bind:this={dialog} width={600} >
     <div class="about">
-        <p>Tables is a demonstration Holochain app built by Lightning Rod Labs.</p>
+        <p>Datatub is a demonstration Holochain app built by Lightning Rod Labs.</p>
         <p> <b>Developers:</b>
             Check out this hApp's source-code <a href="https://github.com/lightningrodlabs/tables">in our github repo</a>.
             This project's real-time syncronization is powered by <a href="https://github.com/holochain/syn">Syn</a>, 
@@ -147,10 +147,10 @@
 
 
     {#if $allBoards.status == "pending"}
-        <div class="spinning" style="display:inline-block"> <SvgIcon icon=faSpinner  color="black"></SvgIcon></div>
+        <div class="spinning" style="display:inline-block;"> <SvgIcon icon=faSpinner  color="black"></SvgIcon></div>
     {:else if $allBoards.status == "complete"}
         <sl-dropdown skidding=15>
-            <sl-button slot="trigger" caret><SvgIcon icon=faClone size=20px style="margin-right: 10px"/><span>New table From </span></sl-button>
+            <sl-button slot="trigger" caret><SvgIcon icon=faClone size=20px style="margin-right: 10px;"/><span>New table From </span></sl-button>
             <sl-menu>
                 {#each Array.from($allBoards.value.entries()) as [key,board]}
                     <sl-menu-item on:click={()=>{
@@ -171,9 +171,6 @@
 </sl-dialog>
 
 <style>
-    .about {
-        background-color: white;
-    }
     .about p {
 
         margin-bottom:10px;
@@ -194,6 +191,7 @@
         align-items: center;
         border-radius: 5px;
         cursor: pointer;
+        margin-bottom: 6px;;
     }
 
     .export-import span {
