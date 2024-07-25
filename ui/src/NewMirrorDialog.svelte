@@ -12,6 +12,15 @@
   import BoardSelect from './BoardSelect.svelte';
   import { getTableValues, getRowValues, getColumnValues, getValueOfCell, getValueOfColumnSummary } from './DataHelpers';
   import { weaveUrlFromWal, weaveUrlToWAL } from '@lightningrodlabs/we-applet';
+  import {basicSetup, EditorView} from "codemirror"
+  import {javascript} from "@codemirror/lang-javascript"
+  import CodeMirror from './CodeMirror.svelte';
+
+  // new EditorView({
+  //   doc: "console.log('hello')\n",
+  //   extensions: [basicSetup, javascript()],
+  //   parent: document.getElementById("codeEditor")
+  // })
 
   let editLabelDefs = []
   let editColumnDefs = []
@@ -114,14 +123,29 @@
   </div>
   <button on:click={() => variables = [...variables, {name: "", value: ""}]}>Add Variable</button>
   
-  <textarea
+  <!-- <textarea
     style="width: 100%; height: 100px; resize: none; border: 1px solid #ccc; padding: 5px; margin-top: 5px;"
-    bind:value={raw} on:input={e => raw= e.target.value}></textarea>
+    bind:value={raw} on:input={e => raw= e.target.value}></textarea> -->
 
+  <!-- <div id="codeEditor"></div> -->
+
+  <!-- <CodeMirror /> -->
+    
   <button on:click={()=>{
     addMirror(name, variables, raw)
   }}
    >Save</button>
 </div>
+
+<CodeMirror />
   <!-- <MirrorEditor bind:this={mirrorEditor}  handleSave={addMirror} cancelEdit={()=>dialog.hide()} /> -->
 </sl-dialog>
+
+<style>
+  #codeEditor {
+    all:initial;
+    display: inline-block;
+    width: 100%;
+    background: white;
+  }
+</style>

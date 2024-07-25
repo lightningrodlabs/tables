@@ -168,10 +168,70 @@
   let feedHidden = true
   let rowDetailsDrawer
 
+  function checkKey(e: any) {
+    if (e.key === "Tab" && !e.shiftKey) {
+      // if cell editing, save and move to next cell in the row
+      if (editingCell) {
+        activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: e.target.value }]);
+        // let row = $state.rows.find(row=>row.id == editingCell.rowId)
+        let index = $state.columnDefs.findIndex(def=>def.id == editingCell.columnId)
+        console.log("index", index)
+        if (index < $state.columnDefs.length-1) {
+          console.log("index 2", editingCell, $state.columnDefs[index+1].id)
+          editingCell = {rowId: editingCell.rowId, columnId: $state.columnDefs[index+1].id}
+        }
+      }
+    }
+
+    // enter saves and goes to next row same column
+    if (e.key === "Enter" && !e.shiftKey) {
+      if (editingCell && $state.rows && $state.columnDefs) {
+        activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: e.target.value }]);
+
+        let index = $state.columnDefs.findIndex(def=>def.id == editingCell.columnId)
+        let rowIndex = $state.rows.findIndex(row=>row.id == editingCell.rowId)
+
+        console.log(rowIndex, $state.rows.length-1)
+        if (rowIndex == $state.rows.length-1) {
+          activeBoard.requestChanges([{ type: "add-row", row: new Row(store.myAgentPubKeyB64, {}) }]);
+          queriedData[activeHashB64] = activeBoard.state().rows.map(row=>row.id)
+        }
+
+        if (rowIndex < $state.rows.length-1) {
+          editingCell = {rowId: $state.rows[rowIndex+1].id, columnId: $state.columnDefs[index].id}
+        }
+      }
+    }
+
+    // escape saves and closes
+    if (e.key === "Escape" && !e.shiftKey) {
+      console.log("esc")
+      e.preventDefault();
+      if (editingCell) {
+        activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: e.target.value }]);
+        editingCell = undefined;
+      }
+    }
+  }
+
   onMount(() => {
+    window.addEventListener("keydown", checkKey);
     if (activeBoard) {
       queriedData[activeHashB64] = activeBoard.state().rows.map(row=>row.id)
     }
+    // TODO: if mouse click outside cell, save cell
+    window.addEventListener("click", (e) => {
+      if (!e.target.classList.contains('data-cell')) {
+        console.log(editingCell, e.target)
+        const editingCellInput = document.querySelector('.edit-cell-input')
+        const editingCellValue = editingCellInput.value;
+        console.log(editingCellValue, "--")
+        if (editingCell && !e.target.classList.contains('data-cell') && !e.target.classList.contains('edit-cell-input')) {
+          activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: editingCellValue }]);
+          editingCell = undefined;
+        }
+      }
+    });
   });
 </script>
 <RowDetailsDrawer
@@ -472,6 +532,10 @@
               {:else}
                 <div class="data-cell" style="width:{width}px"
                   on:click={()=>{
+                    const previousCell = document.querySelector('.edit-cell-input')
+                    if (previousCell) {
+                      activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: previousCell.value }]);
+                    }
                     editingCell= {rowId:row.id, columnId:def.id}
                   }}
                 >

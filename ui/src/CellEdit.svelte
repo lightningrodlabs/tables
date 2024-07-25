@@ -44,16 +44,16 @@
     ];
     $: label;
 
-    function checkKey(e: any) {
-        if (e.key === "Escape" && !e.shiftKey) {
-        e.preventDefault();
-            dispatch("cancel")
-        }
-    }
+    // function checkKey(e: any) {
+    //     if (e.key === "Escape" && !e.shiftKey) {
+    //     e.preventDefault();
+    //         dispatch("cancel")
+    //     }
+    // }
 
-    onMount(() => {
-        window.addEventListener("keydown", checkKey);
-    });
+    // onMount(() => {
+        // window.addEventListener("keydown", checkKey);
+    // });
 
     $: allColumnValues = allColumnCells.map((cell:Cell)=>cell?.value)
     $: cellValuePresent = cell?.value !== undefined
@@ -141,7 +141,7 @@
         if (closing!="cancel") {
             const value = inputElement.value
             if (value != origValue) {
-                dispatch("save", value)
+                // dispatch("save", value)
             }
         }
     }}
@@ -152,10 +152,10 @@
         value = e.target.value
     }}
     on:keydown={(e)=> {
-        if (e.keyCode == 27) {
-            closing="cancel"
-            dispatch("cancel")
-        }
+        // if (e.keyCode == 27) {
+        //     closing="cancel"
+        //     dispatch("cancel")
+        // }
         if (e.keyCode == 13 && (!allColumnValuesExceptThisCell.includes(value) || !unique)) {
             closing="save"
             inputElement.blur()

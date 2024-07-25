@@ -187,6 +187,7 @@
 </profiles-context>
 {:else}
 <div class="loading"><div class="loader"></div></div>
+
 {/if}
 
 <style>

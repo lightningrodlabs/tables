@@ -86,6 +86,7 @@
         let wal: WAL = weaveUrlToWAL(variable.value);
         switch (wal?.context?.assetType) {
           case "Cell":
+            console.log(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId)
             const valueOfCell = await getValueOfCell(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId, store)
             cellValues[variable.name] = valueOfCell
             break
@@ -238,6 +239,7 @@
     </div>
   {/if}
   {#if $state}
+  
     {@const rawSubbed = $state.raw.replace(/!weave{(.*?)}/g, (match, p1) => {
       const variable = $state.variables.find(v => v.name === p1);
       // if variable is array, return the array as a string. otherwise return value

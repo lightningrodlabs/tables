@@ -38,7 +38,11 @@
     "javascript-time-ago": "2.3.7",
     "@types/javascript-time-ago": "^2.0.3",
     "highlight.js": "^11.9.0",
-    "papaparse": "^5.4.1"
+    "papaparse": "^5.4.1",
+    "codemirror": "6.0.1",
+    "@vanillawc/wc-codemirror": "^2.1.0",
+    "svelte-codemirror-editor": "^1.4.0",
+    "@codemirror/lang-javascript": "6.2.2"
   },
   "devDependencies": {
     "@lightningrodlabs/we-dev-cli": "^0.11.0-dev.0",

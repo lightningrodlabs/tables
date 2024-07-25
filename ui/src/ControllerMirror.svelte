@@ -24,6 +24,7 @@
     store.mirrorList.setActiveMirror(mirror)
     $: activeMirrorHash = store.mirrorList.activeMirrorHash
     $: activeMirror = store.mirrorList.activeMirror
+    $: state = $activeMirror ? $activeMirror.readableState() : undefined
 
     onMount(async () => {
       console.log("Setting active mirror to: ", mirror)
@@ -43,6 +44,7 @@
 
     $: bgUrl = DEFAULT_KD_BG_IMG  // FIXME$activeMirror ?   ($activeMirror.state.props && $mirrorState.props.bgUrl) ? $mirrorState.props.bgUrl : DEFAULT_KD_BG_IMG
   </script>
+  {#if state}
   <div class="flex-scrollable-parent">
     <div class="flex-scrollable-container">
       <div class='app'>
@@ -53,7 +55,7 @@
 
 
         {#if $activeMirrorHash !== undefined}
-          <MirrorPane activeMirror={$activeMirror}/>
+          <MirrorPane activeMirror={$activeMirror} showSettings={false}/>
         {:else}
           Unable to find mirror.
         {/if}
@@ -62,6 +64,7 @@
     </div>
   </div>
 </div>
+{/if}
 <style>
   .app {
     margin: 0;

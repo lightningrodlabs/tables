@@ -18,7 +18,7 @@
     const store:TablesStore = getStore();
 
     $: activeBoards = store.boardList.activeBoardHashes
-    $: archivedBoards = store.boardList.archivedBoardHashes
+    // $: archivedBoards = store.boardList.archivedBoardHashes
 
     $: uiProps = store.uiProps
 
@@ -64,7 +64,7 @@
         {/if}
     <!-- </div> -->
     
-    {#if $archivedBoards.status == "complete" && $archivedBoards.value.length > 0}
+    <!-- {#if $archivedBoards.status == "complete" && $archivedBoards.value.length > 0}
         <h3 class="type-header">Archived Tables</h3>
         <div class="boards-section">
             {#each $archivedBoards.value as hash}
@@ -72,11 +72,11 @@
                     on:click={()=>unarchiveBoard(hash)}
                     class="board" style="height: 45px; border-radius: 4px">
                     <BoardMenuItem boardType={BoardType.archived} boardHash={hash}></BoardMenuItem>
-                    <!-- <div class="board-bg" style="background-image: url({bgUrl});"></div> -->
+                    <div class="board-bg" style="background-image: url({bgUrl});"></div>
                 </div>
             {/each}
         </div>
-    {/if}
+    {/if} -->
 
     <!-- {#if !mainpage} -->
         <NewBoardDialog bind:this={newBoardDialog}></NewBoardDialog>
