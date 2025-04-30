@@ -107,7 +107,7 @@
       </div>
       
       <div style="cursor: pointer; margin: 10px; margin-top: 30px; margin-left: 30px;" on:click={()=>aboutDialog.open()}>
-        <SvgIcon icon=faCog size="20px" color="#000"/> v0.10.2
+        <SvgIcon icon=faCog size="20px" color="#000"/> v0.10.3
       </div>
       <AboutDialog bind:this={aboutDialog} />
 
