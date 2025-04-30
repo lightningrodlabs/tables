@@ -71,7 +71,8 @@ html, body {
 }
 
 body {
-  background: linear-gradient(360deg, rgba(86, 94, 109, .10) 1.94%, rgba(86, 94, 109, 0) 90.23%);
+  /* background: linear-gradient(360deg, rgba(86, 94, 109, .10) 1.94%, rgba(86, 94, 109, 0) 90.23%); */
+  background-color: transparent;
 }
 
 /* p, div, span, h1, h2, h3 { */
@@ -387,7 +388,8 @@ html{
 }
 
 html{
-  background-color: #cadddf;
+  /* background-color: #cadddf; */
+  background-color: #ffffff6a;
 }
 .note{
   background-color: #ff00ff;
@@ -399,7 +401,7 @@ main {
   margin: 0 auto;
 }
 body {
-  background-color: #fff;
+  /* background-color: #fff; */
 }
 .pane {
   position: relative;

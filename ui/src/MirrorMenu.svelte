@@ -42,7 +42,7 @@
 <AboutDialog bind:this={aboutDialog} />
 <div class="mirror-menu" >
 
-    <h1 class="type-header">Views</h1>
+    <!-- <h1 class="type-header">Views</h1> -->
 
     <div class="mirrors-section">
         {#if $activeMirrors.status == "complete" && $activeMirrors.value.length > 0}

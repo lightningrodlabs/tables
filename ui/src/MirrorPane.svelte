@@ -9,9 +9,9 @@
   import { Marked, Renderer } from "@ts-stack/markdown";
   import hljs from 'highlight.js';
   import AttachmentsList from './AttachmentsList.svelte';
-  import type { WAL } from "@lightningrodlabs/we-applet";
+  import type { WAL } from '@theweave/api';
   import { getTableValues, getRowValues, getColumnValues, getValueOfCell, getValueOfColumnSummary } from './DataHelpers';
-  import { weaveUrlToWAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
+  import { weaveUrlToWAL, weaveUrlFromWal } from '@theweave/api';
   import jsPDF from 'jspdf';
 
   export let showSettings: boolean = true;
@@ -77,7 +77,7 @@
 
   const walToPocket = () => {
     const attachment: WAL = { hrl: [store.dnaHash, activeMirror.hash], context: {assetType: "Mirror"} }
-    store.weClient?.walToPocket(attachment)
+    store.weClient?.assets.assetToPocket(attachment)
   }
 
   async function setCellValues() {
@@ -158,7 +158,8 @@
   {#if activeMirror.hash}
     <EditMirrorDialog {activeHashB64} mirrorHash={activeMirror.hash} name={$state.name} raw={$state.raw} variables={$state.variables} bind:this={editMirrorDialog}
       on:mirror-updated={async (newMirror) => {
-        await new Promise(r => setTimeout(r, 2000));
+        // await new Promise(r => setTimeout(r, 2000));
+        console.log("Mirror updated", newMirror);
         await setCellValues();
       }}
     ></EditMirrorDialog>
@@ -167,7 +168,7 @@
   {#if showSettings}
     <div class="top-bar">
       <div class="left-items">
-        <sl-menu style="display: flex; flex-direction: row">
+        <sl-menu style="display: flex; flex-direction: row; width: 100%; background: transparent; border: none;">
           {#if standAlone}
             <sl-menu-item>
               <h2>{$state.name}</h2>
@@ -187,7 +188,7 @@
             () => {
               setCellValues();
             }
-          }>reset</sl-menu-item>
+          }>refresh</sl-menu-item>
           <!-- download -->
           <sl-menu-item on:click={
             () => {

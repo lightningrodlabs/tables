@@ -12,14 +12,14 @@
   import '@shoelace-style/shoelace/dist/components/dropdown/dropdown.js';
   import '@shoelace-style/shoelace/dist/components/textarea/textarea.js';
   import { onVisible } from "./util";
-  import { isWeContext, type WAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
+  import { isWeaveContext, type WAL, weaveUrlFromWal } from '@theweave/api';
   import SvgIcon from "./SvgIcon.svelte";
   import { exportBoard } from "./export";
   import { Marked, Renderer } from "@ts-stack/markdown";
   import hljs from 'highlight.js';
   import AttachmentsList from './AttachmentsList.svelte';
   import AttachmentsDialog from "./AttachmentsDialog.svelte"
-  import type { HrlWithContext } from "@lightningrodlabs/we-applet";
+  import type { HrlWithContext } from '@theweave/api';
   import RowDetailsDrawer from "./RowDetailsDrawer.svelte";
     
   export let showEditHeader = false;

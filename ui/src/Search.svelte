@@ -41,8 +41,12 @@
         showSearchResults = true
         if (text != "") {
             const searchText = text.toLocaleLowerCase()
-            const all = await toPromise(store.boardList.allBoards)
-            for (const [hash, asyncBoardData] of Array.from(all.entries()) ) {
+            // const allViews = await toPromise(store.mirrorList.allMirrors)
+            const allTables = await toPromise(store.boardList.allBoards)
+            // const allViewsArray = Array.from(allViews.entries());
+            const allTablesArray = Array.from(allTables.entries());
+            const all = [...allTablesArray]//, ...allViewsArray];
+            for (const [hash, asyncBoardData] of all) {
                 const state = asyncBoardData.latestState
 
                 if (state.name.toLocaleLowerCase().includes(searchText) 
@@ -150,9 +154,9 @@ sl-input::part(base) {
     /* background-color: rgb(10 17 76); */
     /* border: 1px solid rgba(71, 76, 154, 1.0); */
     /* background-color: rgb(188, 128, 25); */
-    background-color: #89b3bf;
+    background-color: #55555584;
     /* border: 1px solid rgb(188, 128, 25); */
-    border: 1px solid #055a72;
+    border: 1px solid #202020;
 }
 
 sl-input::part(input) {

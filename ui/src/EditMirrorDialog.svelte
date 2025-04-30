@@ -9,12 +9,16 @@
     import '@shoelace-style/shoelace/dist/components/input/input.js';
     import type SlDialog from '@shoelace-style/shoelace/dist/components/dialog/dialog';
     import SelectRowAndValue from './SelectRowAndValue.svelte';
+    import { createEventDispatcher } from 'svelte';
     import { isEqual } from 'lodash'
     import BoardSelect from './BoardSelect.svelte';
     import { getTableValues, getRowValues, getColumnValues, getValueOfCell, getValueOfColumnSummary } from './DataHelpers';
-    import { weaveUrlFromWal, weaveUrlToWAL } from '@lightningrodlabs/we-applet';
+    import { weaveUrlFromWal, weaveUrlToWAL } from '@theweave/api';
     import { encodeHashToBase64 } from '@holochain/client';
+    import { removeSymbolFields } from './util';
   
+    const dispatch = createEventDispatcher()
+
     let editLabelDefs = []
     let editColumnDefs = []
     let dialog: SlDialog
@@ -76,9 +80,12 @@
                   name: name
               })
           }
+          console.log("mirrorState.variables", mirrorState.variables, variables)
           if (!isEqual(variables, mirrorState.variables)) {
               changes.push({type: 'set-variables',
-              variables: variables
+              variables: variables.map(v => {
+                return removeSymbolFields(v)
+              })
               })
           }
           if (raw != mirrorState.raw) {
@@ -91,7 +98,8 @@
             await mirror.requestChanges(changes)
           }
         }
-        dispatchEvent(new CustomEvent('mirror-updated', {detail: {mirrorHash}}))
+        // dispatchEvent(new CustomEvent('mirror-updated', {detail: {mirrorHash}}))
+        dispatch('mirror-updated', {detail: {mirrorHash}})
         dialog.hide()
     }
 
@@ -149,7 +157,7 @@
   </script>
   <sl-dialog bind:this={dialog} label="New View"
     on:sl-initial-focus={(e)=>{
-        mirrorEditor.initialFocus()
+        mirrorEditor?.initialFocus()
         e.preventDefault()
     }}
     on:sl-request-close={(event)=>{
@@ -158,27 +166,36 @@
   }}}>
   
   <div class='mirror-editor'>
-    <input class='textarea' maxlength="60" bind:value={name} on:input={e => name= e.target.value} />
+    <input class='title' maxlength="60" bind:value={name} on:input={e => name= e.target.value} />
     <!-- <BoardSelect /> -->
     <div class="variables">
       {#each variables as variable, i}
         <div class="variable">
           <input class='textarea' placeholder="variable name" maxlength="60" bind:value={variable.name} on:input={() => variables[i] = variable}/>
-          {#if variable.value}
-            {cellValues[i]}
-          {/if}
           <button
+            class="assign-wal"
             on:click={async ()=>{
-              const wal = await store.weClient.userSelectWal()
+              const wal = await store.weClient.assets.userSelectAsset()
               // TODO: verify wal from datatub
               processWal(wal, i)
             }}
           >Assign WAL</button>
-          <button on:click={() => variables = variables.filter((v, j) => j !== i)}>Remove</button>
+          <button
+            class="remove-var"
+          on:click={() => variables = variables.filter((v, j) => j !== i)}>Remove</button>
+          {#if variable.value}
+            <div
+              style="width: 100%; resize: none; border: 1px solid #ccc; padding: 5px; margin-top: 5px;"
+            >
+              {JSON.stringify(cellValues[i])}
+            </div>
+          {/if}
         </div>
       {/each}
     </div>
-    <button on:click={() => variables = [...variables, {name: "", value: ""}]}>Add Variable</button>
+    <button
+    class="add-var"
+    on:click={() => variables = [...variables, {name: "var_" + (variables.length + 1), value: ""}]}>Add Variable</button>
     
     <textarea
       style="width: 100%; height: 100px; resize: none; border: 1px solid #ccc; padding: 5px; margin-top: 5px;"
@@ -191,3 +208,76 @@
   </div>
     <!-- <MirrorEditor bind:this={mirrorEditor}  handleSave={addMirror} cancelEdit={()=>dialog.hide()} /> -->
   </sl-dialog>
+
+
+<style>
+  #codeEditor {
+    all:initial;
+    display: inline-block;
+    width: 100%;
+    background: white;
+  }
+
+  input.title {
+    width: 100%;
+    height: 30px;
+    border: 1px solid #ccc;
+    padding: 5px;
+    background-color: #fff;
+  }
+
+  button.add-var {
+    background-color: #af4c9d;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-bottom: 6px;
+  }
+
+  button.add-var:hover {
+    background-color: #9b3a7a;
+  }
+
+  button.remove-var {
+    background-color: #ff4c4c;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  button.remove-var:hover {
+    background-color: #d43f3f;
+  }
+  button.assign-wal {
+    background-color: #4caf50;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+  button.assign-wal:hover {
+    background-color: #45a049;
+  }
+  .variables {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+  }
+  .variable {
+    border: 1px solid #ccc;
+    padding: 5px;
+    background-color: white;
+  }
+  button.save {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+</style>

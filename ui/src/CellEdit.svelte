@@ -4,7 +4,7 @@
     import type SlInput from '@shoelace-style/shoelace/dist/components/input/input.js';
     import { getContext, onMount } from "svelte";
     import { onVisible } from './util';
-    import { isWeContext, type WAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
+    import { isWeaveContext, type WAL, weaveUrlFromWal } from '@theweave/api';
     import { ColumnType, type Cell, Board, ColumnDef, type CellId } from './board';
     import { createEventDispatcher } from "svelte";
     import AttachmentsList from './AttachmentsList.svelte';
@@ -56,6 +56,8 @@
     // });
 
     $: allColumnValues = allColumnCells.map((cell:Cell)=>cell?.value)
+    $: duplicateValue = cell?.value === undefined || allColumnValues.includes(value) && unique && cell?.value !== value
+    // $: allColumnValuesExceptThisCell = cellValuePresent ? allColumnValues.filter((v)=>v!=cell.value) : allColumnValues
     $: cellValuePresent = cell?.value !== undefined
     // $: boardHash = columnDef.linkedTable ? decodeHashFromBase64(columnDef.linkedTable) : null
     $: boardData = columnDef.linkedTable ? store.boardList.boardData2.get(boardHash) : null
@@ -65,7 +67,7 @@
         console.log("copyWalToPocket", boardHash)
         const attachment: WAL = { hrl: [store.dnaHash, boardHash], context: {cellId: cellId, def: columnDef, assetType: "Cell"} }
         console.log("attachment", attachment)
-        store.weClient?.walToPocket(attachment)
+        store.weClient?.assets.assetToPocket(attachment)
         dispatch("cancel")
     }
 
@@ -100,7 +102,7 @@
 {/if}
 
 {#if slTypes[type] !== undefined}
-    {@const allColumnValuesExceptThisCell = cellValuePresent ? allColumnValues.filter((v)=>v!=cell.value) : allColumnValues}
+    <!-- {@const allColumnValuesExceptThisCell = cellValuePresent ? allColumnValues.filter((v)=>v!=cell.value) : allColumnValues} -->
     <!-- <sl-input
     class="edit-cell-input"
     class:duplicate = {allColumnValuesExceptThisCell.includes(value) && unique}
@@ -134,7 +136,7 @@
 
 <input 
     class="edit-cell-input"
-    class:duplicate = {allColumnValuesExceptThisCell.includes(value) && unique}
+    class:duplicate = {duplicateValue}
     size="small"
     bind:this={inputElement}
     on:blur={()=>{
@@ -156,7 +158,8 @@
         //     closing="cancel"
         //     dispatch("cancel")
         // }
-        if (e.keyCode == 13 && (!allColumnValuesExceptThisCell.includes(value) || !unique)) {
+        if (e.keyCode == 13 && !duplicateValue) {
+            console.log("Enter pressed", value, unique, duplicateValue)
             closing="save"
             inputElement.blur()
         }
@@ -196,7 +199,7 @@
         />
         {/if}
         <button title="Search For Attachment" class="attachment-button" style="margin-right:10px" on:click={async ()=>{
-        const hrl = await store.weClient.userSelectWal()
+        const hrl = await store.weClient.assets.userSelectAsset()
         if (hrl) {
             value = weaveUrlFromWal(hrl)
             dispatch("save", value)

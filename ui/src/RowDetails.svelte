@@ -16,7 +16,7 @@
   import ClickEdit from './ClickEdit.svelte';
   import AttachmentsList from './AttachmentsList.svelte';
   import AttachmentsDialog from "./AttachmentsDialog.svelte"
-  import type { WAL } from '@lightningrodlabs/we-applet';
+  import type { WAL } from '@theweave/api';
   
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
@@ -87,7 +87,7 @@
 
   const walToPocket = () => {
     const attachment: WAL = { hrl: [store.dnaHash, $activeBoard.hash], context: rowId }
-    store.weClient?.walToPocket(attachment)
+    store.weClient?.assets.assetToPocket(attachment)
   }
 
   const columnName = (defId: ColumnId) => {

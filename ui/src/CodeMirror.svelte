@@ -34,4 +34,4 @@
     </script>
   </wc-code>     -->
 
-  <CodeMirror bind:value lang={javascript()} />
+  <!-- <CodeMirror bind:value lang={javascript()} /> -->

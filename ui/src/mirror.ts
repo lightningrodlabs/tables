@@ -6,7 +6,7 @@ import { MirrorType } from "./mirrorList";
 import type { WALUrl } from "./util";
 import { cloneDeep } from "lodash";
 import { reorder } from "svelte-dnd-list";
-import type { WAL } from "@lightningrodlabs/we-applet";
+import type { WAL } from '@theweave/api';
 
 export type MirrorProps = {
   bgUrl: string,
@@ -193,17 +193,22 @@ export type MirrorDelta =
           state.raw = delta.raw
           break;
         case "set-variables":
-          for (const variable of delta.variables) {
-            console.log("SET VARIABLE", variable)
-            const idx = state.variables.findIndex(v=>v.name === variable.name)
-            if (idx >= 0) {
-              console.log("UPDATING VARIABLE", variable)
-              state.variables[idx]["value"] = variable["value"]
-            } else {
-              console.log("ADDING VARIABLE", variable)
-              state.variables.push(variable)
-            }
-          }
+          console.log("var compare", state.variables, delta.variables)
+          state.variables = delta.variables
+          // for (const variable of delta.variables) {
+          //   console.log("SET VARIABLE", variable)
+          //   const idx = state.variables.findIndex(v=>v.name === variable.name)
+          //   console.log("index", idx, variable)
+          //   if (idx >= 0) {
+          //     console.log("UPDATING VARIABLE", variable)
+          //     state.variables[idx]["value"] = variable["value"]
+          //   } else {
+          //     console.log("ADDING VARIABLE", variable)
+          //     state.variables.push(variable)
+          //   }
+
+          //   console.log("state vars", state.variables)
+          // }
           break;
         case "set-props":
           state.props = delta.props
@@ -288,6 +293,7 @@ export class Mirror {
       this.session.change((state,_eph)=>{
         for (const delta of deltas) {
           try {
+            console.log("trying to apply", delta)
             mirrorGrammar.applyDelta(delta, state,_eph, this.myAgentKeyB64)
           } catch (e) {
             console.log("Error applying delta:",e, delta)

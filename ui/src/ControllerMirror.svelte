@@ -5,7 +5,7 @@
     import type { AppClient, EntryHash } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
     import type { ProfilesStore } from "@holochain-open-dev/profiles";
-    import type { WeClient } from '@lightningrodlabs/we-applet';
+    import type { WeClient } from '@theweave/api';
     import { onMount } from 'svelte';
 
     export let roleName = ""
@@ -51,7 +51,7 @@
 
       <div class="wrapper">
 
-      <div class="workspace" style="display:flex">
+      <div class="workspace" style="border-radius: 0;">
 
 
         {#if $activeMirrorHash !== undefined}

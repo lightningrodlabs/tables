@@ -7,7 +7,7 @@ import type { ProfilesStore } from "@holochain-open-dev/profiles";
 import { cloneDeep } from "lodash";
 import { Board, feedItems, type BoardDelta, type BoardState, deltaToFeedString, type RowId } from "./board";
 import { hashEqual } from "./util";
-import type { WeaveClient } from "@lightningrodlabs/we-applet";
+import type { WeaveClient } from '@theweave/api';
 import { SeenType } from "./store";
 
 export enum BoardType {

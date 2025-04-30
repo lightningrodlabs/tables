@@ -44,9 +44,9 @@
 
     <!-- <div class="boards-section"> -->
         {#if $activeBoards.status == "complete" && $activeBoards.value.length > 0}
-            <h3 class="type-header">
+            <!-- <h3 class="type-header">
                 Tables
-            </h3>
+            </h3> -->
             <div class="boards-section">
                 {#each $activeBoards.value as hash}
                     <div
@@ -138,7 +138,7 @@
         /* border: 1px solid #4A559D; */
         color: #fff;
         display: flex;
-        align-items: center;
+        align-items: left;
         border-radius: 5px;
         font-size: 46px;
         font-weight: bold;

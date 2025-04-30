@@ -20,7 +20,7 @@ import type { v1 as uuidv1 } from "uuid";
 import { get, writable, type Unsubscriber, type Writable } from "svelte/store";
 import type { ProfilesStore } from '@holochain-open-dev/profiles';
 import type { BoardState } from './board';
-import type { WeaveClient } from '@lightningrodlabs/we-applet';
+import type { WeaveClient } from '@theweave/api';
 import { HoloHashMap } from '@holochain-open-dev/utils';
 import { getMyDna } from './util';
 

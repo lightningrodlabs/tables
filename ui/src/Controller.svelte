@@ -6,7 +6,7 @@
     import type { AppClient } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
     import type { ProfilesStore } from "@holochain-open-dev/profiles";
-    import type { WeClient } from '@lightningrodlabs/we-applet';
+    import type { WeClient } from '@theweave/api';
     import NewBoardDialog from './NewBoardDialog.svelte';
     import SvgIcon from "./SvgIcon.svelte";
     import BoardMenu from "./BoardMenu.svelte";
@@ -73,24 +73,44 @@
         {:else if $activeMirrorHash !== undefined}
           <MirrorPane activeMirror={$activeMirror}/>
         {:else}
-          <div style="margin:20px;">
-            <div style="display:flex; flex-wrap:wrap;">
-            <div class="new-board" on:click={()=>newBoardDialog.open()} title="New Table"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Table</span></div>
-            <div class="new-board" on:click={()=>newMirrorDialog.open()} title="New View"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New View</span></div>
-            </div>
+          <div
+            style="
+              display:flex; 
+              justify-content: center;
+              align-items: top;
+            "
+          >
+            <div style="margin:20px; width: 50%;">
+              <h1 class="type-header">
+                Tables
+              </h1>
 
-            <BoardMenu mainpage={true} />
-            <MirrorMenu mainpage={true} />
-            
-            <div style="cursor: pointer; margin: 10px; margin-top: 30px;" on:click={()=>aboutDialog.open()}>
-              <SvgIcon icon=faCog size="20px" color="#000"/> v0.10-dev.0
+              <div style="display:flex; flex-wrap:wrap;">
+                <div class="new-board" style="background: #333" on:click={()=>newBoardDialog.open()} title="New Table"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Table</span></div>
+              <!-- <div class="new-board" on:click={()=>newMirrorDialog.open()} title="New View"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New View</span></div> -->
+              </div>
+
+              <BoardMenu mainpage={true} />
+
             </div>
-            <AboutDialog bind:this={aboutDialog} />
+            <div style="margin:20px;">
+              <h1 class="type-header">Views</h1>
+              <div style="display:flex; flex-wrap:wrap;">
+                <div class="new-board" on:click={()=>newMirrorDialog.open()} title="New View"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New View</span></div>
+              </div>
+              <MirrorMenu mainpage={true} />
+              
+            </div>
           </div>
-        {/if}
+          {/if}
         </div>
       </div>
       
+      <div style="cursor: pointer; margin: 10px; margin-top: 30px; margin-left: 30px;" on:click={()=>aboutDialog.open()}>
+        <SvgIcon icon=faCog size="20px" color="#000"/> v0.10.2
+      </div>
+      <AboutDialog bind:this={aboutDialog} />
+
     </div>
   </div>
 </div>
@@ -106,7 +126,8 @@
     /* background-image: url('/datatub.png'); */
     /* background-color: #ac7c3f; */
     /* background-color: #d7ddde; */
-    background-color: #e1e1e1;
+    /* background-color: #e1e1e1; */
+    background-color: transparent;
     /* make background image vertically centered */
     background-position: center;
     height: 100vh;
@@ -212,5 +233,15 @@
   .wrapper {
     position: relative;
     z-index: 10;
+  }
+
+  .type-header {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    margin: 0;
+    padding: 0;
+    margin-bottom: 6px;
+    margin-left: 10px;
   }
 </style>

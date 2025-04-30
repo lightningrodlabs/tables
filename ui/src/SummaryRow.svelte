@@ -5,7 +5,7 @@
   import { cloneDeep, isEqual } from "lodash";
   import type { TablesStore } from './store';
   import SvgIcon from './SvgIcon.svelte';
-  import type { HrlWithContext } from '@lightningrodlabs/we-applet';
+  import type { HrlWithContext } from '@theweave/api';
   export let activeBoard: Board;
   export let width = 0;
   export let def: ColumnDef;
@@ -22,7 +22,7 @@
     console.log("copyWalToPocket", activeBoard.hashB64)
     const attachment: HrlWithContext = { hrl: [store.dnaHash, activeBoard.hash], context: {columnId: columnId, query: query, sumType: sumType, assetType: "Column Summary"} }
     console.log("attachment", attachment)
-    store.weClient?.walToPocket(attachment)
+    store.weClient?.assets.assetToPocket(attachment)
   }
 
   $: state = activeBoard.readableState()

@@ -21,7 +21,7 @@
   import hljs from 'highlight.js';
   import AttachmentsList from './AttachmentsList.svelte';
   import AttachmentsDialog from "./AttachmentsDialog.svelte"
-  import type { WAL } from "@lightningrodlabs/we-applet";
+  import type { WAL } from '@theweave/api';
   import DragDropList, { VerticalDropZone, reorder, type DropEvent, HorizontalDropZone } from 'svelte-dnd-list';
   import RowDetailsDrawer from "./RowDetailsDrawer.svelte";
   import CellDisplay from "./CellDisplay.svelte";
@@ -142,17 +142,17 @@
 
   const walToPocket = () => {
     const attachment: WAL = { hrl: [store.dnaHash, activeBoard.hash], context: {assetType: "Table"} }
-    store.weClient?.walToPocket(attachment)
+    store.weClient?.assets.assetToPocket(attachment)
   }
 
   const rowToPocket = (rowId: RowId) => {
     const attachment: WAL = { hrl: [store.dnaHash, activeBoard.hash], context: {assetType: "Row", rowId} }
-    store.weClient?.walToPocket(attachment)
+    store.weClient?.assets.assetToPocket(attachment)
   }
 
   const columnToPocket = (columnId: string) => {
     const attachment: WAL = { hrl: [store.dnaHash, activeBoard.hash], context: {assetType: "Column", columnId} }
-    store.weClient?.walToPocket(attachment)
+    store.weClient?.assets.assetToPocket(attachment)
   }
 
   const onDropColumnDefs = ({ detail: { from, to } }: CustomEvent<DropEvent>) => {
@@ -172,9 +172,22 @@
     if (e.key === "Tab" && !e.shiftKey) {
       // if cell editing, save and move to next cell in the row
       if (editingCell) {
+        let rowIndex = $state.rows.findIndex(row=>row.id == editingCell.rowId)
+        let index = $state.columnDefs.findIndex(def=>def.id == editingCell.columnId)
+        
+        const columnCellValues = Object.values($state.rows.map(row=>row.cells[editingCell.columnId])).map(cell=>cell?.value)
+        const shouldBeUnique = $state.columnDefs[index]?.unique
+        const valueIsUnique = !shouldBeUnique || columnCellValues.indexOf(e.target.value) == -1 || e.target.value == null
+        console.log("enter", shouldBeUnique)
+
+        if (!valueIsUnique) {
+          console.log("value is not unique")
+          editingCell = undefined
+          return
+        }
+
         activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: e.target.value }]);
         // let row = $state.rows.find(row=>row.id == editingCell.rowId)
-        let index = $state.columnDefs.findIndex(def=>def.id == editingCell.columnId)
         console.log("index", index)
         if (index < $state.columnDefs.length-1) {
           console.log("index 2", editingCell, $state.columnDefs[index+1].id)
@@ -186,10 +199,21 @@
     // enter saves and goes to next row same column
     if (e.key === "Enter" && !e.shiftKey) {
       if (editingCell && $state.rows && $state.columnDefs) {
-        activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: e.target.value }]);
-
-        let index = $state.columnDefs.findIndex(def=>def.id == editingCell.columnId)
         let rowIndex = $state.rows.findIndex(row=>row.id == editingCell.rowId)
+        let index = $state.columnDefs.findIndex(def=>def.id == editingCell.columnId)
+        
+        const columnCellValues = Object.values($state.rows.map(row=>row.cells[editingCell.columnId])).map(cell=>cell?.value)
+        const shouldBeUnique = $state.columnDefs[index]?.unique
+        const valueIsUnique = !shouldBeUnique || columnCellValues.indexOf(e.target.value) == -1 || e.target.value == null
+        console.log("enter", shouldBeUnique)
+
+        if (!valueIsUnique) {
+          console.log("value is not unique")
+          editingCell = undefined
+          return
+        }
+
+        activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: e.target.value }]);
 
         console.log(rowIndex, $state.rows.length-1)
         if (rowIndex == $state.rows.length-1) {
@@ -222,11 +246,20 @@
     // TODO: if mouse click outside cell, save cell
     window.addEventListener("click", (e) => {
       if (!e.target.classList.contains('data-cell')) {
-        console.log(editingCell, e.target)
         const editingCellInput = document.querySelector('.edit-cell-input')
+        if (!editingCellInput) {return;}
         const editingCellValue = editingCellInput.value;
-        console.log(editingCellValue, "--")
         if (editingCell && !e.target.classList.contains('data-cell') && !e.target.classList.contains('edit-cell-input')) {
+          let index = $state.columnDefs.findIndex(def=>def.id == editingCell.columnId)
+          const columnCellValues = Object.values($state.rows.map(row=>row.cells[editingCell.columnId])).map(cell=>cell?.value)
+          const shouldBeUnique = $state.columnDefs[index]?.unique
+          const valueIsUnique = !shouldBeUnique || columnCellValues.indexOf(editingCellValue) == -1 || editingCellValue == null
+          if (!valueIsUnique) {
+            console.log("value is not unique")
+            editingCell = undefined
+            return
+          }
+
           activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: editingCellValue }]);
           editingCell = undefined;
         }

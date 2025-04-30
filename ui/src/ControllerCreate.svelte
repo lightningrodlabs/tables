@@ -4,7 +4,7 @@
   import type { AppAgentClient } from '@holochain/client';
   import { SynStore } from '@holochain-syn/store';
   import type { ProfilesStore } from "@holochain-open-dev/profiles";
-  import type { WeaveClient } from '@lightningrodlabs/we-applet';
+  import type { WeaveClient } from '@theweave/api';
   import { SynClient } from '@holochain-syn/core';
   import { getMyDna } from './util';
   import { Board } from './board';
