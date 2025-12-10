@@ -86,7 +86,10 @@
   }
 
   const walToPocket = () => {
-    const attachment: WAL = { hrl: [store.dnaHash, $activeBoard.hash], context: rowId }
+    const attachment: WAL = { hrl: [store.dnaHash, $activeBoard.hash], context: {
+      assetType: "TableRow",
+      assetId: encodeHashToBase64(rowId),
+    }, }
     store.weClient?.assets.assetToPocket(attachment)
   }
 

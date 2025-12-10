@@ -859,7 +859,8 @@
     overflow-x: auto;
     width: 100%;
     position: relative;
-    max-height: calc(100vh - 50px);
+    height: calc(100vh - 92px);
+    border-bottom: 1px solid #a1a1a1;
   }
   .top-bar {
     box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);

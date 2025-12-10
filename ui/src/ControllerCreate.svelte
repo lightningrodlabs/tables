@@ -53,7 +53,7 @@ let disabled = true
               //const hrlB64 = weaveUrlFromWal(attachToWAL)
               const board = await Board.Create(synStore, {/*boundTo:[hrlB64]*/name: inputElement.value})
               const dnaHash = await getMyDna(roleName, client)
-              view.resolve({hrl:[dnaHash, board.hash]})
+              view.resolve({hrl:[dnaHash, board.hash], context: {assetType: "Table"}})
             } catch(e) {
               console.log("ERR",e)
               view.reject(e)
