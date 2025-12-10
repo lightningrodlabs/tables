@@ -7,12 +7,16 @@
     import type { ProfilesStore } from "@holochain-open-dev/profiles";
     import type { WeClient } from '@theweave/api';
     import { onMount } from 'svelte';
+    import { encodeHashToBase64 } from '@holochain/client';
 
     export let roleName = ""
     export let client : AppClient
     export let weClient : WeClient
     export let profilesStore : ProfilesStore
     export let mirror : EntryHash
+
+    console.log("ControllerMirror initialized with mirror:", mirror)
+    console.log("Mirror hash (base64):", mirror ? encodeHashToBase64(mirror) : "undefined")
 
     let store: TablesStore = new TablesStore (
       weClient,
@@ -21,14 +25,25 @@
       roleName,
     );
     let synStore: SynStore = store.synStore
-    store.mirrorList.setActiveMirror(mirror)
+    
     $: activeMirrorHash = store.mirrorList.activeMirrorHash
     $: activeMirror = store.mirrorList.activeMirror
     $: state = $activeMirror ? $activeMirror.readableState() : undefined
+    
+    $: {
+      console.log("activeMirrorHash:", $activeMirrorHash ? encodeHashToBase64($activeMirrorHash) : "undefined")
+      console.log("activeMirror:", $activeMirror)
+      console.log("state:", state)
+    }
 
     onMount(async () => {
-      console.log("Setting active mirror to: ", mirror)
-      store.mirrorList.setActiveMirror(mirror)
+      console.log("onMount: Setting active mirror to:", mirror ? encodeHashToBase64(mirror) : "undefined")
+      if (mirror) {
+        const result = await store.mirrorList.setActiveMirror(mirror)
+        console.log("setActiveMirror result:", result)
+      } else {
+        console.error("Mirror prop is undefined!")
+      }
     })
 
     setContext('synStore', {
@@ -43,8 +58,22 @@
     const NO_BOARD_IMG = "none"
 
     $: bgUrl = DEFAULT_KD_BG_IMG  // FIXME$activeMirror ?   ($activeMirror.state.props && $mirrorState.props.bgUrl) ? $mirrorState.props.bgUrl : DEFAULT_KD_BG_IMG
+    
+    let mounted = false
+    onMount(() => {
+      mounted = true
+    })
   </script>
-  {#if state}
+  {#if !mirror}
+  <div class="error-container">
+    <div class="error">Error: Mirror hash is undefined</div>
+  </div>
+  {:else if !mounted}
+  <div class="loading-container">
+    <div class="loader"></div>
+    <p>Loading mirror...</p>
+  </div>
+  {:else if state}
   <div class="flex-scrollable-parent">
     <div class="flex-scrollable-container">
       <div class='app'>
@@ -57,13 +86,18 @@
         {#if $activeMirrorHash !== undefined}
           <MirrorPane activeMirror={$activeMirror} showSettings={false}/>
         {:else}
-          Unable to find mirror.
+          <div class="error">Unable to find mirror. Mirror may not exist or may not be properly tagged.</div>
         {/if}
         </div>
         </div>
     </div>
   </div>
 </div>
+{:else}
+  <div class="loading-container">
+    <div class="loader"></div>
+    <p>Waiting for mirror state to load...</p>
+  </div>
 {/if}
 <style>
   .app {
@@ -116,6 +150,34 @@
   .wrapper {
     position: relative;
     z-index: 10;
+  }
+  
+  .error-container, .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    min-height: 200px;
+  }
+  
+  .error {
+    color: #d32f2f;
+    background-color: #ffebee;
+    padding: 16px;
+    border-radius: 4px;
+    border: 1px solid #ef5350;
+    font-weight: 500;
+  }
+  
+  .loader {
+    border: 8px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 8px solid #3498db;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+    margin-bottom: 16px;
   }
 
 </style>

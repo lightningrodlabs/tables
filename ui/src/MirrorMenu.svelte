@@ -50,7 +50,7 @@
                 <div
                     on:click={()=>selectMirror(hash)}
                     class="mirror" >
-                    <MirrorMenuItem largeDisplay={true} mirrorType={MirrorType.active} mirrorHash={hash}></MirrorMenuItem>
+                    <MirrorMenuItem largeDisplay={true} mirrorHash={hash}></MirrorMenuItem>
                     <!-- <div class="mirror-bg" style="background-image: url({bgUrl});"></div> -->
                 </div>
             {/each}
@@ -68,7 +68,7 @@
                 <div
                     on:click={()=>unarchiveMirror(hash)}
                     class="mirror" style="height: 45px; border-radius: 4px">
-                    <MirrorMenuItem mirrorType={MirrorType.archived} mirrorHash={hash}></MirrorMenuItem>
+                    <MirrorMenuItem mirrorHash={hash}></MirrorMenuItem>
                     <!-- <div class="mirror-bg" style="background-image: url({bgUrl});"></div> -->
                 </div>
             {/each}

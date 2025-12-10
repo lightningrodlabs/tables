@@ -83,38 +83,48 @@
   async function setCellValues() {
     if ($state.variables) {
       for (const variable of $state.variables) {
-        let wal: WAL = weaveUrlToWAL(variable.value);
-        switch (wal?.context?.assetType) {
-          case "Cell":
-            console.log(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId)
-            const valueOfCell = await getValueOfCell(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId, store)
-            cellValues[variable.name] = valueOfCell
-            break
-          case "Column Summary":
-            const valueOfSummary = await getValueOfColumnSummary(wal.hrl[1], wal.context?.columnId, wal.context?.sumType, store, "true")
-            console.log(valueOfSummary)
-            cellValues[variable.name] = valueOfSummary
-            break
-          case "Table":
-            console.log("table")
-            const tableValues = await getTableValues(wal.hrl[1], store)
-            console.log(tableValues)
-            cellValues[variable.name] = tableValues
-            break
-          case "Row":
-            console.log("row")
-            const rowValues = await getRowValues(wal.hrl[1], wal.context?.rowId, store)
-            console.log(rowValues)
-            cellValues[variable.name] = rowValues
-            break
-          case "Column":
-            console.log("column")
-            const columnValues = await getColumnValues(wal.hrl[1], wal.context?.columnId, store)
-            console.log(columnValues)
-            cellValues[variable.name] = columnValues
-            console.log(cellValues)
-            break
+        try {
+          let wal: WAL = weaveUrlToWAL(variable.value);
+          if (!wal) {
+            console.warn(`Could not parse WAL from variable ${variable.name}:`, variable.value);
+            continue;
           }
+          
+          switch (wal?.context?.assetType) {
+            case "Cell":
+              console.log(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId)
+              const valueOfCell = await getValueOfCell(wal.hrl[1], wal.context?.cellId?.rowId, wal.context?.cellId?.columnId, store)
+              cellValues[variable.name] = valueOfCell
+              break
+            case "Column Summary":
+              const valueOfSummary = await getValueOfColumnSummary(wal.hrl[1], wal.context?.columnId, wal.context?.sumType, store, "true")
+              console.log(valueOfSummary)
+              cellValues[variable.name] = valueOfSummary
+              break
+            case "Table":
+              console.log("table")
+              const tableValues = await getTableValues(wal.hrl[1], store)
+              console.log(tableValues)
+              cellValues[variable.name] = tableValues
+              break
+            case "Row":
+              console.log("row")
+              const rowValues = await getRowValues(wal.hrl[1], wal.context?.rowId, store)
+              console.log(rowValues)
+              cellValues[variable.name] = rowValues
+              break
+            case "Column":
+              console.log("column")
+              const columnValues = await getColumnValues(wal.hrl[1], wal.context?.columnId, store)
+              console.log(columnValues)
+              cellValues[variable.name] = columnValues
+              console.log(cellValues)
+              break
+          }
+        } catch (error) {
+          console.error(`Error loading cell value for variable ${variable.name}:`, error);
+          cellValues[variable.name] = undefined; // Set to undefined on error
+        }
       }
     }
   }
@@ -141,11 +151,20 @@
   };
 
   onMount(async () => {
-    await setCellValues();
+    try {
+      await setCellValues();
+    } catch (error) {
+      console.error("Error in initial setCellValues:", error);
+    }
+    
     setTimeout(async () => {
       console.log("Setting cell values")
-      await setCellValues();
-      console.log("Cell Values: ", cellValues)
+      try {
+        await setCellValues();
+        console.log("Cell Values: ", cellValues)
+      } catch (error) {
+        console.error("Error in delayed setCellValues:", error);
+      }
     }, 1000)
   });
   // setInterval(async() => {

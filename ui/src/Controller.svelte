@@ -76,11 +76,14 @@
           <div
             style="
               display:flex; 
-              justify-content: center;
               align-items: top;
+              border-bottom: 1px solid #a1a1a1;
+              width: 100%;
+              height: calc(100vh - 92px);
+              overflow-y: auto;
             "
           >
-            <div style="margin:20px; width: 50%;">
+            <div style="padding:20px; width: 50%;">
               <h1 class="type-header">
                 Tables
               </h1>
@@ -93,7 +96,7 @@
               <BoardMenu mainpage={true} />
 
             </div>
-            <div style="margin:20px;">
+            <div style="padding:20px; border-left: 1px solid #a1a1a1;">
               <h1 class="type-header">Views</h1>
               <div style="display:flex; flex-wrap:wrap;">
                 <div class="new-board" on:click={()=>newMirrorDialog.open()} title="New View"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New View</span></div>
@@ -106,8 +109,8 @@
         </div>
       </div>
       
-      <div style="cursor: pointer; margin: 10px; margin-top: 30px; margin-left: 30px;" on:click={()=>aboutDialog.open()}>
-        <SvgIcon icon=faCog size="20px" color="#000"/> v0.10.3
+      <div style="cursor: pointer; margin: 10px; margin-top: 10px; margin-left: 30px;" on:click={()=>aboutDialog.open()}>
+        <SvgIcon icon=faCog size="20px" color="#000"/> v0.10.4
       </div>
       <AboutDialog bind:this={aboutDialog} />
 
@@ -117,7 +120,6 @@
 <style>
   .app {
     margin: 0;
-    padding-bottom: 10px;
     background-size: cover;
     display: flex;
     flex-direction: column;
