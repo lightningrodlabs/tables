@@ -382,8 +382,6 @@
       {#if $participants}
         <div class="participants">
           <div style="display:flex; flex-direction: row">
-            <Avatar agentPubKey={store.myAgentPubKey} showNickname={false} size={30} />
-
             {#each Array.from($participants.entries()) as [agentPubKey, sessionData]}
             <div class:idle={Date.now()-sessionData.lastSeen >30000}>
               <Avatar agentPubKey={agentPubKey} showNickname={false} size={30} />
