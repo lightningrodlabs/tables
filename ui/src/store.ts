@@ -86,7 +86,7 @@ export class TablesStore {
           this.roleName,
           this.zomeName
         );
-        this.synStore = new SynStore(new SynClient(this.client,this.roleName,this.zomeName))
+        this.synStore = new SynStore(new SynClient(this.client,this.roleName,this.zomeName), true)
         this.boardList = new BoardList(profilesStore, this.synStore, weClient)
         this.mirrorList = new MirrorList(profilesStore, this.synStore, weClient)
         this.boardList.activeBoard.subscribe((board)=>{

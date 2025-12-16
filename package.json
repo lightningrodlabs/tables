@@ -19,10 +19,10 @@
     "start:happ": "echo \"starting with admin $VITE_ADMIN_PORT\" && RUST_LOG=warn echo \"pass\" | hc s -f=$VITE_ADMIN_PORT --piped generate workdir/tables.happ --run=$VITE_APP_PORT -a tables network -b \"http://127.0.0.1:$BOOTSTRAP_PORT\"  webrtc \"ws://127.0.0.1:$SIGNAL_PORT\"",
     "build:happ": "npm run build:zomes && hc app pack workdir --recursive",
     "build:zomes": "CARGO_TARGET_DIR=target RUSTFLAGS='--cfg getrandom_backend=\"custom\"' cargo build --release --target wasm32-unknown-unknown",
-    "calculate-hashes": "weave hash-webhapp workdir/tables.webhapp"
+    "calculate-hashes": "weave hash-webhapp 0.10.5 workdir/tables.webhapp"
   },
   "devDependencies": {
-    "@theweave/cli": "0.15.5",
+    "@theweave/cli": "0.15.9",
     "@holochain/hc-spin": "^0.600.0",
     "@holochain-playground/cli": "^0.1.1",
     "@rollup/plugin-typescript": "^8.0.0",

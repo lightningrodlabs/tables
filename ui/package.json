@@ -1,6 +1,6 @@
 {
   "name": "ui",
-  "version": "0.10.4",
+  "version": "0.10.5",
   "scripts": {
     "start": "vite --clearScreen false --port $UI_PORT",
     "build": "vite build",
