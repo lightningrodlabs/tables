@@ -10,7 +10,6 @@
     import NewBoardDialog from './NewBoardDialog.svelte';
     import SvgIcon from "./SvgIcon.svelte";
     import BoardMenu from "./BoardMenu.svelte";
-    import MirrorMenu from "./MirrorMenu.svelte";
     import NewMirrorDialog from './NewMirrorDialog.svelte';
     import MirrorPane from './MirrorPane.svelte'
     import AboutDialog from './AboutDialog.svelte'
@@ -53,8 +52,8 @@
     let newMirrorDialog
 
   </script>
-      <NewBoardDialog bind:this={newBoardDialog}></NewBoardDialog>
-      <NewMirrorDialog bind:this={newMirrorDialog}></NewMirrorDialog>
+      <!-- <NewBoardDialog bind:this={newBoardDialog}></NewBoardDialog>
+      <NewMirrorDialog bind:this={newMirrorDialog}></NewMirrorDialog> -->
 
   <div class="flex-scrollable-parent">
     <div class="flex-scrollable-container">
@@ -83,26 +82,18 @@
               overflow-y: auto;
             "
           >
-            <div style="padding:20px; width: 50%;">
-              <h1 class="type-header">
+            <div style="padding:20px; width: 100%;">
+              <!-- <h1 class="type-header">
                 Tables
-              </h1>
+              </h1> -->
 
-              <div style="display:flex; flex-wrap:wrap;">
-                <div class="new-board" style="background: #333" on:click={()=>newBoardDialog.open()} title="New Table"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Table</span></div>
+              <!-- <div style="display:flex; flex-wrap:wrap;"> -->
+                <!-- <div class="new-board" style="background: #333" on:click={()=>newBoardDialog.open()} title="New Table"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New Table</span></div> -->
               <!-- <div class="new-board" on:click={()=>newMirrorDialog.open()} title="New View"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New View</span></div> -->
-              </div>
+              <!-- </div> -->
 
               <BoardMenu mainpage={true} />
 
-            </div>
-            <div style="padding:20px; border-left: 1px solid #a1a1a1;">
-              <h1 class="type-header">Views</h1>
-              <div style="display:flex; flex-wrap:wrap;">
-                <div class="new-board" on:click={()=>newMirrorDialog.open()} title="New View"><SvgIcon color="#fff" size=25px icon=faSquarePlus /><span style="margin-left:10px; color:rgb(255 255 255 / 74%);">New View</span></div>
-              </div>
-              <MirrorMenu mainpage={true} />
-              
             </div>
           </div>
           {/if}
