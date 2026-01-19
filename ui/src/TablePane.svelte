@@ -71,11 +71,8 @@
 
   $: uiProps = store.uiProps
   $: participants = activeBoard.participants()
-  // $: activeHashB64 = store.boardList.activeBoardHashB64;
   $: activeHashB64 = activeBoard.hashB64
   $: activeRow = store.boardList.activeRow;
-
-  // let columnDefs: Array<ColumnDef> = []
 
   $: state = activeBoard.readableState()
   $: orderedRows = Object.entries($state.rows).map(([key,value])=>{return{id:key, cells:value}})
@@ -83,13 +80,10 @@
   let showQueryBuilder = true;
   let editingCell: undefined|CellId
   let queriedData = {};
+  let newQueryBool = false;
   $: queriedData;
   let newSummaryRowModal = false;
   $: newSummaryRowModal;
-  function init(el){
-    //if (el)
-     // el.focus()
-  }
 
   $: openDetails = (rowId) => {
     if (rowId) {
@@ -178,19 +172,14 @@
         const columnCellValues = Object.values($state.rows.map(row=>row.cells[editingCell.columnId])).map(cell=>cell?.value)
         const shouldBeUnique = $state.columnDefs[index]?.unique
         const valueIsUnique = !shouldBeUnique || columnCellValues.indexOf(e.target.value) == -1 || e.target.value == null
-        console.log("enter", shouldBeUnique)
 
         if (!valueIsUnique) {
-          console.log("value is not unique")
           editingCell = undefined
           return
         }
 
         activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: e.target.value }]);
-        // let row = $state.rows.find(row=>row.id == editingCell.rowId)
-        console.log("index", index)
         if (index < $state.columnDefs.length-1) {
-          console.log("index 2", editingCell, $state.columnDefs[index+1].id)
           editingCell = {rowId: editingCell.rowId, columnId: $state.columnDefs[index+1].id}
         }
       }
@@ -205,17 +194,14 @@
         const columnCellValues = Object.values($state.rows.map(row=>row.cells[editingCell.columnId])).map(cell=>cell?.value)
         const shouldBeUnique = $state.columnDefs[index]?.unique
         const valueIsUnique = !shouldBeUnique || columnCellValues.indexOf(e.target.value) == -1 || e.target.value == null
-        console.log("enter", shouldBeUnique)
 
         if (!valueIsUnique) {
-          console.log("value is not unique")
           editingCell = undefined
           return
         }
 
         activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: e.target.value }]);
 
-        console.log(rowIndex, $state.rows.length-1)
         if (rowIndex == $state.rows.length-1) {
           activeBoard.requestChanges([{ type: "add-row", row: new Row(store.myAgentPubKeyB64, {}) }]);
           queriedData[activeHashB64] = activeBoard.state().rows.map(row=>row.id)
@@ -229,7 +215,6 @@
 
     // escape saves and closes
     if (e.key === "Escape" && !e.shiftKey) {
-      console.log("esc")
       e.preventDefault();
       if (editingCell) {
         activeBoard.requestChanges([{ type: "set-cell", cellId: editingCell, value: e.target.value }]);
@@ -255,7 +240,6 @@
           const shouldBeUnique = $state.columnDefs[index]?.unique
           const valueIsUnique = !shouldBeUnique || columnCellValues.indexOf(editingCellValue) == -1 || editingCellValue == null
           if (!valueIsUnique) {
-            console.log("value is not unique")
             editingCell = undefined
             return
           }
@@ -284,7 +268,7 @@
         <sl-dropdown class="board-options board-menu" skidding=15 hoist>
           <!-- <sl-button slot="trigger"   class="board-button settings">{$state.name}</sl-button> -->
           <sl-button slot="trigger"   class="board-button settings" caret>{$state.name}</sl-button>
-          <sl-menu className="settings-menu">
+          <sl-menu class="settings-menu">
             <sl-menu-item on:click={()=> editBoardDialog.open(cloneDeep(activeBoard.hash))} class="board-settings" >
                 <SvgIcon icon="faCog"  style="background: transparent; opacity: .5; position: relative; top: -2px;" size="14px"/> <span>Settings</span>
             </sl-menu-item>
@@ -347,6 +331,15 @@
             <span>Query Builder</span>
           {/if}
         </sl-menu-item> -->
+
+        <!-- <button class="new-query"
+          on:click={() => 
+            {
+              newQueryBool = true
+            }
+          }
+        >+ filter</button> -->
+
       {/if}
     </div>
     <div class="filter-by">
@@ -397,7 +390,7 @@
   {#if $state}
 
   {#if showQueryBuilder && $state.queries}
-    <Queries {activeBoard} {state} bind:queriedData />
+    <Queries {activeBoard} {state} bind:newQueryBool bind:queriedData />
   {/if}
 
   {#if dataView}
@@ -405,16 +398,9 @@
   {:else}
     <div class="data-table">
       <div class="header-row">
-        <div style="width:22px; cursor: pointer; border-right: 1px solid #462700;">
-          <!-- <sl-button
-            on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
-            circle size=small> -->
-            <div style="display:flex; align-items: center; justify-content: center; width:18px; height:18px; cursor: pointer; margin: 2px;"
-              on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}}
-            >
-            <!-- <SvgIcon icon="expand" size="16px"/> -->
+        <div class="header-actions-cell">
+          <div class="header-action-placeholder">
           </div>
-          <!-- </sl-button> -->
           </div>
           
       <DragDropList
@@ -427,24 +413,31 @@
         let:drag
       >
         {@const isDragging = drag?.sourceIndex === index}
-        <div class="header-cell" >
-          <button title="Add Row to Pocket" style="padding: 0; background-color: transparent;" on:click={()=>{
+        <div 
+          class="header-cell"
+          title={$state.columnDefs[index].name}
+        >
+          <div class="column-title">
+            {$state.columnDefs[index].name}
+            {#if $state.columnDefs[index].unique}
+              *
+            {/if}
+          </div>
+
+          <button class="pocket-button" title="Add Column to Pocket" on:click={()=>{
             columnToPocket($state.columnDefs[index].id)
           }} >
             <SvgIcon icon="addToPocket" size="20px"/>
           </button>
-          {$state.columnDefs[index].name}
-          {#if $state.columnDefs[index].unique}
-            *
-          {/if}
-          <span class="header-caret"
-          on:click={()=>{
-            editHeaderIndex = index;
-            showEditHeader = true;
-          }}
+          
+          <div class="header-caret"
+            on:mousedown={()=>{
+              editHeaderIndex = index;
+              showEditHeader = true;
+            }}
           >
             &#9660;
-          </span>
+        </div>
 
         </div>
         {#if isDragging}
@@ -456,21 +449,12 @@
         {/if}
         
       </DragDropList>
-        <!-- <sl-dialog label="Edit Header" open={showEditHeader} onSlOverlayDismiss={() => showEditHeader = false}>
-          <sl-input label="Name" value={editHeaderIndex} on:input={(e)=>{activeBoard.requestChanges([{ type: "set-column-name", columnId: $state.columnDefs[editHeaderIndex].id, name:e.target.value}])}}></sl-input>
-          <sl-button on:click={()=>{
-            showEditHeader = false;
-          }}>Save</sl-button>
-        </sl-dialog> -->
-      <div style="width:22px; cursor: pointer;"
-        on:click={()=>{
+      <div class="add-column-header" on:click={()=>{
           showAddColumnModal = true;
-        }}
-      >
-      <div class="add-column-button">
-        <SvgIcon icon=faPlus size=10 style="height:23px;"/>
-      </div>
-      
+        }}>
+        <div class="add-column-button">
+          <SvgIcon icon=faPlus size=10 style="height:23px;"/>
+        </div>
       </div>
       {#if showAddColumnModal}
         <AddColumnModal bind:showAddColumnModal activeBoard={activeBoard} />
@@ -480,64 +464,36 @@
     {#if showEditHeader}
       <EditHeader bind:showEditHeader {activeBoard} {editHeaderIndex}></EditHeader>
     {/if}
-      <!-- <div class="header-row">
-        {#each $state.columnDefs as def}
-          <div class="header-cell" style="width:{width}px">
-            {def.name}
-          </div>
-        {/each}
-        <div class="header-cell" style="width:40px; cursor: pointer;"
-          on:click={()=>{
-            showAddColumnModal = true;
-          }}
-        >
-        <sl-button size="small" circle style="margin-left:3px">
-          <SvgIcon icon=faPlus size=10/>
-        </sl-button>
-        </div>
-        {#if showAddColumnModal}
-          <AddColumnModal bind:showAddColumnModal activeBoard={activeBoard} />
-        {/if}
-      </div> -->
 
       {#each $state.rows as row, y}
-        <!-- {queriedData} -->
         {#if queriedData[activeHashB64] && queriedData[activeHashB64].indexOf(row.id) == -1 ? null : true}
           <div class="data-row">
-            <div style="width:72px; cursor: pointer; border-right: 1px solid #462700; display:flex;">
-              <!-- <sl-button
-                on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}} 
-                circle size=small> -->
-              <div
-              >
-              <!-- style="display:flex; align-items: center; justify-content: center; width:18px; height:18px; cursor: pointer; margin: 2px;" -->
-              
-                <button title="Add Row to Pocket" style="padding: 0" on:click={()=>{
+            <div class="row-actions-cell">
+              <div class="row-action-wrapper">
+                <button class="pocket-button" title="Add Row to Pocket" on:click={()=>{
                   rowToPocket(row.id)
                 }} >          
                   <SvgIcon icon="addToPocket" size="20px"/>
                 </button>
               </div>
-              <div
-                class="trash-button"
+              <div 
+                class="trash-button" 
+                title="Delete Row"
                 on:click={(e)=>{
                   e.stopPropagation(); 
                   let id = row.id
                   activeBoard.requestChanges([{ type: "delete-row", id }]);
                 }}
               >
-                <!-- Expand -->
                 <SvgIcon icon="faTrash" size="10px"/>
               </div>
               <div 
-                class="expand-button"
-                on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}}
-              >
-                <!-- Expand -->
+                class="expand-button" 
+                title="Row Details"
+                on:click={(e)=>{e.stopPropagation(); rowDetails(row.id)}}>
                 <SvgIcon icon="expand" size="14px"/>
               </div>
-              <!-- </sl-button> -->
-              </div>
+            </div>
             {#each $state.columnDefs as def, x}
             {@const cell = row.cells[def.id]}
             <!-- column values -->
@@ -584,21 +540,23 @@
         {/if}
       {/each}
       
-      <div size="small" circle style="margin-left:55px; cursor: pointer;" 
-      class="add-column-button"
-      on:click={async ()=>{
-        const cells = {}
-        //$state.columnDefs.forEach(def=>cells[def.id]={value: null, attachments:[]})
-        const row = new Row(store.myAgentPubKeyB64, cells)
-        await activeBoard.requestChanges([{ type: "add-row",  row}]);
-        queriedData[activeHashB64] = activeBoard.state().rows.map(row=>row.id)
-      }} >          
+      <div 
+        on:mousedown={async ()=>{
+          const cells = {}
+          const row = new Row(store.myAgentPubKeyB64, cells)
+          await activeBoard.requestChanges([{ type: "add-row",  row}]);
+          queriedData[activeHashB64] = activeBoard.state().rows.map(row=>row.id)
+        }}
+        class="add-row-wrapper" 
+        style="width: {200 * $state.columnDefs.length + 1}px">
+        Add Row&nbsp;
+        <div class="add-column-button">
           <SvgIcon icon=faPlus size=10 style="height: 23px;"/>
         </div>
       </div>
       <div class="summary-row">
-        <div class="summary-row-label" style="margin-left: 20px;">
-          All data
+        <div class="summary-row-label summary-row-label-main">
+          No filter
         </div>
         {#each $state.columnDefs as def, x}
           <SummaryRow activeBoard={activeBoard} def={def} width={width} sumType={def.sumType} />
@@ -609,15 +567,12 @@
       <div class="summary-row">
         <button
           class="remove-summary-row"
+          title="Remove Summary Row"
           on:click={()=>{activeBoard.requestChanges([{ type: "remove-summary-row", id: summaryRow.id}]);}}
         >x</button>
           <div class="summary-row-label">
               {summaryRow.queryLabel}
           </div>
-          <!-- {summaryRow.queryLabel} -->
-
-          <!-- <div style="width:22px; cursor: pointer;">
-          </div> -->
           {#each $state.columnDefs as def, x}
             <SummaryRow activeBoard={activeBoard} def={def} width={width} query={summaryRow.query} sumType={summaryRow.summaryDefs[def.id] ? summaryRow.summaryDefs[def.id] : 0}
               on:set-sumtype={(e)=>{
@@ -697,42 +652,25 @@
                 </div>
               {/each}
             {/if}
-            <!-- <button on:click={()=>{newSummaryRowModal = false}}>Done</button> -->
           </div>
         </div>
       {/if}
       <div class="data-row">
-        <!-- <button style="width: 20px" on:click={()=>{newSummaryRowModal = true}}> -->
-      <div class="add-column-button" style="margin-left: 51px" on:click={()=>{newSummaryRowModal = true}}>
-
-          <SvgIcon icon=faPlus size=10 style="height:23px;"/>
+        <div class="add-summary-row-wrapper" on:click={()=>{newSummaryRowModal = true}}>
+          <div class="add-column-button">
+            <SvgIcon icon=faPlus size=10 style="height:23px;"/>
+          </div>
+        </div>
       </div>
-      </div>
+    </div>
   {/if}
   {/if}
-  <!-- <div class="bottom-fade"></div> -->
 </div>
 <style>
 
   .form-group {
     text-align: center;
     margin-bottom: 0.2em;
-  }
-
-  .modal {
-    /* display: none;
-    position: fixed;
-    z-index: 1;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgb(0, 0, 0);
-    background-color: rgba(0, 0, 0, 0.4); */
-    position: relative;
-    height: 0;
-    padding: 0;
   }
 
   .modal {
@@ -759,16 +697,6 @@
     max-width: 80%;
     min-width: 300px;
   }
-  
-  /* .modal-content {
-    background-color: #fefefe;
-    position: absolute;
-    top: 22px;
-    left: -202px;
-    padding: 14px;
-    border: 1px solid #888;
-    width: fit-content;
-  } */
 
   .close {
     color: #aaa;
@@ -785,12 +713,78 @@
   }
 
   .data-table {
-    /* min-height: 200px; */
-    /* border-bottom: 1px solid; */
   }
+
+  .header-actions-cell {
+    width: 22px;
+    cursor: pointer;
+    border-right: 1px solid #462700;
+  }
+
+  .header-action-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    margin: 2px;
+  }
+
+  .pocket-button {
+    padding: 0;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .pocket-button:hover {
+    transform: scale(1.1);
+  }
+
+  .add-column-header {
+    width: 22px;
+    cursor: pointer;
+  }
+
+  .row-actions-cell {
+    width: 72px;
+    cursor: pointer;
+    border-right: 1px solid #462700;
+    display: flex;
+  }
+
+  .row-action-wrapper {
+    display: flex;
+    align-items: center;
+  }
+
+  .add-row-wrapper {
+    margin-left: 81px;
+    cursor: pointer;
+    background: #b9b9b9;
+    display: flex;
+    width: fit-content;
+    justify-content: center;
+    border: 1px solid;
+    border-top: 0;
+    border-bottom: 0;
+  }
+
+  .add-row-wrapper:hover {
+    background: #ababab;
+  }
+
+  .add-summary-row-wrapper {
+    margin-left: 51px;
+  }
+
+  .summary-row-label-main {
+    margin-left: 19px;
+  }
+
   .header-row {
-    display:flex;
-    /* border-bottom: 1px solid; */
+    display: flex;
     width: fit-content;
   }
   .header-cell {
@@ -798,35 +792,68 @@
     color: black;
     background-color: #ededed;
     border-top: 1px solid #462700;
+    display: flex;
   }
 
+  .column-title {
+    width: 84%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
   .header-caret {
-    position: absolute;
-    right: 5px;
+    cursor: pointer;
   }
 
-  .long-header {
-    /* transparent background */
-    background: rgb(213, 213, 213);
-    /* background: linear-gradient(360deg, rgba(189, 209, 230, 0) 0%, rgba(185, 185, 185, 0.81) 100%); */
-    border: 0 !important;
+  .header-caret:hover {
+    color: #555;
   }
 
   .header-row {
     margin-left: 60px;
   }
+
+  .header-cell .pocket-button,
+  .header-cell .header-caret {
+    opacity: 0;
+  }
+
+  .header-cell:hover .pocket-button,
+  .header-cell:hover .header-caret {
+    opacity: 1;
+  }
  
   .data-row {
-    display:flex;
-    /* border-bottom: 1px dashed; */
+    display: flex;
     width: fit-content;
     margin-left: 10px;
   }
 
+  /* .data-row .pocket-button,
+  .data-row .trash-button,
+  .data-row .expand-button
+  {
+    opacity: 0;
+  } */
+
+  .data-row:hover .pocket-button,
+  .data-row:hover .trash-button,
+  .data-row:hover .expand-button {
+    opacity: 1;
+  }
+
   .summary-row {
-    display:flex;
-    /* border-bottom: 1px dashed; */
+    display: flex;
     width: fit-content;
+    border-right: 1px solid #462700;
+  }
+
+  .summary-row .remove-summary-row {
+    opacity: 0;
+  }
+
+  .summary-row:hover .remove-summary-row {
+    opacity: 1;
   }
 
   .data-cell, .header-cell {
@@ -843,9 +870,13 @@
   }
 
   .data-cell {
-    background-color: #eeeeee;
-    color: rgb(20, 20, 20);
-    /* height: 23px; */
+    background-color: #f5f5f5;
+    color: #1a1a1a;
+    transition: background-color 0.15s ease;
+  }
+
+  .data-cell:hover {
+    background-color: #e8e8e8;
   }
 
   .board {
@@ -861,23 +892,20 @@
     border-bottom: 1px solid #a1a1a1;
   }
   .top-bar {
-    box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+    /* box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15); */
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    /* background-color: #fff; */
-    /* background-color: #b789327b; */
-    background-color: #6f6f6f7b;
-    padding-left: 10px;
-    padding-right: 10px;
+    background: rgb(105, 105, 105);
+    /* padding: 10px 15px; */
     border-radius: 0;
     position: sticky;
     width: 100%;
     top: 0;
     left: 0;
     z-index: 200;
-    color: white
+    color: white;
   }
   .left-items {
     display: flex;
@@ -904,10 +932,6 @@
   .board-button.close::part(base) {
     font-size: 16px;
     line-height: 36px;
-  }
-
-  .right-items .board-button::part(base) {
-    font-size: 24px;
   }
   
   .board-button {
@@ -988,169 +1012,12 @@
     padding-left: 8px;
   }
 
-  .card-edit {
-    position: relative;
-    z-index: 1;
-  }
-
-  .card-edit .board-button:hover {
-
-  }
-  .card-edit .board-button:active {
-    padding: 5px 10px;
-    box-shadow: 0px 8px 10px rgba(53, 39, 211, 0.35);
-  }
-
   .filter-by {
     display: flex;
     align-items: center;
     margin-right: 8px;
     height: 47px;
     padding-right: 10px;
-  }
-
-  .bottom-fade {
-    position: fixed;
-    bottom: 0;
-    z-index: 100;
-    width: 100%;
-    height: 20px;
-    bottom: 10px;
-    background: linear-gradient(180deg, rgba(189, 209, 230, 0) 0%, rgba(102, 138, 174, 0.81) 100%);
-    opacity: 0.4;
-  }
- 
-  .columns {
-    display: flex;
-    flex: 0 1 auto;
-    max-height: 100%;
-    background: transparent;
-    min-height: 0;
-    padding: 0 15px 0 15px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .column-item {
-    padding: 10px 10px 0px 10px;
-    display: flex;
-    align-items: center;
-    flex: 0 1 auto;
-  }
-
-  .column-title, .add-column {
-    font-weight: bold;
-    font-size: 16px;
-    padding: 10px;
-    border-radius: 0 0 5px 5px;
-    position: sticky;
-    z-index: 0;
-    top: 0;
-    background-color: #fff;
-    box-shadow: 0px 4px 15px rgba(35, 32, 74, 0.15);
-    z-index: 150;
-    transition: all .25s ease;
-  }
-  .add-column {
-    opacity: .7;
-    transition: all .25s ease;
-  }
-
-  .editing-column-name.add-column {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .new-column-button {
-    width: 60px;
-    transform: scale(1);
-    transition: all .25s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    top: -2px;
-  }
-
-  .new-column-button:hover {
-    transform: scale(1.25);
-    cursor: pointer;
-  }
-  
-  .new-column-button:active {
-    transform: sclae(1.1);
-    box-shadow: 0px 8px 10px rgba(53, 39, 211, 0.35);
-  }
-
-  .new-column-button::part(base) {
-    border: none;
-  }
-
-  .new-column-icon {
-    position: relative;
-    top: 3px;
-  }
-  .column-title:hover, .add-column:hover {
-    box-shadow: 0px 4px 15px rgba(35, 32, 74, 0.3);
-    padding: 15px;
-    margin: 0 -5px;
-    opacity: 1;
-    cursor: pointer;
-  }
-
-  .column-name-input {
-    width: 230px;
-  }
-
-  .column-title:hover {
-    cursor: pointer;
-    margin: 0 -5px -10px -5px;
-  }
-
-  .column-footer {
-    border-top: 1px solid #999;
-    padding: 0 5px;
-    min-height: 38px;
-  }
-  .column-wrap {
-    display: flex;
-    flex-direction: column;
-  }
-  .column {
-    margin-right: 10px;
-    display: flex;
-    flex-direction: column;
-    width: 300px;
-    margin-left: 10px;
-    border-radius: 3px;
-    min-width: 130px;
-    min-height: 0;
-    max-height: calc(100vh - 100px);
-    overflow: visible;
-  }
-  .first-column {
-    margin-left: 0px !important;
-  }
-  .cards {
-    display: flex;
-    flex-direction: column;
-    overflow-y: scroll;
-    width: calc(100% + 8px);
-    height: calc(100vh - 150px);
-    margin-top: 0;
-    padding-top: 10px;
-    padding-bottom: 20px;
-  }
-  .cards::-webkit-scrollbar {
-    width: 5px;
-    background-color: transparent;
-  }
-
-  .cards::-webkit-scrollbar-thumb {
-      height: 5px;
-      border-radius: 5px;
-      background: rgba(20,60,119,.3);
-      opacity: 1;
   }
 
   .board::-webkit-scrollbar {
@@ -1162,154 +1029,6 @@
     border-radius: 0 0 0 0;
     background: rgba(20,60,119,.7);
     /* background: linear-gradient(180deg, rgba(20, 60, 119, 0) 0%, rgba(20,60,119,.6) 100%); */
-  }
-
-  .glowing {
-    outline: none;
-    border-color: #9ecaed;
-    box-shadow: 0 0 10px #9ecaed !important;
-  }
-  .tilted {
-    transform: rotate(3deg);
-    box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.5) !important;
-  }
-
-  .card, .add-card {
-    background-color: white;
-    margin: 0px 10px 10px 10px;
-    box-shadow: 0px 4px 4px rgba(35, 32, 74, 0.15);
-    font-size: 12px;
-    line-height: 16px;
-    color: #23204A;
-    border-radius: 5px;
-    display:flex;
-    flex-direction:column;
-    padding: 10px;
-    transition: all .25s ease;
-    height: 0;
-    height: auto;
-  }
-
-  .card:hover .board-button {
-    opacity: 1;
-  }
-
-  .card:hover, .add-card:hover {
-    cursor: pointer;
-    box-shadow: 0px 8px 10px rgba(35, 32, 74, 0.25);
-    padding: 20px;
-    margin: -5px 0px -5px 0px;
-    position: relative;
-    z-index: 100;
-
-    /* uncomment to see this example of card growing dramatically */
-    /* height: calc(100vh - 125px);
-    max-height: calc(100vh - 125px); */
-  }
-
-  .card:active, .add-card:active {
-    box-shadow: 0px 8px 10px rgba(53, 39, 211, 0.35);
-    padding: 15px;
-    margin: 0px 5px 0px 5px;
-  }
-
-  .add-card {
-    display: flex;
-    flex-direction: row;
-    font-size: 14px;
-    opacity: .7;
-  }
-
-  .add-card:hover {
-    opacity: 1;
-  }
-
-  .add-icon {
-    font-size: 24px;
-    opacity: .6;
-    font-weight: bold;
-    margin-right: 5px;
-  }
-
-  .card-edit .board-button {
-    padding: 10px 15px;
-    opacity: 0;
-    transition: all .25s ease;
-  }
-
-  .card:hover .card-edit .board-button {
-    opacity: 1;
-  }
-  .card-content {
-    padding: 0 5px;
-  }
-
-  .card-title {
-    font-size: 16px;
-    font-weight: bold;
-  }
-
-  .card-description {
-    font-size: 14px;
-    opacity: .8;
-    line-height: 18px;
-    padding-top: 3px;
-    -webkit-line-clamp: 3;
-    display: -webkit-box;
-    overflow: hidden;
-    -webkit-box-orient: vertical;
-    position: relative;
-    z-index: 0;
-  }
-
-  .contributors {
-    padding-top: 15px;
-    padding-left: 8px;
-    padding-right: 10px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-
-  .unread-comment {
-    background-color: red;
-    width:8px;
-    height: 8px;
-    border-radius: 50%;
-    position: absolute;
-    top: 2px;
-    left: 2px;
-
-  }
-  .comments-checklist {
-    display: flex;
-    position: relative;
-    top: 3px;
-  }
-  
-  .comment-count {
-    margin-right: 10px;
-  }
-  .attachments-count {
-    margin-left: 10px;
-  }
-
-  .labels {
-    display: block;
-    padding-bottom: 10px;
-  }
-  
-  .labels div {
-    display: inline-flex;
-    width: 30px;
-    height: 30px;
-    align-items: center;
-    justify-content: center;
-    border-radius: 5px;
-    margin-right: 10px;
-    /* border: 1px solid rgba(235, 235, 238, 1.0); */
-    border: none;
-    background-color: rgba(255,255,255,.8);
   }
 
   :global(.attachment-button) {
@@ -1333,12 +1052,13 @@
     border: solid 2px black;
     border-radius: 5px;
     position: absolute;
-    top: 30px;
+    top: 50px;
     right: 10px;
     z-index: 10;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgb(63 63 63);
     display:flex;
     flex-direction: column;
+    max-height: calc(100vh - 160px);
   }
   .feed-header {
     margin: 5px;
@@ -1360,8 +1080,8 @@
     padding: 4px;
     border-radius: 5px;
     margin-bottom: 5px;
-    border: solid 1px blue;
-    background-color: rgba( 0, 0, 255, 0.1);
+    border: solid 1px rgb(255, 255, 255);
+    background-color: rgba(199, 199, 199, 0.1);
   }
   .idle {
     opacity: 0.5;
@@ -1378,7 +1098,7 @@
     font-weight: bold;
     font-size: 10px;
     margin-top: 5px;
-    margin-left: 2px;
+    margin-left: 1px;
   }
 
   .remove-summary-row:hover {
@@ -1416,7 +1136,7 @@
   }
 
   .add-column-button {
-    background-color:#c2c2c2; 
+    /* background-color:#c2c2c2;  */
     color:#3c3c3c; 
     font-weight: bold; 
     display:flex; 

@@ -12,7 +12,7 @@
   export let embedded = false;
   export let query = "true";
   export let sumType;
-  export let color = "#c2c2c2";
+  export let color = "#fff";
 
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
@@ -57,12 +57,6 @@
   </div>
   {#each $state.columnDefs as def, x} -->
     <div class:column-summary={!embedded} style="width:{width}px; color: {color}">
-      {#if store.weClient && !embedded}
-        <button class="copyWal" title="Add this card to pocket" on:click={()=>copyWalToPocket(def.id)}>
-          <SvgIcon color="#c2c2c2" icon=addToPocket size="25px"/>
-        </button>
-      {/if}
-        
         {#if sumType == SumType.Sum}
           {@const sum = Object.values(querriedData).reduce((acc, row) => {
             const cell = row.cells[def.id];
@@ -181,8 +175,14 @@
           &nbsp;--
         {/if}
 
+        {#if store.weClient && !embedded}
+          <button class="copyWal" title="Add this card to pocket" on:click={()=>copyWalToPocket(def.id)}>
+            <SvgIcon color="#c2c2c2" icon=addToPocket size="25px"/>
+          </button>
+        {/if}
+
         {#if !embedded}
-          <div style="float: right; color: #c2c2c2; margin: 2px;">
+          <div style="float: right; color: #fff; margin: 2px;">
             {SumType[sumType]}
           {#if def.type == ColumnType.Number || def.type == ColumnType.Currency}
             <select
@@ -276,8 +276,16 @@
     border: 1px solid rgb(97, 97, 97);
   }
 
+  .column-summary .copyWal {
+    opacity: 0;
+  }
+
+  .column-summary:hover .copyWal {
+    opacity: 1;
+  }
+
   select {
-    background-color: #c2c2c2;
+    background-color: #8a8a8a;
     color: #ece0cc;
     border: none;
     height: 18px;

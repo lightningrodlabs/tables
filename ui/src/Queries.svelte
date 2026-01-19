@@ -13,6 +13,7 @@ import { v1 as uuidv1 } from 'uuid';
 export let activeBoard;
 export let state;
 export let queriedData = {};
+export let newQueryBool = false;
 
 let queryBuilder;
 // let fields2;
@@ -22,7 +23,6 @@ $: fields = $state.columnDefs.map((col) => {
       label: col.name
     }
   })
-let newQueryBool = false;
 let queryName = "";
 
 // $: state = activeBoard.readableState()
@@ -34,6 +34,15 @@ currentQuery[activeHashB64] = "true";
 
 const initialQuery: RuleGroupType = { combinator: 'and', rules: [] };
 const queryStore = writable(initialQuery);
+
+// Safe eval function
+function safeEval(expr: string): boolean {
+  try {
+    return eval(expr);
+  } catch (e) {
+    return false;
+  }
+}
 
 function changeQuery(newQuery) {
   currentQuery[activeHashB64] = newQuery
@@ -59,9 +68,11 @@ function changeQuery(newQuery) {
         subbedQuery = subbedQuery.replace(new RegExp('contains', 'g'), 'includes');
       })
 
-      // console.log("subbedQuery", subbedQuery)
-      if (subbedQuery && eval(subbedQuery)) {
-        queriedData[activeHashB64].push(row.id)
+      if (
+        subbedQuery 
+        && safeEval(subbedQuery)
+      ) {
+        queriedData[activeHashB64].push(row?.id)
       }
     }
   })
@@ -74,16 +85,6 @@ function onQueryChange(newQuery) {
   changeQuery(formatQuery(newQuery, 'cel'));
 }
 
-// onMount(() => {
-//   fields2 = $state.columnDefs.map((col) => {
-//     return {
-//       name: col.id,
-//       label: col.name
-//     }
-//   })
-//   console.log(fields2)
-// });
-
 </script>
 
 <!-- <ReactAdapter
@@ -91,97 +92,94 @@ function onQueryChange(newQuery) {
   data={{ fields: fields, query: queryStore, onQueryChange: onQueryChange }}
 /> -->
 
+<!-- <div style="margin-left: 68px;"> -->
+<div>
 
-<div style="display: flex; margin: 7px;">
+  <div style="display: flex; margin: 7px;">
 
-  <button class="new-query"
-    on:click={() => 
-      {
-        // console.log(formatQuery($queryStore, 'cel'))
-        newQueryBool = true
-      }
-    }
-  >+ query</button>
-  <!-- <div>Queries</div> -->
-  <!-- <select
-    on:change={(e) => {
-      console.log(e.target.value)
-
-    }}
-   style="width: 100px"> -->
-    {#each $state.queries as q}
-      <div
-      class="query-button-select"
-      class:selected-query={q.query === currentQuery[activeHashB64]}
-      on:click={() => {
-        if (q.query === currentQuery[activeHashB64]) {
-          changeQuery("true")
-        } else {
-
-          console.log(q.query)
-          newQueryBool = false
-          changeQuery(q.query);
+    <button class="new-query"
+      on:click={() => 
+        {
+          newQueryBool = true
         }
-      }}
-      >
-      <div
-        class="remove-query"
+      }
+    >+ filter</button>
+
+      {#each $state.queries as q}
+        <div
+        class="query-button-select"
+        class:selected-query={q.query === currentQuery[activeHashB64]}
         on:click={() => {
-          activeBoard.requestChanges([{ type: "remove-query", query: q}]);
+          if (q.query === currentQuery[activeHashB64]) {
+            changeQuery("true")
+          } else {
+
+            console.log(q.query)
+            newQueryBool = false
+            changeQuery(q.query);
+          }
         }}
-      >&times;</div>
-      {q.label}
+        >
+        <div
+          class="remove-query"
+          on:click={() => {
+            activeBoard.requestChanges([{ type: "remove-query", query: q}]);
+          }}
+        >&times;</div>
+        {q.label}
+      </div>
+
+      {/each}
+  </div>
+
+  {#if fields && newQueryBool}
+    <div 
+      style="margin-left: 81px; border: 1px solid rgb(115 115 115); padding: 10px; background-color: rgb(223 223 223);
+        width: {200 * $state.columnDefs.length + 1}px
+      "
+    >
+      <div style="display:flex;">
+        <input
+          bind:value={queryName}
+          type="text" 
+          placeholder="Filter name" 
+          style="width: 203px; margin-right: 4px; background-color: #fff; border: 0; padding: 4px"
+        />
+      </div>
+
+      {#if fields && $state && $state.rows}
+        <ReactAdapter 
+          el={QueryBuilder}
+          fields={fields}
+          onQueryChange={onQueryChange} 
+        />
+      {/if}
+
+      <button class="query-button" on:click={()=>{newQueryBool = false; changeQuery("true")}}>Cancel</button>
+      <button class="query-button" on:click={()=>{
+        if (queryName === "") {
+          queryName = "Query " + $state.queries.length
+        }
+        activeBoard.requestChanges([{ type: "add-query", query: {label: queryName, query: formatQuery($queryStore, 'cel'), id: uuidv1()}}]);
+        newQueryBool = false;
+        queryName = "";
+      }}>Save</button>
     </div>
-
-    {/each}
-    <!-- <option value="new">New</option> -->
-  <!-- </select> -->
+  {/if}
 </div>
-
-{#if fields && newQueryBool}
-<div style="display:flex; margin-left: 12px;">
-  <input
-    bind:value={queryName}
-   type="text" placeholder="Query Name" style="width: 100px; margin-right: 4px; background-color: #aedcfb; border: 0; padding: 4px"/>
-  <button class="query-button" on:click={()=>{newQueryBool = false; changeQuery("true")}}>Cancel</button>
-  <button class="query-button" on:click={()=>{
-    if (queryName === "") {
-      queryName = "Query " + $state.queries.length
-    }
-    activeBoard.requestChanges([{ type: "add-query", query: {label: queryName, query: formatQuery($queryStore, 'cel'), id: uuidv1()}}]);
-    newQueryBool = false;
-    queryName = "";
-  }}>Save</button>
-</div>
-
-{#if fields && $state && $state.rows}
-  <ReactAdapter 
-  el={QueryBuilder}
-  fields={fields}
-  onQueryChange={onQueryChange} 
-  />
-{/if}
-
-{/if}
-<br>
-
-<!-- <ReactAdapter 
-  el={QueryBuilder}
-  fields={fields2}
-  onQueryChange={onQueryChange} 
-/> -->
 
 <style>
   .query-button {
     margin-right: 4px;
-    background-color: #aedcfb;
+    background-color: rgb(136, 136, 136);
     border: 0;
-    padding: 4px;
-    color: #263798;
+    padding: 4px 8px;
+    color: #ffffff;
+    border-radius: 2px;
   }
 
   .query-button:hover {
-    background-color: #83cdfe !important;
+    background-color: #a4a4a4 !important;
   }
 
   .query-button-select {
@@ -192,14 +190,15 @@ function onQueryChange(newQuery) {
     padding: 5px;
     font-weight: bold;
     background-color: #00000078;
+    color: white;
   }
 
   .query-button-select:hover {
-    background-color: #83cdfe !important;
+    background-color: #dbb63d !important;
   }
 
   .selected-query {
-    background-color: #263798 !important;
+    background-color: #dbb63d !important;
     border: 2px solid !important;
     padding: 4px !important;
   }
@@ -213,7 +212,7 @@ function onQueryChange(newQuery) {
     padding: 0px;
     font-size: 12px;
     height: 33px;
-    background-color: #263798;
+    background-color: rgb(105, 105, 105);
     color: white;
     font-weight: bold;
     border: 0;
@@ -223,7 +222,7 @@ function onQueryChange(newQuery) {
   }
 
   .new-query:hover {
-    background-color: #586de4;
+    background-color: #808080;
     /* transition */
     transition: background-color 0.2s;
   }
