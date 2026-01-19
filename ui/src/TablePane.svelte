@@ -56,6 +56,7 @@
   $: showAddColumnModal = false;
   $: showEditHeader = false;
   $: editHeaderIndex = null;
+  $: editHeaderElement = null;
   $: dataView = false;
   $: addUniqueSummaryFromColumn = null;
 
@@ -424,14 +425,17 @@
             {/if}
           </div>
 
-          <button class="pocket-button" title="Add Column to Pocket" on:click={()=>{
+          <button class="pocket-button" title="Add Column to Pocket" on:click={(e)=>{
+            e.stopPropagation();
             columnToPocket($state.columnDefs[index].id)
           }} >
             <SvgIcon icon="addToPocket" size="20px"/>
           </button>
           
           <div class="header-caret"
-            on:mousedown={()=>{
+            on:mousedown={(e)=>{
+              e.stopPropagation();
+              editHeaderElement = e.currentTarget.closest('.header-cell');
               editHeaderIndex = index;
               showEditHeader = true;
             }}
@@ -462,7 +466,7 @@
     </div>
 
     {#if showEditHeader}
-      <EditHeader bind:showEditHeader {activeBoard} {editHeaderIndex}></EditHeader>
+      <EditHeader bind:showEditHeader {activeBoard} {editHeaderIndex} headerElement={editHeaderElement}></EditHeader>
     {/if}
 
       {#each $state.rows as row, y}
@@ -529,7 +533,7 @@
                   {#if cell}
                     <CellDisplay {cell} {def} />                  
                   {:else}
-                  null
+                   
                   {/if}
                 
                 </div>
@@ -870,13 +874,13 @@
   }
 
   .data-cell {
-    background-color: #f5f5f5;
+    background-color: #ffffff;
     color: #1a1a1a;
     transition: background-color 0.15s ease;
   }
 
   .data-cell:hover {
-    background-color: #e8e8e8;
+    background-color: #ffffff;
   }
 
   .board {

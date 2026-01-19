@@ -70,7 +70,7 @@
 {:else if def.type === ColumnType.Label}
   <!-- background color should be derrived mathematically from value -->
   <div style="font-size: 13px; font-weight: bold; margin: 2px 0; padding: 0 4px; color: black; background-color:{stringToColor(cell.value)}">{cell.value}</div>
-{:else}
+{:else if cell.value}
   {cell.value}
 {/if}
 {/if}

@@ -96,7 +96,7 @@
 </script>
 
 {#if store.weClient}
-    <span class="copyWal" title="Add this card to pocket" on:click={()=>copyWalToPocket()}>
+    <span class="copyWal" title="Add this cell to pocket" on:click={()=>copyWalToPocket()}>
       <SvgIcon icon=addToPocket size="20px"/>
     </span>
 {/if}
