@@ -12,6 +12,7 @@
     import type { v1 as uuidv1 } from "uuid";
     import { toPromise } from "@holochain-open-dev/stores";
     import type { BoardState, BoardStateData } from "./board";
+    import type { MirrorState, MirrorStateData } from "./mirror";
     import type { TablesStore } from "./store";
 
 
@@ -23,8 +24,10 @@
     }
     let foundCards: Array<FoundCard> = []
     let foundBoards: Array<BoardStateData> = []
+    let foundMirrors: Array<MirrorStateData> = []
     $: foundCards
     $: foundBoards
+    $: foundMirrors
 
     const { getStore } :any = getContext('store');
     const store:TablesStore = getStore();
@@ -34,41 +37,42 @@
         store.setActiveBoard(hash)
     }
 
+    const selectMirror = (hash: EntryHash) => {
+        store.setActiveMirror(hash)
+    }
+
     const doSearch = async (text:string) => {
         const fb: BoardStateData[] = []
         const fc: FoundCard[] = []
+        const fm: MirrorStateData[] = []
 
         showSearchResults = true
         if (text != "") {
             const searchText = text.toLocaleLowerCase()
-            // const allViews = await toPromise(store.mirrorList.allMirrors)
+            const allMirrors = await toPromise(store.mirrorList.allMirrors)
             const allTables = await toPromise(store.boardList.allBoards)
-            // const allViewsArray = Array.from(allViews.entries());
+            const allMirrorsArray = Array.from(allMirrors.entries());
             const allTablesArray = Array.from(allTables.entries());
-            const all = [...allTablesArray]//, ...allViewsArray];
-            for (const [hash, asyncBoardData] of all) {
+            
+            // Search tables
+            for (const [hash, asyncBoardData] of allTablesArray) {
                 const state = asyncBoardData.latestState
 
                 if (state.name.toLocaleLowerCase().includes(searchText) 
                     ) fb.push({hash,state:state})
-                // state.cards.forEach((c)=>{
-                //     if (c.props.title.toLocaleLowerCase().includes(searchText)
-                //     || c.props.description.toLocaleLowerCase().includes(searchText)
-                //     || Object.values(c.comments).find(c=>c.text.includes(searchText))
+            }
+            
+            // Search mirrors/views
+            for (const [hash, asyncMirrorData] of allMirrorsArray) {
+                const state = asyncMirrorData.latestState
 
-                //     ) {
-                //         fc.push({
-                //             hash,
-                //             state,
-                //             card: c.id,
-                //             title: c.props.title,
-                //         })
-                //     }
-                // })
+                if (state.name.toLocaleLowerCase().includes(searchText) 
+                    ) fm.push({hash,state:state})
             }
         }
         foundBoards = fb
         foundCards = fc
+        foundMirrors = fm
 
     }
     const clearSearch = () => {
@@ -93,7 +97,7 @@
     >
     <span slot="prefix"style="margin-left:10px;"><SvgIcon color="#fff" size="16px" icon=faSearch/></span>
     </sl-input>
-    {#if showSearchResults && (foundBoards.length>0 || foundCards.length>0)}
+    {#if showSearchResults && (foundBoards.length>0 || foundCards.length>0 || foundMirrors.length>0)}
     <sl-menu class="search-results"
     >
         {#if foundCards.length>0}
@@ -117,13 +121,29 @@
         {/if}
         {#if foundBoards.length>0}
             {#if foundCards.length> 0}<sl-divider></sl-divider>{/if}
-            <sl-menu-label>Data Tables</sl-menu-label>
+            <sl-menu-label>Tables</sl-menu-label>
             {#each foundBoards as found}
                 <sl-menu-item
                     on:mousedown={(e)=>{
                         if (encodeHashToBase64(found.hash) != $activeHashB64) {
                             selectBoard(found.hash)
                         }
+                        clearSearch()
+                    }}
+                >
+                <div style="margin-left:10px;">
+                    {found.state.name} 
+                </div>
+                </sl-menu-item>
+            {/each}
+        {/if}
+        {#if foundMirrors.length>0}
+            {#if foundBoards.length> 0 || foundCards.length> 0}<sl-divider></sl-divider>{/if}
+            <sl-menu-label>Views</sl-menu-label>
+            {#each foundMirrors as found}
+                <sl-menu-item
+                    on:mousedown={(e)=>{
+                        selectMirror(found.hash)
                         clearSearch()
                     }}
                 >

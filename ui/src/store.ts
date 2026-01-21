@@ -173,6 +173,9 @@ export class TablesStore {
     }
 
     async setActiveBoard(hash: EntryHash | undefined) {
+        // Close any active mirror first
+        await this.mirrorList.setActiveMirror(undefined)
+        
         const board = await this.boardList.setActiveBoard(hash)
         // let bgUrl = ""
         // if (board) {
@@ -185,6 +188,9 @@ export class TablesStore {
     }
 
     async setActiveMirror(hash: EntryHash | undefined) {
+        // Close any active board first
+        await this.boardList.setActiveBoard(undefined)
+        
         const mirror = await this.mirrorList.setActiveMirror(hash)
         this.setUIprops({showMenu:false})
     }
