@@ -206,6 +206,13 @@ export class TablesStore {
         }
     }
 
+    async archiveMirror(documentHash: EntryHash) {
+        const wasActive = this.mirrorList.archiveMirror(documentHash)
+        if (wasActive ) {
+            this.setUIprops({showMenu:true, bgUrl:""})
+        }
+    }
+
     get myAgentPubKey(): AgentPubKey {
         return this.client.myPubKey;
     }

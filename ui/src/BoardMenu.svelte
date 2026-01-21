@@ -17,6 +17,7 @@
     let newBoardDialog
     let newMirrorDialog
     let showArchived: boolean = false
+    let showCreateChoice: boolean = false
 
     const { getStore } :any = getContext('store');
 
@@ -163,19 +164,12 @@
     <div class="items-section">
         <!-- Combined Boards and Mirrors sorted by timestamp -->
 
-        <!-- Add New Buttons -->
+        <!-- Add New Button -->
         {#if true}
-            <div class="item-card new-item-card" on:click={()=>newBoardDialog.open()} on:keydown={(e) => e.key === 'Enter' && newBoardDialog.open()} role="button" tabindex="0" title="New Board">
+            <div class="item-card new-item-card" on:click={()=>showCreateChoice = true} on:keydown={(e) => e.key === 'Enter' && (showCreateChoice = true)} role="button" tabindex="0" title="Create New">
                 <div class="new-item-content">
                     <SvgIcon color="#888" size="40px" icon=faSquarePlus />
-                    <div class="new-item-label">New Table</div>
-                </div>
-            </div>
-            
-            <div class="item-card new-item-card" on:click={()=>newMirrorDialog.open()} on:keydown={(e) => e.key === 'Enter' && newMirrorDialog.open()} role="button" tabindex="0" title="New View">
-                <div class="new-item-content">
-                    <SvgIcon color="#888" size="40px" icon=faSquarePlus />
-                    <div class="new-item-label">New View</div>
+                    <div class="new-item-label">New</div>
                 </div>
             </div>
         {/if}
@@ -209,6 +203,24 @@
 
     <NewBoardDialog bind:this={newBoardDialog}></NewBoardDialog>
     <NewMirrorDialog bind:this={newMirrorDialog}></NewMirrorDialog>
+    
+    {#if showCreateChoice}
+        <div class="modal-overlay" on:click={() => showCreateChoice = false}>
+            <div class="modal-content" on:click|stopPropagation>
+                <h3>Create New</h3>
+                <div class="choice-buttons">
+                    <button class="choice-btn" on:click={() => { showCreateChoice = false; newBoardDialog.open(); }}>
+                        <SvgIcon color="#444" size="32px" icon="faBars" />
+                        <span>Table</span>
+                    </button>
+                    <button class="choice-btn" on:click={() => { showCreateChoice = false; newMirrorDialog.open(true); }}>
+                        <SvgIcon color="#444" size="32px" icon="faEye" />
+                        <span>View</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    {/if}
 </div>
 
 <!-- Revealable archived items -->
@@ -401,5 +413,70 @@
 
     .new-item-card:hover .new-item-label {
         color: #333
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 32px;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        min-width: 300px;
+    }
+
+    .modal-content h3 {
+        margin: 0 0 24px 0;
+        text-align: center;
+        color: #333;
+        font-size: 20px;
+    }
+
+    .choice-buttons {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+    }
+
+    .choice-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        padding: 24px;
+        background: white;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 120px;
+    }
+
+    .choice-btn:hover {
+        border-color: #4caf50;
+        background: #f8f8f8;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .choice-btn span {
+        font-size: 14px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .choice-btn:hover span {
+        color: #333;
     }
 </style>

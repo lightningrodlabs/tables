@@ -25,7 +25,6 @@
   import DragDropList, { VerticalDropZone, reorder, type DropEvent, HorizontalDropZone } from 'svelte-dnd-list';
   import RowDetailsDrawer from "./RowDetailsDrawer.svelte";
   import CellDisplay from "./CellDisplay.svelte";
-  import DataView from "./DataView.svelte";
   import Queries from './Queries.svelte'
   import { scale } from 'svelte/transition';
 
@@ -57,7 +56,6 @@
   $: showEditHeader = false;
   $: editHeaderIndex = null;
   $: editHeaderElement = null;
-  $: dataView = false;
   $: addUniqueSummaryFromColumn = null;
 
   function setFilterOption(newOption) {
@@ -326,28 +324,6 @@
             {/if}
           </div>
         {/if}
-        <!-- <sl-menu-item  on:click={() => {dataView = !dataView}} class="leave-board" >
-          {#if dataView}
-            <span>Table View</span>
-          {:else}
-            <span>Data View</span>
-          {/if}
-        </sl-menu-item> -->
-        <!-- <sl-menu-item  on:click={() => {showQueryBuilder = !showQueryBuilder}} class="leave-board" >
-          {#if showQueryBuilder}
-            <span>Hide Query Builder</span>
-          {:else}
-            <span>Query Builder</span>
-          {/if}
-        </sl-menu-item> -->
-
-        <!-- <button class="new-query"
-          on:click={() => 
-            {
-              newQueryBool = true
-            }
-          }
-        >+ filter</button> -->
 
       {/if}
     </div>
@@ -402,8 +378,8 @@
     <Queries {activeBoard} {state} bind:newQueryBool bind:queriedData />
   {/if}
 
-  {#if dataView}
-    <DataView state={$state} />
+  {#if false}
+    <!-- <DataView state={$state} /> -->
   {:else}
     <div class="data-table">
       <div class="header-row">
