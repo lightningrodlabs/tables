@@ -18,15 +18,32 @@
   let position = { top: 0, left: 0 }
 
   onMount(() => {
-    columnName = $state.columnDefs[editHeaderIndex].name;
-    columnType = $state.columnDefs[editHeaderIndex].type;
-    
-    // Position the dropdown relative to the header element
-    if (headerElement) {
+    // If no headerElement, we're adding a new column at the end
+    if (!headerElement) {
+      columnName = "Field " + ($state.columnDefs.length + 1);
+      columnType = ColumnType.String;
+      viewType = "add";
+      addTo = "right";
+      // Position at the end of the table
+      const addColumnElement = document.getElementById("add-column-button");
+      if (addColumnElement) {
+        const rect = addColumnElement.getBoundingClientRect();
+        position = {
+          top: 166,
+          left: rect.left - 180
+        };
+      }
+    } else {
+      columnName = $state.columnDefs[editHeaderIndex].name;
+      columnType = $state.columnDefs[editHeaderIndex].type;
+      
+      // Position the dropdown relative to the header element
+      // Using getBoundingClientRect which gives viewport-relative coordinates
       const rect = headerElement.getBoundingClientRect();
+      
       position = {
-        top: rect.bottom + window.scrollY - 51,
-        left: rect.left + window.scrollX
+        top: rect.bottom,
+        left: rect.left
       };
     }
   })
@@ -179,9 +196,13 @@
         <button
           class="dropdown-action-btn"
           on:click={()=>{
-            viewType = "choice";
+            if (headerElement === null) {
+              showEditHeader = false;
+            } else {
+              viewType = "choice";
+            }
           }}
-        >Back</button>
+        >{headerElement === null ? 'Cancel' : 'Back'}</button>
         <button
           class="dropdown-action-btn primary"
           on:click={()=>{
@@ -202,14 +223,14 @@
 
 <style>
 .dropdown-menu {
-  position: absolute;
+  position: fixed;
   z-index: 1000;
   background: white;
   border: 1px solid #462700;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   width: 160px;
   margin-left: 40px;
-  padding: 4px 0;
+  padding: 0;
   max-height: 400px;
   overflow-y: auto;
 }
@@ -271,7 +292,7 @@
   width: 100%;
   padding: 6px 8px;
   border: 1px solid #ccc;
-  border-radius: 3px;
+  border-radius: 0px;
   font-size: 14px;
   box-sizing: border-box;
 }
@@ -294,7 +315,7 @@
   flex: 1;
   padding: 6px 12px;
   border: 1px solid #ccc;
-  border-radius: 3px;
+  border-radius: 0px;
   background: white;
   cursor: pointer;
   font-size: 13px;

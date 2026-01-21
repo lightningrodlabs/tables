@@ -85,6 +85,14 @@ function onQueryChange(newQuery) {
   changeQuery(formatQuery(newQuery, 'cel'));
 }
 
+function injectColumnNames(query) {
+  let newQuery = query;
+  $state.columnDefs.forEach((col) => {
+    newQuery = newQuery.replace(new RegExp(col.id, 'g'), col.name);
+  })
+  return newQuery;
+}
+
 </script>
 
 <!-- <ReactAdapter
@@ -108,6 +116,7 @@ function onQueryChange(newQuery) {
       {#each $state.queries as q}
         <div
         class="query-button-select"
+        title={currentQuery[activeHashB64] === q.query ? "Unselect Filter (" + injectColumnNames(q.query) + ")" : "Select Filter (" + injectColumnNames(q.query) + ")"}
         class:selected-query={q.query === currentQuery[activeHashB64]}
         on:click={() => {
           if (q.query === currentQuery[activeHashB64]) {
@@ -122,10 +131,11 @@ function onQueryChange(newQuery) {
         >
         <div
           class="remove-query"
+          title="Remove Query"
           on:click={() => {
             activeBoard.requestChanges([{ type: "remove-query", query: q}]);
           }}
-        >&times;</div>
+        >-</div>
         {q.label}
       </div>
 
@@ -236,11 +246,13 @@ function onQueryChange(newQuery) {
     border: 1px solid;
     border-radius: 20px;
     height: 20px;
+    width: 20px;
+    padding-left: 6.5px;
     transition: background-color 0.2s;
   }
 
   .remove-query:hover {
-    background-color: rgba(210, 147, 0, 0.608);
+    background-color: rgba(140, 98, 0, 0.608);
     transition: background-color 0.2s;
   }
 </style>

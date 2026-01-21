@@ -64,6 +64,14 @@
     filterOption = newOption;
   }
 
+  function injectColumnNames(query) {
+    let newQuery = query;
+    $state.columnDefs.forEach((col) => {
+      newQuery = newQuery.replace(new RegExp(col.id, 'g'), col.name);
+    })
+    return newQuery;
+  }
+
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
 
@@ -454,9 +462,11 @@
         
       </DragDropList>
       <div class="add-column-header" on:click={()=>{
-          showAddColumnModal = true;
+          editHeaderIndex = $state.columnDefs.length - 1;
+          showEditHeader = true;
+          editHeaderElement = null;
         }}>
-        <div class="add-column-button">
+        <div class="add-column-button" id="add-column-button">
           <SvgIcon icon=faPlus size=10 style="height:23px;"/>
         </div>
       </div>
@@ -573,8 +583,11 @@
           class="remove-summary-row"
           title="Remove Summary Row"
           on:click={()=>{activeBoard.requestChanges([{ type: "remove-summary-row", id: summaryRow.id}]);}}
-        >x</button>
-          <div class="summary-row-label">
+        >-</button>
+          <div 
+            class="summary-row-label"
+            title={summaryRow.queryLabel + " (" + injectColumnNames(summaryRow.query) + ")"}
+          >
               {summaryRow.queryLabel}
           </div>
           {#each $state.columnDefs as def, x}
@@ -659,11 +672,13 @@
           </div>
         </div>
       {/if}
-      <div class="data-row">
-        <div class="add-summary-row-wrapper" on:click={()=>{newSummaryRowModal = true}}>
-          <div class="add-column-button">
-            <SvgIcon icon=faPlus size=10 style="height:23px;"/>
-          </div>
+      <div
+        on:mousedown={()=>{newSummaryRowModal = true}}
+        class="add-summary-row-wrapper" 
+        style="width: {200 * $state.columnDefs.length + 1}px">
+        Add Summary Row&nbsp;
+        <div class="add-column-button">
+          <SvgIcon icon=faPlus size=10 style="height: 23px;"/>
         </div>
       </div>
     </div>
@@ -780,7 +795,20 @@
   }
 
   .add-summary-row-wrapper {
-    margin-left: 51px;
+    margin-left: 81px;
+    cursor: pointer;
+    background: #b9b9b9;
+    display: flex;
+    width: fit-content;
+    justify-content: center;
+    border: 2px solid rgb(97, 97, 97);
+    border-top: 0;
+    border-left-width: 1px;
+    border-bottom-width: 1px;
+  }
+
+  .add-summary-row-wrapper:hover {
+    background: #ababab;
   }
 
   .summary-row-label-main {

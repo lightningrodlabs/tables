@@ -56,7 +56,11 @@
   <div style="width:22px; cursor: pointer; border-right: 1px dashed">
   </div>
   {#each $state.columnDefs as def, x} -->
-    <div class:column-summary={!embedded} style="width:{width}px; color: {color}">
+    <div 
+      class:column-summary={!embedded} 
+      style="width:{width}px; color: {color}"
+      title="Column: {def.name}&#10;Type: {ColumnType[def.type]}&#10;Summary: {SumType[sumType]}"
+    >
         {#if sumType == SumType.Sum}
           {@const sum = Object.values(querriedData).reduce((acc, row) => {
             const cell = row.cells[def.id];
