@@ -134,26 +134,36 @@
   async function autoSave() {
     if (!editMode) return;
     
-    const mirror = await store.mirrorList.getMirror(activeMirror.hash);
-    if (mirror) {
-      let changes = [];
-      const mirrorState = mirror.state();
-      if (mirrorState.name != name) {
-        changes.push({type: 'set-name', name: name});
+    isSaving = true;
+    try {
+      const mirror = await store.mirrorList.getMirror(activeMirror.hash);
+      if (mirror) {
+        const mirrorState = mirror.state();
+        if (!mirrorState) {
+          console.warn("Mirror state is not available yet");
+          return;
+        }
+        
+        let changes = [];
+        if (mirrorState.name != name) {
+          changes.push({type: 'set-name', name: name});
+        }
+        if (!isEqual(variables, mirrorState.variables)) {
+          changes.push({type: 'set-variables', variables: variables.map(v => {
+            const {name, value} = v;
+            return {name, value};
+          })});
+        }
+        if (raw != mirrorState.raw) {
+          changes.push({type: 'set-raw', raw: raw});
+        }
+        if (changes.length > 0) {
+          await mirror.requestChanges(changes);
+          await setCellValues();
+        }
       }
-      if (!isEqual(variables, mirrorState.variables)) {
-        changes.push({type: 'set-variables', variables: variables.map(v => {
-          const {name, value} = v;
-          return {name, value};
-        })});
-      }
-      if (raw != mirrorState.raw) {
-        changes.push({type: 'set-raw', raw: raw});
-      }
-      if (changes.length > 0) {
-        await mirror.requestChanges(changes);
-        await setCellValues();
-      }
+    } finally {
+      isSaving = false;
     }
   }
   
@@ -164,17 +174,37 @@
     }, 1000);
   }
   
+  // Track if we're in the middle of auto-saving to prevent overwriting local changes
+  let isSaving = false;
+  
   // Auto-save when edit values change
-  $: if (editMode && (name || raw || variables)) {
+  $: if (editMode && (name || raw || variables) && !isSaving) {
     debouncedAutoSave();
   }
   
-  // Initialize edit variables when state changes
-  $: if ($state && !editMode) {
+  // Initialize/update edit variables when state changes (including collaborative edits)
+  // Only update if we're not currently saving (to avoid overwriting local changes)
+  $: if ($state && !isSaving) {
     name = $state.name || "";
     raw = $state.raw || "";
-    variables = $state.variables || [];
+    variables = cloneDeep($state.variables || []);
   }
+  
+  // Update cell values when state variables change (for collaborative editing)
+  // This watches for changes from other collaborators and updates the displayed data
+  $: if ($state && $state.variables && JSON.stringify($state.variables)) {
+    // The JSON.stringify ensures we detect deep changes in the variables array
+    // Use void to explicitly ignore the promise return
+    void (async () => {
+      try {
+        await setCellValues();
+        console.log("Updated cell values from collaborative change");
+      } catch (error) {
+        console.error("Error updating cell values from state change:", error);
+      }
+    })();
+  }
+  
   function init(el){
     //if (el)
      // el.focus()
