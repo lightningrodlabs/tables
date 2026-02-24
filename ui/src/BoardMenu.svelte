@@ -12,12 +12,20 @@
     import BoardMenuItem from "./BoardMenuItem.svelte";
     import { BoardType } from "./boardList";
     import MirrorMenuItem from "./MirrorMenuItem.svelte";
+    import { presets, type PresetInfo } from "./presets";
+    import { deserializeExport } from "./export";
+    import type { Board } from "./board";
+    import type { Mirror } from "./mirror";
+    import { weaveUrlFromWal } from '@theweave/api';
+    
     export let mainpage = false
 
     let newBoardDialog
     let newMirrorDialog
     let showArchived: boolean = false
     let showCreateChoice: boolean = false
+    let selectedPreset: string = ""
+    let importing: boolean = false
 
     const { getStore } :any = getContext('store');
 
@@ -153,6 +161,85 @@
         selectMirror(hash)
     }
 
+    const importPreset = async () => {
+        if (!selectedPreset) return;
+        
+        const preset = presets.find(p => p.id === selectedPreset);
+        if (!preset) return;
+
+        importing = true;
+        try {
+            const jsonString = JSON.stringify(preset.data);
+            const imported = deserializeExport(jsonString);
+            const boards: Array<Board> = [];
+            const mirrors: Array<Mirror> = [];
+            let board;
+            
+            // Import boards first
+            for (const b of imported.boards) {
+                console.log("importing preset board", b.name);
+                try {
+                    board = await store.boardList.makeBoard(b);
+                    boards.push(board);
+                } catch(e) {
+                    console.log("error importing preset board", b.name, e);
+                }
+            }
+            
+            // Import mirrors and link the first board as var_1 if boards exist
+            for (const m of imported.mirrors) {
+                console.log("importing preset view", m.name);
+                try {
+                    // If we have at least one board, add it as var_1 to the mirror
+                    if (boards.length > 0) {
+                        const boardHash = boards[0].hash;
+                        const wal = { 
+                            hrl: [store.dnaHash, boardHash] as [Uint8Array, Uint8Array], 
+                            context: { assetType: 'Table' } 
+                        };
+                        const walUrl = weaveUrlFromWal(wal);
+                        
+                        // Add var_1 variable with the board reference
+                        if (!m.variables) {
+                            m.variables = [];
+                        }
+                        m.variables.push({
+                            name: "var_1",
+                            value: walUrl
+                        });
+                    }
+                    
+                    const newMirror = await store.mirrorList.makeMirror(m)
+                    mirrors.push(newMirror);
+                } catch(e) {
+                    console.log("error importing preset view", m.name, e);
+                }
+            }
+            
+            // If only one item imported, activate it
+            const totalImported = boards.length + mirrors.length;
+            if (totalImported == 1) {
+                store.setUIprops({showMenu:false});
+                if (boards.length == 1) {
+                    await boards[0].join();
+                    await store.setActiveBoard(boards[0].hash);
+                } else if (mirrors.length == 1) {
+                    await store.setActiveMirror(mirrors[0].hash);
+                }
+            } else if (mirrors.length > 0) {
+                // If multiple items, activate the first mirror (view)
+                store.setUIprops({showMenu:false});
+                await store.setActiveMirror(mirrors[0].hash);
+            }
+        } catch(e) {
+            console.error("Error importing preset:", e);
+        } finally {
+            importing = false;
+            showCreateChoice = false;
+            selectedPreset = "";
+        }
+    }
+
     let aboutDialog
 //    <GroupParticipants/>
 
@@ -218,6 +305,31 @@
                         <span>View</span>
                     </button>
                 </div>
+                
+                {#if presets.length > 0}
+                    <div class="preset-section">
+                        <div class="divider">OR</div>
+                        <h4>Start from Template</h4>
+                        <select bind:value={selectedPreset} class="preset-select">
+                            <option value="">Choose a template...</option>
+                            {#each presets as preset}
+                                <option value={preset.id}>{preset.name}</option>
+                            {/each}
+                        </select>
+                        {#if selectedPreset}
+                            <p class="preset-description">
+                                {presets.find(p => p.id === selectedPreset)?.description}
+                            </p>
+                            <button 
+                                class="preset-import-btn" 
+                                on:click={importPreset}
+                                disabled={importing}
+                            >
+                                {importing ? 'Importing...' : 'Create from Template'}
+                            </button>
+                        {/if}
+                    </div>
+                {/if}
             </div>
         </div>
     {/if}
@@ -478,5 +590,98 @@
 
     .choice-btn:hover span {
         color: #333;
+    }
+
+    .preset-section {
+        margin-top: 24px;
+        padding-top: 24px;
+    }
+
+    .divider {
+        text-align: center;
+        color: #999;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        width: 40%;
+        height: 1px;
+        background: #ddd;
+    }
+
+    .divider::before {
+        left: 0;
+    }
+
+    .divider::after {
+        right: 0;
+    }
+
+    .preset-section h4 {
+        margin: 0 0 12px 0;
+        color: #333;
+        font-size: 14px;
+        text-align: center;
+    }
+
+    .preset-select {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-bottom: 12px;
+        cursor: pointer;
+        transition: border-color 0.2s ease;
+    }
+
+    .preset-select:hover {
+        border-color: #4caf50;
+    }
+
+    .preset-select:focus {
+        outline: none;
+        border-color: #4caf50;
+    }
+
+    .preset-description {
+        font-size: 13px;
+        color: #666;
+        margin: 8px 0;
+        line-height: 1.4;
+        text-align: center;
+        white-space: pre-wrap;
+    }
+
+    .preset-import-btn {
+        width: 100%;
+        padding: 12px;
+        background: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        margin-top: 8px;
+    }
+
+    .preset-import-btn:hover:not(:disabled) {
+        background: #45a049;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+
+    .preset-import-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
     }
 </style>

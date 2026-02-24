@@ -9,18 +9,30 @@
 
   export let size:number = 24;
 
+  // Track stable values to prevent re-renders when participants are the same
+  let stableParticipantList: any[] = [];
+  let stableExtra: number = 0;
+  
+  $: if ($participants && $participants.status === "complete") {
+    const currentList = Array.from($participants.value);
+    // Only update if the participant count or members have actually changed
+    if (currentList.length !== stableParticipantList.length || 
+        !currentList.every((p, i) => p === stableParticipantList[i])) {
+      stableParticipantList = currentList.slice(0, max);
+      stableExtra = currentList.length - stableParticipantList.length;
+    }
+  }
+
 </script>
 <div class="wrapper"
     class:bordered={false}  >
     {#if $participants && $participants.status=="complete"}
-    {@const folks = Array.from($participants.value).slice(0,max)}
-    {@const extra = $participants.value.length - folks.length}
-      {#each folks as agentPubKey}
+      {#each stableParticipantList as agentPubKey (agentPubKey)}
         <Avatar size={size} agentPubKey={agentPubKey} showNickname={false} />
       {/each}
-      {#if extra != 0}
-        <div style="font-size: 12px; height: 10px; padding: 4px">
-          + {extra} more
+      {#if stableExtra > 0}
+        <div style="font-size: 12px; height: 10px; padding: 4px; white-space: nowrap;">
+          + {stableExtra} more
         </div>
       {/if}
     {/if}

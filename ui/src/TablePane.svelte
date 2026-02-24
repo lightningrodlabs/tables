@@ -269,7 +269,7 @@
       {#if standAlone}
         <h2>{$state.name}</h2>
       {:else}
-        <sl-button  class="board-button close" on:click={closeBoard} title="Close">
+        <sl-button  class="board-button close" on:click={leaveBoard} title="Close">
           <SvgIcon icon=faClose size="16px"/>
         </sl-button>
         <sl-dropdown class="board-options board-menu" skidding=15 hoist>

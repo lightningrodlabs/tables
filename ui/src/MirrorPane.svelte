@@ -1,5 +1,6 @@
 <script lang="ts">
   import { getContext, onMount } from "svelte";
+  import { get } from "svelte/store";
   import type { TablesStore } from "./store";
   import EditMirrorDialog from "./EditMirrorDialog.svelte";
   import { cloneDeep, isEqual } from "lodash";
@@ -183,8 +184,8 @@
   }
   
   // Initialize/update edit variables when state changes (including collaborative edits)
-  // Only update if we're not currently saving (to avoid overwriting local changes)
-  $: if ($state && !isSaving) {
+  // Only update if we're not currently saving or editing (to avoid overwriting local changes)
+  $: if ($state && !isSaving && !editMode) {
     name = $state.name || "";
     raw = $state.raw || "";
     variables = cloneDeep($state.variables || []);
@@ -213,10 +214,58 @@
   let cellValues = {}
   $: cellValues;
   let attachmentsDialog;
+  let variableSources = {}
+  $: variableSources;
 
   const walToPocket = () => {
     const attachment: WAL = { hrl: [store.dnaHash, activeMirror.hash], context: {assetType: "Mirror"} }
     store.weClient?.assets.assetToPocket(attachment)
+  }
+
+  function getVariableSourceLabel(walUrl: string, boardHash?: Uint8Array): string {
+    try {
+      const wal: WAL = weaveUrlToWAL(walUrl);
+      if (!wal) return "";
+      
+      // Get board name if we have the hash
+      let boardName = "Table";
+      if (boardHash) {
+        const boardData = store.boardList.boardData2.get(boardHash);
+        const boardValue = boardData ? get(boardData) : null;
+        if (boardValue && boardValue.status === "complete" && boardValue.value?.latestState?.name) {
+          boardName = boardValue.value.latestState.name;
+        }
+      }
+      
+      switch (wal?.context?.assetType) {
+        case "Cell":
+          return `Cell from ${boardName}`;
+        case "Column Summary":
+          return `Column Summary from ${boardName}`;
+        case "Table":
+          return `Table: ${boardName}`;
+        case "Row":
+          return `Row from ${boardName}`;
+        case "Column":
+          return `Column from ${boardName}`;
+        default:
+          return wal?.context?.assetType || "Unknown";
+      }
+    } catch (error) {
+      return "";
+    }
+  }
+
+  async function openVariableSource(walUrl: string) {
+    try {
+      const wal: WAL = weaveUrlToWAL(walUrl);
+      if (!wal || !wal.hrl[1]) return;
+      
+      const boardHash = wal.hrl[1];
+      await store.setActiveBoard(boardHash);
+    } catch (error) {
+      console.error("Error opening variable source:", error);
+    }
   }
 
   async function setCellValues() {
@@ -228,6 +277,9 @@
             console.warn(`Could not parse WAL from variable ${variable.name}:`, variable.value);
             continue;
           }
+          
+          // Set the source label
+          variableSources[variable.name] = getVariableSourceLabel(variable.value, wal.hrl[1]);
           
           switch (wal?.context?.assetType) {
             case "Cell":
@@ -329,7 +381,7 @@
         {#if standAlone}
           <h2>{$state.name}</h2>
         {:else}
-          <button class="mirror-button close" on:click={closeMirror} title="Close">
+          <button class="mirror-button close" on:click={leaveMirror} title="Close">
             <SvgIcon icon=faClose size="12px"/>
           </button>
           <button class="mirror-button title" title="View title">
@@ -352,6 +404,11 @@
           </button>
           <button class="mirror-button" on:click={leaveMirror} title="Leave View">
             <SvgIcon icon="faArrowTurnDown" style="opacity: .5;" size="12px" /> <span>Leave</span>
+          </button>
+          <button class="refresh-button mirror-button" on:click={async () => {
+            await setCellValues();
+          }} title="Refresh View">
+            <SvgIcon icon="faArrowsRotate" style="opacity: .5;" size="14px" /> <span>Refresh</span>
           </button>
           <button class="mirror-button" on:click={()=> { 
             editMode = !editMode; 
@@ -408,6 +465,18 @@
                       <button class="btn-remove" on:click={() => variables = variables.filter((v, j) => j !== i)}>✕</button>
                     </div>
                     {#if variable.value}
+                      {#if variableSources[variable.name]}
+                        <div 
+                          class="var-source" 
+                          on:click={() => openVariableSource(variable.value)}
+                          on:keydown={(e) => e.key === 'Enter' && openVariableSource(variable.value)}
+                          role="button"
+                          tabindex="0"
+                          title="Click to open source table"
+                        >
+                          <span class="source-label">{variableSources[variable.name]}</span>
+                        </div>
+                      {/if}
                       <div 
                         class="var-preview"
                         class:copied={copiedVariableIndex === i}
@@ -551,12 +620,14 @@
                 case 'table':
                   wal = { hrl: [store.dnaHash, boardHash], context: { assetType: 'Table' } };
                   variables[currentVariableIndex].value = weaveUrlFromWal(wal);
+                  variableSources[variables[currentVariableIndex].name] = getVariableSourceLabel(variables[currentVariableIndex].value, boardHash);
                   cellValues[variables[currentVariableIndex].name] = await getTableValues(boardHash, store);
                   break;
                 case 'row':
                   if (selectedRow) {
                     wal = { hrl: [store.dnaHash, boardHash], context: { assetType: 'Row', rowId: selectedRow } };
                     variables[currentVariableIndex].value = weaveUrlFromWal(wal);
+                    variableSources[variables[currentVariableIndex].name] = getVariableSourceLabel(variables[currentVariableIndex].value, boardHash);
                     cellValues[variables[currentVariableIndex].name] = await getRowValues(boardHash, selectedRow, store);
                   }
                   break;
@@ -564,6 +635,7 @@
                   if (selectedColumn) {
                     wal = { hrl: [store.dnaHash, boardHash], context: { assetType: 'Column', columnId: selectedColumn } };
                     variables[currentVariableIndex].value = weaveUrlFromWal(wal);
+                    variableSources[variables[currentVariableIndex].name] = getVariableSourceLabel(variables[currentVariableIndex].value, boardHash);
                     cellValues[variables[currentVariableIndex].name] = await getColumnValues(boardHash, selectedColumn, store);
                   }
                   break;
@@ -571,6 +643,7 @@
                   if (selectedRow && selectedColumn) {
                     wal = { hrl: [store.dnaHash, boardHash], context: { assetType: 'Cell', cellId: { rowId: selectedRow, columnId: selectedColumn } } };
                     variables[currentVariableIndex].value = weaveUrlFromWal(wal);
+                    variableSources[variables[currentVariableIndex].name] = getVariableSourceLabel(variables[currentVariableIndex].value, boardHash);
                     cellValues[variables[currentVariableIndex].name] = await getValueOfCell(boardHash, selectedRow, selectedColumn, store);
                   }
                   break;
@@ -747,6 +820,36 @@
 
   .btn-remove:hover {
     background: #d32f2f;
+  }
+
+  .var-source {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 8px;
+    background: #f0f4ff;
+    border: 1px solid #d0d9f0;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .var-source:hover {
+    background: #e3ecff;
+    border-color: #5c85d6;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(63, 81, 181, 0.2);
+  }
+
+  .source-icon {
+    font-size: 12px;
+  }
+
+  .source-label {
+    font-weight: 500;
+    color: #3f51b5;
   }
 
   .var-preview {

@@ -53,27 +53,27 @@ export class MirrorList {
                                 const key = `${SeenType.Tip}:${mirror.hashB64}`
                                 const seenTipB64 = localStorage.getItem(key)
 
-                                if (tipB64 != seenTipB64) {
-                                    const mirrorState = stateFromCommit(tipRecord.entry) as MirrorState
-                                    const feed = feedItems(mirrorState.feed)
-                                    const me = encodeHashToBase64(this.synStore.client.client.myPubKey)
-                                    feed.forEach(feedItem=> {
-                                        const key = `${feedItem.author}.${feedItem.timestamp.getTime()}`
-                                        if (! this.notifiedItems[key] ) {
-                                            let body = `${feedItem.author} ${deltaToFeedString(mirrorState, feedItem.content)}`
-                                            this.weClient.notifyFrame([{
-                                                title: `${mirrorState.name} updated`,
-                                                body,
-                                                notification_type: "change",
-                                                icon_src: undefined,
-                                                urgency: "low",
-                                                timestamp: Date.now()
-                                            }
-                                            ])
-                                            this.notifiedItems[key] = true
-                                        }
-                                    })
-                                }
+                                // if (tipB64 != seenTipB64) {
+                                //     const mirrorState = stateFromCommit(tipRecord.entry) as MirrorState
+                                //     const feed = feedItems(mirrorState.feed)
+                                //     const me = encodeHashToBase64(this.synStore.client.client.myPubKey)
+                                //     feed.forEach(feedItem=> {
+                                //         const key = `${feedItem.author}.${feedItem.timestamp.getTime()}`
+                                //         if (! this.notifiedItems[key] ) {
+                                //             let body = `${feedItem.author} ${deltaToFeedString(mirrorState, feedItem.content)}`
+                                //             this.weClient.notifyFrame([{
+                                //                 title: `${mirrorState.name} updated`,
+                                //                 body,
+                                //                 notification_type: "change",
+                                //                 icon_src: undefined,
+                                //                 urgency: "low",
+                                //                 timestamp: Date.now()
+                                //             }
+                                //             ])
+                                //             this.notifiedItems[key] = true
+                                //         }
+                                //     })
+                                // }
                             }
                         } catch(e) {
                             console.log("Error notifying We", e)

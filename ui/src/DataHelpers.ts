@@ -377,7 +377,9 @@ export async function getRowValues(tableHash: EntryHash, rowId: string, store: T
         return;
       }
 
-      const values = Object.values(row.cells).map(cell => {
+      const columnIds = boardData.value.latestState.columnDefs.map(def => def.id);
+      const values = columnIds.map(columnId => {
+        const cell = row.cells[columnId];
         if (cell && cell.value) {
           return cell.value;
         }
@@ -414,8 +416,12 @@ export async function getTableValues(tableHash: EntryHash, store: TablesStore) {
         return;
       }
 
+      console.log("board data", boardData.value.latestState)
+
+      const columnIds = boardData.value.latestState.columnDefs.map(def => def.id);
       const values = Object.values(boardData.value.latestState.rows).map(row => {
-        return Object.values(row.cells).map(cell => {
+        return columnIds.map(columnId => {
+          const cell = row.cells[columnId];
           if (cell && cell.value) {
             return cell.value;
           }
