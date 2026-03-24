@@ -2,10 +2,9 @@ import { DocumentStore, SynClient, SynStore, WorkspaceStore } from '@holochain-s
 import type { BoardEphemeralState, BoardState } from './board';
 import { asyncDerived, pipe, sliceAndJoin, toPromise } from '@holochain-open-dev/stores';
 import { BoardType } from './boardList';
-import { LazyHoloHashMap } from '@holochain-open-dev/utils';
 import type { AppletHash, AppletServices, AssetInfo, WAL, WeaveServices, RecordInfo } from '@theweave/api';
 import { getMyDna } from './util';
-import type { AppClient, RoleName, ZomeName } from '@holochain/client';
+import type { AppClient, RoleName, ZomeName, LazyHoloHashMap } from '@holochain/client';
 import { svgIcons } from "./svgIcons"
 
 const ROLE_NAME = "tables"

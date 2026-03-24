@@ -156,7 +156,7 @@
 </script>
 
 
-<sl-dialog label="Datatub: UI v0.10.7 for DNA v0.10.5" bind:this={dialog} width={600} >
+<sl-dialog label="Datatub: UI v0.10.8 for DNA v0.10.5" bind:this={dialog} width={600} >
     <div class="about">
         <p>Datatub is a demonstration Holochain app built by Lightning Rod Labs.</p>
         <p> <b>Developers:</b>
