@@ -53,7 +53,6 @@
     }
 
     const updateMirror = async (name: string, variables: Array<Variable>, raw: string ) => {
-        console.log("updateMirror")
         const state:Partial<MirrorState> = {name, variables, raw}
         state.feed = {}
         // state.feed[newFeedKey(store.myAgentPubKeyB64)] = {delta:{type:"create", name}, context:null}

@@ -218,7 +218,7 @@
   $: variableSources;
 
   const walToPocket = () => {
-    const attachment: WAL = { hrl: [store.dnaHash, activeMirror.hash], context: {assetType: "Mirror"} }
+    const attachment: WAL = { hrl: [store.dnaHash, activeMirror.hash], context: {assetType: "View"} }
     store.weClient?.assets.assetToPocket(attachment)
   }
 

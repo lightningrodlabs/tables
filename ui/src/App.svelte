@@ -169,16 +169,18 @@
       <ControllerCreate  view={createView} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerCreate>
     {:else if renderType== RenderType.App}
       <Controller  client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></Controller>
-    {:else if  renderType== RenderType.Hrl && wal.context.assetType == "Table"}
+    {:else if  renderType== RenderType.Hrl && wal?.context?.assetType == "Table"}
       <ControllerBoard  board={wal.hrl[1]} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerBoard>
-    {:else if  renderType== RenderType.Hrl && wal.context.assetType == "Mirror"}
+    {:else if  renderType== RenderType.Hrl && wal?.context?.assetType == "View"}
       <ControllerMirror  mirror={wal.hrl[1]} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerMirror>
-    {:else if  renderType== RenderType.Hrl && wal.context.assetType == "Row"}
+    {:else if  renderType== RenderType.Hrl && wal?.context?.assetType == "Row"}
       <ControllerCard  {wal} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerCard>
-    {:else if  renderType== RenderType.Hrl && wal.context.assetType == "Column"}
+    {:else if  renderType== RenderType.Hrl && wal?.context?.assetType == "Column"}
       <ControllerCard  {wal} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerCard>
-    {:else if  renderType== RenderType.Hrl && wal.context}
+    {:else if  renderType== RenderType.Hrl && wal?.context}
       <ControllerCard  {wal} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerCard>
+    {:else if  renderType== RenderType.Hrl}
+      <ControllerBoard  board={wal.hrl[1]} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerBoard>
     {:else if  renderType== RenderType.BlockActiveBoards}
       <ControllerBlockActiveBoards client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerBlockActiveBoards>
     {/if}
