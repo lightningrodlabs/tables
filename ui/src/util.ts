@@ -1,5 +1,6 @@
 import { decodeHashFromBase64, encodeHashToBase64, type AppAgentClient, type EntryHash, type DnaHash, CellType } from "@holochain/client";
-// import type { HrlB64WithContext, HrlWithContext } from "@lightningrodlabs/we-applet";
+// import type { HrlB64WithContext, HrlWithContext } from '@theweave/api';
+import { cloneDeep } from "lodash";
 
 export function onVisible(element, callback) {
     new IntersectionObserver((entries, observer) => {
@@ -45,9 +46,7 @@ export const hashEqual = (a:EntryHash, b:EntryHash) : boolean => {
 
 export const getMyDna = async (role:string, client: AppAgentClient) : Promise<DnaHash>  => {
   const appInfo = await client.appInfo();
-  const dnaHash = (appInfo.cell_info[role][0] as any)[
-    CellType.Provisioned
-  ].cell_id[0];
+  const dnaHash = appInfo.cell_info[role][0].value.cell_id[0];
   return dnaHash
 } 
 
@@ -66,4 +65,16 @@ export const stringToColor = (str:string) : string => {
   }
 
   return color;
+}
+
+export function removeSymbolFields(obj) {
+  let newObj = cloneDeep(obj)
+  for (const key in newObj) {
+      if (key.startsWith("Symbol") || key.startsWith("[[")) {
+          delete newObj[key];
+      } else if (typeof newObj[key] === "object" && newObj[key] !== null) {
+          removeSymbolFields(newObj[key]);
+      }
+  }
+  return newObj;
 }

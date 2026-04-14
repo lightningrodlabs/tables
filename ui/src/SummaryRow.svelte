@@ -5,14 +5,14 @@
   import { cloneDeep, isEqual } from "lodash";
   import type { TablesStore } from './store';
   import SvgIcon from './SvgIcon.svelte';
-  import type { HrlWithContext } from '@lightningrodlabs/we-applet';
+  import type { HrlWithContext } from '@theweave/api';
   export let activeBoard: Board;
   export let width = 0;
   export let def: ColumnDef;
   export let embedded = false;
   export let query = "true";
   export let sumType;
-  export let color = "#c2c2c2";
+  export let color = "#fff";
 
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
@@ -22,7 +22,7 @@
     console.log("copyWalToPocket", activeBoard.hashB64)
     const attachment: HrlWithContext = { hrl: [store.dnaHash, activeBoard.hash], context: {columnId: columnId, query: query, sumType: sumType, assetType: "Column Summary"} }
     console.log("attachment", attachment)
-    store.weClient?.walToPocket(attachment)
+    store.weClient?.assets.assetToPocket(attachment)
   }
 
   $: state = activeBoard.readableState()
@@ -56,13 +56,11 @@
   <div style="width:22px; cursor: pointer; border-right: 1px dashed">
   </div>
   {#each $state.columnDefs as def, x} -->
-    <div class:column-summary={!embedded} style="width:{width}px; color: {color}">
-      {#if store.weClient && !embedded}
-        <button class="copyWal" title="Add this card to pocket" on:click={()=>copyWalToPocket(def.id)}>
-          <SvgIcon color="#c2c2c2" icon=addToPocket size="25px"/>
-        </button>
-      {/if}
-        
+    <div 
+      class:column-summary={!embedded} 
+      style="width:{width}px; color: {color}"
+      title="Column: {def.name}&#10;Type: {ColumnType[def.type]}&#10;Summary: {SumType[sumType]}"
+    >
         {#if sumType == SumType.Sum}
           {@const sum = Object.values(querriedData).reduce((acc, row) => {
             const cell = row.cells[def.id];
@@ -181,8 +179,14 @@
           &nbsp;--
         {/if}
 
+        {#if store.weClient && !embedded}
+          <button class="copyWal" title="Add this card to pocket" on:click={()=>copyWalToPocket(def.id)}>
+            <SvgIcon color="#c2c2c2" icon=addToPocket size="25px"/>
+          </button>
+        {/if}
+
         {#if !embedded}
-          <div style="float: right; color: #c2c2c2; margin: 2px;">
+          <div style="float: right; color: #fff; margin: 2px;">
             {SumType[sumType]}
           {#if def.type == ColumnType.Number || def.type == ColumnType.Currency}
             <select
@@ -276,8 +280,16 @@
     border: 1px solid rgb(97, 97, 97);
   }
 
+  .column-summary .copyWal {
+    opacity: 0;
+  }
+
+  .column-summary:hover .copyWal {
+    opacity: 1;
+  }
+
   select {
-    background-color: #c2c2c2;
+    background-color: #8a8a8a;
     color: #ece0cc;
     border: none;
     height: 18px;

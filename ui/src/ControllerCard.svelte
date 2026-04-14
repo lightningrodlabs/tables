@@ -4,7 +4,7 @@
     import type { AppClient, EntryHash } from '@holochain/client';
     import type { SynStore } from '@holochain-syn/store';
     import type { ProfilesStore } from "@holochain-open-dev/profiles";
-    import type { WeClient, WAL } from '@lightningrodlabs/we-applet';
+    import type { WeClient, WAL } from '@theweave/api';
     import CellDisplay from './CellDisplay.svelte';
     import SummaryRow from './SummaryRow.svelte';
     import { getTableValues, getRowValues, getColumnValues, getValueOfCell, getValueOfColumnSummary } from './DataHelpers';

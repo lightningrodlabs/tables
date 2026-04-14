@@ -1,0 +1,82 @@
+{
+  "version": "1",
+  "name": "Contacts List",
+  "description": "A simple contacts list template with table and dashboard view",
+  "boards": [
+    {
+      "status": "complete",
+      "name": "Contacts List",
+      "rows": [
+        {
+          "id": "72395f60-0e93-11f1-bbd7-89708570acf9",
+          "props": {
+            "attachments": []
+          },
+          "creator": "uhCAkiwqDW9D7rMHbY99_O9sB3y1pgtuf4sR2bFuyh56ob9p2SJ1W",
+          "cells": {
+            "col-name": {
+              "value": "Example name",
+              "attachments": []
+            },
+            "col-phone": {
+              "value": "1234567890",
+              "attachments": []
+            },
+            "col-email": {
+              "value": "example@example.com",
+              "attachments": []
+            },
+            "col-notes": {
+              "value": "Example note",
+              "attachments": []
+            }
+          }
+        }
+      ],
+      "queries": [],
+      "summaryRows": [],
+      "labelDefs": [],
+      "columnDefs": [
+        {
+          "id": "col-name",
+          "name": "Name",
+          "type": 0
+        },
+        {
+          "id": "col-phone",
+          "name": "Phone",
+          "type": 0
+        },
+        {
+          "id": "col-email",
+          "name": "Email",
+          "type": 0
+        },
+        {
+          "id": "col-notes",
+          "name": "Notes",
+          "type": 0
+        }
+      ],
+      "boundTo": [],
+      "props": {
+        "bgUrl": "",
+        "attachments": []
+      }
+    }
+  ],
+  "mirrors": [
+    {
+      "status": "complete",
+      "name": "Contacts View",
+      "variables": [],
+      "raw": "<!DOCTYPE html>\n<html>\n<head>\n    <style>\n        .card {\n            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);\n            transition: 0.3s;\n            width: 300px;\n            margin-bottom: 20px;\n        }\n\n        .card:hover {\n            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);\n        }\n\n        .container {\n            padding: 2px 16px;\n        }\n\n        #contacts {\n            display: flex;\n            flex-wrap: wrap;\n            gap: 20px;\n        }\n    </style>\n</head>\n<body>\n\n<div id='contacts'></div>\n\n<script>\n    var contacts = !inject{var_1};\n\n    contacts.forEach(function(contact) {\n        var card = document.createElement('div');\n        card.className = 'card';\n\n        var container = document.createElement('div');\n        container.className = 'container';\n\n        if (contact[0]) {\n            var h4 = document.createElement('h4');\n            h4.innerHTML = '<b>' + contact[0] + '</b>';\n            container.appendChild(h4);\n        }\n\n        if (contact[1]) {\n            var p2 = document.createElement('p');\n            p2.textContent = 'Phone: ' + contact[1];\n            container.appendChild(p2);\n        }\n\n        if (contact[2]) {\n            var p3 = document.createElement('p');\n            p3.textContent = 'Address: ' + contact[2];\n            container.appendChild(p3);\n        }\n\n        if (contact[3]) {\n            var p4 = document.createElement('p');\n            p4.textContent = 'Notes: ' + contact[3];\n            container.appendChild(p4);\n        }\n\n        card.appendChild(container);\n\n        document.getElementById('contacts').appendChild(card);\n    });\n</script>\n\n</body>\n</html>",
+      "props": {
+        "bgUrl": "",
+        "attachments": []
+      },
+      "boundTo": [],
+      "feed": {}
+    }
+  ]
+}

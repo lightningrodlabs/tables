@@ -4,7 +4,7 @@
   import type SlInput from '@shoelace-style/shoelace/dist/components/input/input.js';
   import { getContext, onMount } from "svelte";
   import { onVisible } from './util';
-  import { isWeContext, type WAL, weaveUrlFromWal } from "@lightningrodlabs/we-applet";
+  import { isWeaveContext, type WAL, weaveUrlFromWal } from '@theweave/api';
   import { ColumnType, type Cell, Board, ColumnDef } from './board';
   import { createEventDispatcher } from "svelte";
   import AttachmentsList from './AttachmentsList.svelte';
@@ -16,7 +16,7 @@
 
   import "@holochain-open-dev/profiles/dist/elements/search-agent.js";
   import "@holochain-open-dev/profiles/dist/elements/profiles-context.js";
-  import '@lightningrodlabs/we-elements/dist/elements/wal-embed.js';
+  import '@theweave/elements/dist/elements/wal-embed.js';
 
   import SvgIcon from './SvgIcon.svelte';
 
@@ -70,7 +70,7 @@
 {:else if def.type === ColumnType.Label}
   <!-- background color should be derrived mathematically from value -->
   <div style="font-size: 13px; font-weight: bold; margin: 2px 0; padding: 0 4px; color: black; background-color:{stringToColor(cell.value)}">{cell.value}</div>
-{:else}
+{:else if cell.value}
   {cell.value}
 {/if}
 {/if}

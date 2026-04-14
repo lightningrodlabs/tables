@@ -12,6 +12,8 @@
     import { encodeHashToBase64 } from "@holochain/client";
     import { v1 as uuidv1 } from "uuid";
     import Papa from "papaparse";
+    import type { Mirror, MirrorState, MirrorEphemeralState } from "./mirror";
+    import { MirrorType } from "./mirrorList";
     
     const { getStore } :any = getContext('store');
     
@@ -26,21 +28,43 @@
         let reader = new FileReader();
 
         reader.addEventListener("load", async () => {
-            const importedBoardStates = deserializeExport(reader.result as string)
-            if ( importedBoardStates.length > 0) {
-                const boards:Array<Board> = []
-                for (const b of importedBoardStates) {
-                    console.log("importing", b.name)
+            const imported = deserializeExport(reader.result as string)
+            const boards:Array<Board> = []
+            const mirrors:Array<Mirror> = []
+            
+            // Import boards
+            if (imported.boards.length > 0) {
+                for (const b of imported.boards) {
+                    console.log("importing board", b.name)
                     try {
                         boards.push(await store.boardList.makeBoard(b))
                     } catch(e) {
-                        console.log("error importing", b.name, e)
+                        console.log("error importing board", b.name, e)
                     }
                 }
-                if (importedBoardStates.length == 1) {
-                    store.setUIprops({showMenu:false})
-                    boards[0].join()
-                    store.setActiveBoard(boards[0].hash)
+            }
+            
+            // Import mirrors
+            if (imported.mirrors.length > 0) {
+                for (const m of imported.mirrors) {
+                    console.log("importing view", m.name)
+                    try {
+                        mirrors.push(await store.mirrorList.makeMirror(m))
+                    } catch(e) {
+                        console.log("error importing view", m.name, e)
+                    }
+                }
+            }
+            
+            // If only one item imported, activate it
+            const totalImported = boards.length + mirrors.length
+            if (totalImported == 1) {
+                store.setUIprops({showMenu:false})
+                if (boards.length == 1) {
+                    await boards[0].join()
+                    await store.setActiveBoard(boards[0].hash)
+                } else if (mirrors.length == 1) {
+                    await store.setActiveMirror(mirrors[0].hash)
                 }
             }
             importing = false
@@ -92,20 +116,36 @@
     }
     const exportAllBoards = async () => {
         const boardStates = []
+        const mirrorStates = []
         exporting = true
 
-        const hashes = await toPromise(asyncDerived(store.synStore.documentsByTag.get(BoardType.active),x=>Array.from(x.keys())))
-        const docs = hashes.map(hash=>new DocumentStore<BoardState, BoardEphemeralState>(store.synStore, hash))
-        for (const docStore of docs) {
+        // Export boards
+        const boardHashes = await toPromise(asyncDerived(store.synStore.documentsByTag.get(BoardType.active),x=>Array.from(x.keys())))
+        const boardDocs = boardHashes.map(hash=>new DocumentStore<BoardState, BoardEphemeralState>(store.synStore, hash))
+        for (const docStore of boardDocs) {
             try {
                 const workspaces = await toPromise(docStore.allWorkspaces)
                 const workspaceStore = new WorkspaceStore(docStore, Array.from(workspaces.keys())[0])
                 boardStates.push(await toPromise(workspaceStore.latestSnapshot))
             } catch(e) {
-                console.log("Error getting snapshot for ", encodeHashToBase64(docStore.documentHash), e)
+                console.log("Error getting board snapshot for ", encodeHashToBase64(docStore.documentHash), e)
             }
         }
-        exportBoards(boardStates)
+        
+        // Export mirrors
+        const mirrorHashes = await toPromise(asyncDerived(store.synStore.documentsByTag.get(MirrorType.active),x=>Array.from(x.keys())))
+        const mirrorDocs = mirrorHashes.map(hash=>new DocumentStore<MirrorState, MirrorEphemeralState>(store.synStore, hash))
+        for (const docStore of mirrorDocs) {
+            try {
+                const workspaces = await toPromise(docStore.allWorkspaces)
+                const workspaceStore = new WorkspaceStore(docStore, Array.from(workspaces.keys())[0])
+                mirrorStates.push(await toPromise(workspaceStore.latestSnapshot))
+            } catch(e) {
+                console.log("Error getting view snapshot for ", encodeHashToBase64(docStore.documentHash), e)
+            }
+        }
+        
+        exportBoards(boardStates, mirrorStates)
         exporting = false
     }
     let importing = false
@@ -116,7 +156,7 @@
 </script>
 
 
-<sl-dialog label="Datatub: UI v0.10.1 for DNA v0.10.0-dev.0" bind:this={dialog} width={600} >
+<sl-dialog label="Datatub: UI v0.10.9 for DNA v0.10.5" bind:this={dialog} width={600} >
     <div class="about">
         <p>Datatub is a demonstration Holochain app built by Lightning Rod Labs.</p>
         <p> <b>Developers:</b>

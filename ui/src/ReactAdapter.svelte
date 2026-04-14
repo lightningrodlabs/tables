@@ -28,20 +28,15 @@
 
 <style>
   :global(.ruleGroup) {
-    /* background-color: #b789327b;
-    border-color: #b78932db; */
     background-color: #6f6f6f7b;
     border-color: #dbdbdbdb;
     width: fit-content;
     border-radius: 0;
-    /* border: 0; */
-    margin: 12px;
     margin-top: 6px;
+    margin-bottom: 6px;
   }
 
   :global(.ruleGroup select, .ruleGroup button, .ruleGroup input) {
-    /* background-color: #986526;
-    border: 1px solid #b78932db; */
     background-color: #6f6f6f7b;
     border: 1px solid #dbdbdbdb;
     color: #ffffffca;

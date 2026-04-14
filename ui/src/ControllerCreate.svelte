@@ -4,7 +4,7 @@
   import type { AppAgentClient } from '@holochain/client';
   import { SynStore } from '@holochain-syn/store';
   import type { ProfilesStore } from "@holochain-open-dev/profiles";
-  import type { WeaveClient } from '@lightningrodlabs/we-applet';
+  import type { WeaveClient } from '@theweave/api';
   import { SynClient } from '@holochain-syn/core';
   import { getMyDna } from './util';
   import { Board } from './board';
@@ -49,11 +49,11 @@ let disabled = true
             disabled={disabled}
             on:click={async ()=>{
             try {
-              const synStore = new SynStore(new SynClient(client, roleName));
+              const synStore = new SynStore(new SynClient(client, roleName), true);
               //const hrlB64 = weaveUrlFromWal(attachToWAL)
               const board = await Board.Create(synStore, {/*boundTo:[hrlB64]*/name: inputElement.value})
               const dnaHash = await getMyDna(roleName, client)
-              view.resolve({hrl:[dnaHash, board.hash]})
+              view.resolve({hrl:[dnaHash, board.hash], context: {assetType: "Table"}})
             } catch(e) {
               console.log("ERR",e)
               view.reject(e)

@@ -1,6 +1,6 @@
 {
   "name": "ui",
-  "version": "0.1.0",
+  "version": "0.10.5",
   "scripts": {
     "start": "vite --clearScreen false --port $UI_PORT",
     "build": "vite build",
@@ -9,21 +9,20 @@
     "package": "rm -f dist.zip && npm run build && cd dist && bestzip ../dist.zip *"
   },
   "dependencies": {
-    "@holochain-open-dev/elements": "^0.400.0-dev.3",
-    "@holochain-open-dev/profiles": "^0.400.0-dev.4",
-    "@holochain-open-dev/stores": "^0.400.0-dev.3",
-    "@holochain-open-dev/utils": "^0.400.0-dev.4",
-    "@holochain-syn/core": "^0.400.0-rc.0",
-    "@holochain/client": "0.18.0-dev.13",
-    "@lightningrodlabs/we-applet": "^0.17.0",
-    "@lightningrodlabs/we-elements": "^0.6.0-dev.0",
+    "@holochain-open-dev/elements": "^0.601.0",
+    "@holochain-open-dev/profiles": "^0.601.3",
+    "@holochain-open-dev/stores": "^0.601.0",
+    "@holochain-open-dev/utils": "^0.601.0",
+    "@holochain-syn/core": "^0.601.3",
+    "@holochain/client": "^0.20.4-rc.0",
+    "@theweave/api": "^0.6.6",
+    "@theweave/elements": "^0.6.3",
+    "vite-plugin-wasm": "^3.5.0",
     "react":"18.2.0",
     "react-dom":"18.2.0",
     "react-querybuilder": "7.1.0",
     "jspdf": "^2.5.1",
     "iframe2image": "^0.2.1",
-    "golden-layout": "1.5.9",
-    "svelte-golden-layout": "0.1.1",
     "@mdi/js": "^7.1.96",
     "@ts-stack/markdown": "^1.5.0",
     "lodash": "^4.17.21",
@@ -39,10 +38,9 @@
     "@types/javascript-time-ago": "^2.0.3",
     "highlight.js": "^11.9.0",
     "papaparse": "^5.4.1",
-    "codemirror": "6.0.1",
-    "@vanillawc/wc-codemirror": "^2.1.0",
-    "svelte-codemirror-editor": "^1.4.0",
-    "@codemirror/lang-javascript": "6.2.2"
+    "sass": "^1.97.2",
+    "svelte-split-pane": "^0.1.2",
+    "ace-builds": "^1.43.5"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^2.0.2",

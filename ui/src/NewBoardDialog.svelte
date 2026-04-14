@@ -38,11 +38,7 @@
     on:sl-initial-focus={(e)=>{
         boardEditor.initialFocus()
         e.preventDefault()
-    }}
-    on:sl-request-close={(event)=>{
-        if (event.detail.source === 'overlay') {
-        event.preventDefault();    
-  }}}>
+    }}>
 
     <BoardEditor bind:this={boardEditor}  handleSave={addBoard} cancelEdit={()=>dialog.hide()} />
 </sl-dialog>

@@ -10,6 +10,7 @@ import {
     decodeHashFromBase64,
     type Timestamp,
     type DnaHash,
+    HoloHashMap,
   } from '@holochain/client';
 import { SynStore,  SynClient} from '@holochain-syn/core';
 import { BoardList } from './boardList';
@@ -20,8 +21,7 @@ import type { v1 as uuidv1 } from "uuid";
 import { get, writable, type Unsubscriber, type Writable } from "svelte/store";
 import type { ProfilesStore } from '@holochain-open-dev/profiles';
 import type { BoardState } from './board';
-import type { WeaveClient } from '@lightningrodlabs/we-applet';
-import { HoloHashMap } from '@holochain-open-dev/utils';
+import type { WeaveClient } from '@theweave/api';
 import { getMyDna } from './util';
 
 
@@ -86,7 +86,7 @@ export class TablesStore {
           this.roleName,
           this.zomeName
         );
-        this.synStore = new SynStore(new SynClient(this.client,this.roleName,this.zomeName))
+        this.synStore = new SynStore(new SynClient(this.client,this.roleName,this.zomeName), true)
         this.boardList = new BoardList(profilesStore, this.synStore, weClient)
         this.mirrorList = new MirrorList(profilesStore, this.synStore, weClient)
         this.boardList.activeBoard.subscribe((board)=>{
@@ -173,6 +173,9 @@ export class TablesStore {
     }
 
     async setActiveBoard(hash: EntryHash | undefined) {
+        // Close any active mirror first
+        await this.mirrorList.setActiveMirror(undefined)
+        
         const board = await this.boardList.setActiveBoard(hash)
         // let bgUrl = ""
         // if (board) {
@@ -185,6 +188,9 @@ export class TablesStore {
     }
 
     async setActiveMirror(hash: EntryHash | undefined) {
+        // Close any active board first
+        await this.boardList.setActiveBoard(undefined)
+        
         const mirror = await this.mirrorList.setActiveMirror(hash)
         this.setUIprops({showMenu:false})
     }
@@ -201,6 +207,13 @@ export class TablesStore {
 
     async archiveBoard(documentHash: EntryHash) {
         const wasActive = this.boardList.archiveBoard(documentHash)
+        if (wasActive ) {
+            this.setUIprops({showMenu:true, bgUrl:""})
+        }
+    }
+
+    async archiveMirror(documentHash: EntryHash) {
+        const wasActive = this.mirrorList.archiveMirror(documentHash)
         if (wasActive ) {
             this.setUIprops({showMenu:true, bgUrl:""})
         }

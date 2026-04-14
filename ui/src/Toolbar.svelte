@@ -25,7 +25,10 @@
   <div class="items">
     <!-- <BoardMenu></BoardMenu> -->
     <h1 style="margin-left: 20px; font-size: 24px; font-family:math; font-style: oblique;
-    letter-spacing: 4px;">data⊈tub</h1>
+    letter-spacing: 4px;">
+      <!-- data⊈tub -->
+      datatub
+    </h1>
     <!-- {#if $activeHash}
     <div style="margin-left: 20px;">
       <BoardMenuItem boardType={BoardType.archived} boardHash={$activeHash} />
@@ -56,7 +59,8 @@
   }
   .toolbar {
     /* background: linear-gradient(90.1deg, rgb(101 62 14) 0%, rgb(118, 75, 26) 100%); */
-    background: linear-gradient(90.1deg, rgb(26, 14, 101) 0%, rgb(26, 72, 118) 100%);
+    /* background: linear-gradient(90.1deg, rgb(26, 14, 101) 0%, rgb(26, 72, 118) 100%); */
+    background: rgba(0, 0, 0, 0.555);
     align-items: center;
     justify-content: space-between;
     color: #fff;

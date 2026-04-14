@@ -411,12 +411,12 @@ export interface BoardState {
             if (state.rows[i].id == delta.cellId.rowId) {
               let cell = state.rows[i].cells[delta.cellId.columnId]
               if (cell) {
-                cell = cloneDeep(cell)
-                cell.value = delta.value
+                // Update the cell in place for Automerge
+                state.rows[i].cells[delta.cellId.columnId].value = delta.value
               } else {
-                cell = {value:delta.value, attachments: []}
+                // Create new cell object
+                state.rows[i].cells[delta.cellId.columnId] = {value:delta.value, attachments: []}
               }
-              state.rows[i].cells[delta.cellId.columnId] = cell
             }
           }
           break;

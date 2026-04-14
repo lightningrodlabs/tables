@@ -16,7 +16,7 @@
   import ClickEdit from './ClickEdit.svelte';
   import AttachmentsList from './AttachmentsList.svelte';
   import AttachmentsDialog from "./AttachmentsDialog.svelte"
-  import type { WAL } from '@lightningrodlabs/we-applet';
+  import type { WAL } from '@theweave/api';
   
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
@@ -86,8 +86,8 @@
   }
 
   const walToPocket = () => {
-    const attachment: WAL = { hrl: [store.dnaHash, $activeBoard.hash], context: rowId }
-    store.weClient?.walToPocket(attachment)
+    const attachment: WAL = { hrl: [store.dnaHash, $activeBoard.hash], context: {assetType: "Row", rowId} }
+    store.weClient?.assets.assetToPocket(attachment)
   }
 
   const columnName = (defId: ColumnId) => {
@@ -146,21 +146,6 @@
             {/each}
           {/if}
       </div>
-
-    {#if store.weClient}
-      <div style="display:flex; flex-wrap:wrap; align-items: center; margin-bottom:10px;">
-        <div style="margin-left:20px; margin-right:10px;">
-          <button title="Manage Record Attachments" class="attachment-button" 
-            on:click={()=>attachmentsDialog.open(row.props.attachments,"row")} >          
-            <SvgIcon icon="link" size="16px"/>
-          </button>
-        </div>
-        {#if props.attachments}
-          <AttachmentsList attachments={props.attachments}
-            on:remove-attachment={(e)=>removeAttachment(e.detail)}/>
-        {/if}
-      </div>
-    {/if}
 
     </div>
   </div>
