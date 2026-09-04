@@ -7,7 +7,6 @@ import { MirrorType } from './mirrorList';
 import type { AppletHash, AppletServices, AssetInfo, WAL, WeaveServices, RecordInfo } from '@theweave/api';
 import { getMyDna } from './util';
 import { LazyHoloHashMap, type AppClient } from '@holochain/client';
-import { svgIcons } from "./svgIcons"
 
 const ROLE_NAME = "tables"
 const ZOME_NAME = "syn"
@@ -31,15 +30,11 @@ export const appletServices: AppletServices = {
       }
     },
 
-    // Types of UI widgets/blocks that this Applet supports
-    blockTypes: {
-      'active_boards': {
-        label: 'Active Boards',
-        icon_src: svgIcons["datatubMini"],
-        // `<svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 96C0 60.7 28.7 32 64 32H448c35.3 0 64 28.7 64 64V416c0 35.3-28.7 64-64 64H64c-35.3 0-64-28.7-64-64V96zm64 0v64h64V96H64zm384 0H192v64H448V96zM64 224v64h64V224H64zm384 0H192v64H448V224zM64 352v64h64V352H64zm384 0H192v64H448V352z"/></svg>`,
-        view: "applet-view",
-      },
-    },
+    // NOTE (Holochain 0.7 / Moss 0.16 upgrade): `blockTypes` and the 'block'
+    // AppletView were removed from @theweave/api. AppletServices is now
+    // { creatables, getAssetInfo, search } and AppletView is
+    // 'main' | 'asset' | 'creatable'. The 'active_boards' block declared here has
+    // no 0.7 equivalent, so it is gone. See App.svelte for the matching removal.
     getAssetInfo: async (
       appletClient: AppClient,
       wal: WAL,

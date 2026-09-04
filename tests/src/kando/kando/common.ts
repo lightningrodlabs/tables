@@ -1,2 +1,2 @@
-import { CallableCell } from '@holochain/tryorama';
-import { Timestamp, NewEntryAction, ActionHash, Record, AppBundleSource, fakeActionHash, fakeAgentPubKey, fakeEntryHash, fakeDnaHash } from '@holochain/client';
+import type { CallableCell } from '@holochain-open-dev/tryorama';
+import { Timestamp, ActionHash, Record, AppBundleSource, fakeActionHash, fakeAgentPubKey, fakeEntryHash, fakeDnaHash } from '@holochain/client';

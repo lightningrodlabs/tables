@@ -52,6 +52,13 @@ export class MirrorList {
                                 const key = `${SeenType.Tip}:${mirror.hashB64}`
                                 const seenTipB64 = localStorage.getItem(key)
 
+                                // NOTE (Holochain 0.7 / syn 0.700.1): if this notification
+                                // block is ever revived, `stateFromCommit` must NOT be used.
+                                // syn 0.700.1 still exports it, but it THROWS on any delta
+                                // commit, and with the default SnapshotEveryNCommits=20 about
+                                // 19 commits in 20 are deltas. Use the async
+                                // `docStore.resolveCommitState(tipRecord)` instead, which takes
+                                // the EntryRecord<Commit> (not `.entry`) and returns a Promise.
                                 // if (tipB64 != seenTipB64) {
                                 //     const mirrorState = stateFromCommit(tipRecord.entry) as MirrorState
                                 //     const feed = feedItems(mirrorState.feed)

@@ -9,9 +9,8 @@
     import '@shoelace-style/shoelace/dist/components/menu/menu.js';
     import '@shoelace-style/shoelace/dist/components/menu-item/menu-item.js';
     import '@shoelace-style/shoelace/dist/components/menu-label/menu-label.js';
-    import type { v1 as uuidv1 } from "uuid";
     import { toPromise } from "@holochain-open-dev/stores";
-    import type { BoardState, BoardStateData } from "./board";
+    import type { BoardState, BoardStateData, Uuid } from "./board";
     import type { MirrorState, MirrorStateData } from "./mirror";
     import type { TablesStore } from "./store";
 
@@ -19,7 +18,7 @@
     type FoundCard = {
         hash: EntryHash,
         state: BoardState,
-        card: uuidv1,
+        card: Uuid,
         title: string,
     }
     let foundCards: Array<FoundCard> = []

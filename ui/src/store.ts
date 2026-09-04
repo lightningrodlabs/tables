@@ -17,10 +17,9 @@ import { BoardList } from './boardList';
 import { MirrorList } from './mirrorList';
 import TimeAgo from "javascript-time-ago"
 import en from 'javascript-time-ago/locale/en'
-import type { v1 as uuidv1 } from "uuid";
 import { get, writable, type Unsubscriber, type Writable } from "svelte/store";
 import type { ProfilesStore } from '@holochain-open-dev/profiles';
-import type { BoardState } from './board';
+import type { BoardState, Uuid } from './board';
 import type { WeaveClient } from '@theweave/api';
 import { getMyDna } from './util';
 
@@ -149,19 +148,19 @@ export class TablesStore {
         })
     }
 
-    updateLatestComment(boardHash: EntryHash, cardId:uuidv1, timestamp:Timestamp) {
+    updateLatestComment(boardHash: EntryHash, cardId:Uuid, timestamp:Timestamp) {
         localStorage.setItem(`${SeenType.Comment}:${encodeHashToBase64(boardHash)}:${cardId}`, `${timestamp}`)
         this.setLatestComment(boardHash,cardId,timestamp)
     }
 
-    setLatestComment(boardHash: EntryHash, cardId:uuidv1, timestamp:Timestamp) {
+    setLatestComment(boardHash: EntryHash, cardId:Uuid, timestamp:Timestamp) {
         this.uiProps.update((n) => {
             n.latestComment[`${encodeHashToBase64(boardHash)}:${cardId}`] = timestamp
             return n
         })
     }
 
-    getLatestComment(boardHash: EntryHash, cardId:uuidv1) : Timestamp {
+    getLatestComment(boardHash: EntryHash, cardId:Uuid) : Timestamp {
         return get(this.uiProps).latestComment[`${encodeHashToBase64(boardHash)}:${cardId}`]
     }
 

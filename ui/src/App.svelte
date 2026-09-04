@@ -32,6 +32,14 @@
     App,
     Hrl,
     CreateBoard,
+    // BlockActiveBoards is no longer reachable: @theweave/api 0.7 removed the
+    // 'block' AppletView and AppletServices.blockTypes, so nothing can ever set
+    // this. It and ControllerBlockActiveBoards.svelte are kept deliberately --
+    // they document the surface that was lost, they are revivable if Moss brings
+    // blocks back, and deleting a component is churn inside an upgrade commit on
+    // a DNA line about to be frozen. (In practice this particular block already
+    // threw on the 0.6 line: the arm read `view.recordInfo.block` while the 0.6
+    // AppletView block variant only had `view.block`.)
     BlockActiveBoards,
     Cells
   }
@@ -74,15 +82,6 @@
             case "main":
               // here comes your rendering logic for the main view
               break;
-            case "block":
-              switch(weClient.renderInfo.view.recordInfo.block) {
-                case "active_boards":
-                  renderType = RenderType.BlockActiveBoards
-                  break;
-                default:
-                  throw new Error("Unknown applet-view block type:"+weClient.renderInfo.view.recordInfo.block);
-              }
-              break;
             case "asset":
               switch (weClient.renderInfo.view.recordInfo.roleName) {
                 case "tables":
@@ -122,9 +121,6 @@
           switch (this.weClient.renderInfo.view.recordInfo.type) {
             case "main":
               // here comes your rendering logic for the cross-applet main view
-              //break;
-            case "block":
-              //
               //break;
             default:
               throw new Error("Unknown cross-applet-view render type.")
@@ -181,6 +177,8 @@
       <ControllerCard  {wal} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerCard>
     {:else if  renderType== RenderType.Hrl}
       <ControllerBoard  board={wal.hrl[1]} client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerBoard>
+    <!-- unreachable in Moss 0.16 / @theweave/api 0.7: the 'block' AppletView is gone.
+         Kept to document the lost surface -- see the RenderType comment above. -->
     {:else if  renderType== RenderType.BlockActiveBoards}
       <ControllerBlockActiveBoards client={client} weClient={weClient} profilesStore={profilesStore} roleName={roleName}></ControllerBlockActiveBoards>
     {/if}

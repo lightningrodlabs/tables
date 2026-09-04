@@ -9,8 +9,15 @@ members = ["dnas/*/zomes/coordinator/*", "dnas/*/zomes/integrity/*"]
 resolver = "2"
 
 [workspace.dependencies]
-hdi = "0.7.0"
-hdk = "0.6.0"
+# Frozen 0.7 line: these versions determine the DNA hash. Never bump them on this
+# line, not even for a 0.7.x patch -- a different hdi/hdk produces a different DNA
+# hash and therefore a different, incompatible network.
+# NOTE: these workspace pins are documentation, not the mechanism. No crate in this
+# repo writes `hdk = { workspace = true }`; the zome sources are one-line
+# `extern crate` re-exports, so hdi/hdk arrive transitively via the profiles and syn
+# git tags. What actually holds the line is Cargo.lock plus those two tags.
+hdi = "=0.8.0"
+hdk = "=0.7.0"
 serde = "1"
 
 [workspace.dependencies.tables]

@@ -7,22 +7,30 @@ import type { WALUrl } from "./util";
 import { cloneDeep } from "lodash";
 import { reorder } from "svelte-dnd-list";
 
+/** The id type used throughout the board state: a uuid string, as returned by
+ *  `uuidv1()`. The `uuidv1` import is a *value* (the generator function), so using
+ *  it in type position only ever worked because `uuid@8` shipped no declarations
+ *  and the import resolved to an implicit `any`. Hoisting a declaration-carrying
+ *  `uuid` to the workspace root makes that visible and it becomes an error.
+ *  `Uuid` is the honest spelling and is erased identically. */
+export type Uuid = string;
+
 export class LabelDef {
-    type: uuidv1
+    type: Uuid
     constructor(public emoji: string, public toolTip: string){
         this.type = uuidv1()
     }
 }
 
 export class Query {
-  id: uuidv1
+  id: Uuid
   constructor(public label: string, public query: any){
       this.id = uuidv1()
   }
 }
 
 export class SummaryRow {
-  id: uuidv1
+  id: Uuid
   constructor(public query: any, public queryLabel, public summaryDefs: any){
     this.id = uuidv1()
   }
@@ -71,8 +79,8 @@ export type RowProps = {
   attachments: Array<WALUrl>
 }
 
-export type RowId = uuidv1
-export type ColumnId = uuidv1
+export type RowId = Uuid
+export type ColumnId = Uuid
 
 export class Row {
   id: RowId
@@ -197,7 +205,7 @@ export interface BoardState {
       }
     | {
       type: "remove-summary-row";
-      id: uuidv1;
+      id: Uuid;
     }
     | {
         type: "set-name";
@@ -232,8 +240,8 @@ export interface BoardState {
       }
     | {
         type: "set-column-order";
-        id: uuidv1;
-        order: Array<uuidv1>;
+        id: Uuid;
+        order: Array<Uuid>;
       }
 
 
