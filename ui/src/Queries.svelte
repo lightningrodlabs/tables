@@ -103,7 +103,7 @@ function injectColumnNames(query) {
 <!-- <div style="margin-left: 68px;"> -->
 <div>
 
-  <div style="display: flex; margin: 7px;">
+  <div style="display: flex; margin: 2px 7px; align-items: center;">
 
     <button class="new-query"
       on:click={() => 
@@ -218,10 +218,9 @@ function injectColumnNames(query) {
   }
 
   .new-query {
-    width: 68px;
-    padding: 0px;
-    font-size: 12px;
-    height: 33px;
+    padding: 0 8px;
+    font-size: 11px;
+    height: 20px;
     background-color: rgb(105, 105, 105);
     color: white;
     font-weight: bold;

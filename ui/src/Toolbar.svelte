@@ -2,13 +2,14 @@
   import Folk from "./Folk.svelte";
   import type { ProfilesStore } from "@holochain-open-dev/profiles";
   import Search from './Search.svelte';
-  import { getContext } from "svelte";
+  import { createEventDispatcher, getContext } from "svelte";
   import type { TablesStore } from "./store";
   import SvgIcon from "./SvgIcon.svelte";
   import BoardMenu from "./BoardMenu.svelte";
   import BoardMenuItem from "./BoardMenuItem.svelte";
     import { BoardType } from "./boardList";
 
+  const dispatch = createEventDispatcher();
   const { getStore } :any = getContext("store");
   let store: TablesStore = getStore();
 
@@ -41,6 +42,12 @@
     <a href="https://github.com/lightningrodlabs/tables/issues" title="Report a problem in our GitHub repo" target="_blank">
       <div class="nav-button"><SvgIcon color="#fff" icon="faBug" size=20px /></div>
     </a>
+    <div
+      class="nav-button"
+      style="cursor: pointer;"
+      title="About and settings"
+      on:click={() => dispatch("settings")}
+    ><SvgIcon color="#fff" icon="faCog" size=20px /></div>
   </div>
 </div>
 

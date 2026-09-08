@@ -264,8 +264,9 @@
   bind:this={rowDetailsDrawer}
 />
 
-<div class="board" >
+<div class="board" class:embed={standAlone}>
     <EditBoardDialog bind:this={editBoardDialog}></EditBoardDialog>
+  {#if !standAlone}
   <div class="top-bar">
     <div class="left-items">
       {#if standAlone}
@@ -369,6 +370,7 @@
 
     </div>
   </div>
+  {/if}
   {#if $state}
 
   {#if showQueryBuilder && $state.queries}
@@ -890,14 +892,30 @@
     background: transparent;
     border-radius: 0;
     min-height: 0;
+    /* Without this a flex item keeps min-width: auto and will not shrink below
+       its content, so a wide table pushed .board past its parent instead of
+       scrolling inside it -- which is why removing overflow-x here only moved
+       the scrollbar somewhere else rather than removing it. */
+    min-width: 0;
+    /* .board is the table's own horizontal scroller, so this stays. */
     overflow-x: auto;
     width: 100%;
     position: relative;
-    height: calc(100vh - 92px);
+    /* was height: calc(100vh - 92px) -- right for a full applet window, wrong
+       for an embed or asset frame, and the 92px was a guess at the chrome above
+       it. Fills whatever box it is given now. */
+    flex: 1 1 auto;
+    max-height: 100%;
     border-bottom: 1px solid #a1a1a1;
   }
   .top-bar {
     /* box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.15); */
+    /* <session-participants> overhangs its own host box by 4px -- its content is
+       in shadow DOM, so no parent sizing reaches it -- and those 4px escaped up
+       to .board, which is the ancestor carrying the skinned blue scrollbar. The
+       top bar is chrome and never scrolls, so contain it here rather than on
+       .board, which would break the table's horizontal scrolling. */
+    overflow: hidden;
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -924,6 +942,7 @@
     display: flex;
     align-items: center;
   }
+
 
   sl-button.board-button::part(base) {
     background-color: transparent;

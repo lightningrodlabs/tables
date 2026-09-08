@@ -43,7 +43,7 @@
 
       <div class="wrapper">
 
-      <div class="workspace" style="display:flex">
+      <div class="workspace" style="display:flex; flex:1 1 auto; min-height:0; min-width:0">
 
 
         {#if $activeBoardHash !== undefined}
@@ -59,18 +59,31 @@
 <style>
   .app {
     margin: 0;
-    padding-bottom: 10px;
     background-size: cover;
     display: flex;
     flex-direction: column;
     min-height: 0;
     background-color: #fff;
-    height: 100vh;
+    /* 100% of .flex-scrollable-container (inset: 0), not of the viewport, and
+       no padding-bottom: under the global border-box that came out of the
+       content box as a dead strip under the table. */
+    height: 100%;
     position: relative;
   }
 
   .wrapper {
     background-color: #fff;
+    /* .wrapper sits between .app and .workspace and was a plain block, so the
+       flex chain died here and nothing below it could fill. */
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    /* A flex item defaults to min-width: auto, so it refuses to shrink below its
+       content's intrinsic width -- with a wide table inside, .board grew past
+       its parent and every ancestor that could scroll showed a bar. This is the
+       horizontal half of the min-height: 0 above it. */
+    min-height: 0;
+    min-width: 0;
   }
 
   :global(:root) {

@@ -63,9 +63,10 @@
 
       <div class="header">
         <Toolbar
-          profilesStore={profilesStore}/>
+          profilesStore={profilesStore}
+          on:settings={() => aboutDialog.open()}/>
       </div>
-      <div class="workspace" style="display:flex;">
+      <div class="workspace" style="display:flex; flex:1 1 auto; min-height:0; min-width:0">
 
         {#if $activeBoardHash !== undefined}
           <TablePane activeBoard={$activeBoard}/>
@@ -100,9 +101,6 @@
         </div>
       </div>
       
-      <div style="cursor: pointer; margin: 10px; margin-top: 10px; margin-left: 30px;" on:click={()=>aboutDialog.open()}>
-        <SvgIcon icon=faCog size="20" color="#000"/> <span style="font-size: 14px; ">v0.10.9</span>
-      </div>
       <AboutDialog bind:this={aboutDialog} />
 
     </div>
@@ -226,6 +224,15 @@
   .wrapper {
     position: relative;
     z-index: 10;
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    /* A flex item defaults to min-width: auto, so it refuses to shrink below its
+       content's intrinsic width -- with a wide table inside, .board grew past
+       its parent and every ancestor that could scroll showed a bar. This is the
+       horizontal half of the min-height: 0 above it. */
+    min-height: 0;
+    min-width: 0;
   }
 
   .type-header {
